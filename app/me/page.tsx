@@ -6,6 +6,8 @@ import Link from "next/link";
 import { buildSavedThoughtHref } from "@/app/lib/savedThoughtHref";
 import { SavedThoughtItem } from "./SavedThoughtItem";
 
+export const dynamic = "force-dynamic";
+
 const mockData: MyPageVM = {
   recent: [],
   traces: [],          // ✅ 추가
