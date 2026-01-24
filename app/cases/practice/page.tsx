@@ -1,0 +1,51 @@
+// law-frontend/app/cases/practice/page.tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
+import { useCaseUI } from "../CaseUIContext";
+import { useCasePractice } from "./useCasePractice";
+import { adaptCasePractice } from "./adapters";
+import { CasePracticeView } from "./CasePracticeView";
+
+
+export default function PracticePage() {
+  const params = useSearchParams();
+  const urlCaseId = params.get("caseId");
+  const urlIssue = params.get("issue");
+  
+  const { caseId, setCaseId, openSidebar } = useCaseUI();
+
+  // ✅ 핵심: URL → Context 동기화
+  useEffect(() => {
+    if (!urlCaseId) return;
+    if (urlCaseId === caseId) return;
+    setCaseId(urlCaseId);
+  }, [urlCaseId, caseId, setCaseId]);
+
+  const practice = useCasePractice(caseId);
+  const [selectedIssue, setSelectedIssue] = useState<string | null>(null);
+
+  if (!caseId) return null;
+  if (practice.loading) return <p style={{ padding: 32 }}>불러오는 중…</p>;
+  if (!practice.data)
+    return <p style={{ padding: 32 }}>Report C를 불러오지 못했어요.</p>;
+
+  const vm = adaptCasePractice(practice.data);
+
+  return (
+        <>
+      <CasePracticeView
+        vm={vm}
+        initialIssue={urlIssue} // 🔥 이슈 자동 선택
+        onOpenMenu={() => {
+          openSidebar();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        onIssueChange={setSelectedIssue}
+      />
+
+    </>
+  );
+}

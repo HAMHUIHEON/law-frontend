@@ -1,0 +1,136 @@
+/* RiskTypologyPage.module.css */
+
+.riskPage {
+  background: #f9fafb;
+  color: #111827;
+}
+
+.riskHeader {
+  padding: 40px;
+}
+
+.bookId {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.riskLayout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  padding: 0 40px 40px;
+}
+
+.riskNav {
+  position: sticky;
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.navItem {
+  text-decoration: none;
+  color: inherit;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.navItem:hover {
+  background: #eef2ff;
+}
+
+.navId {
+  font-weight: 600;
+  font-size: 12px;
+  color: #6366f1;
+}
+
+.navTitle {
+  display: block;
+  font-size: 14px;
+}
+
+.riskContent {
+  min-width: 0;
+}
+
+/* ---------- Card ---------- */
+
+.typologyCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 36px;
+  margin-bottom: 64px;
+}
+
+.typologyHeader h2 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.pageRange {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ---------- Tags ---------- */
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 24px;
+}
+
+.tag {
+  background: #f3f4f6;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #374151;
+}
+
+/* ---------- Why Now ---------- */
+
+.whyNow {
+  border-left: 4px solid #111827;
+  padding-left: 20px;
+  margin: 32px 0;
+}
+
+.whyNow h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #374151;
+}
+
+.whyNow p {
+  line-height: 1.7;
+  margin-top: 8px;
+}
+
+/* ---------- Lists ---------- */
+
+.detailList {
+  margin-top: 32px;
+}
+
+.detailList ul {
+  list-style: none;
+  padding: 0;
+}
+
+.detailList li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.bullet {
+  font-weight: 600;
+  color: #9ca3af;
+}

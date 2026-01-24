@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+/**
+ * Prisma 7에서는 datasource에 url 쓰지 않는다
+ */
+datasource db {
+  provider = "postgresql"
+}
+
+/**
+ * =========================
+ * ENUMS
+ * =========================
+ */
+
+enum ThoughtTargetType {
+  case
+  law
+  strategy
+  document
+  block
+}
+
+enum DocumentRole {
+  owner
+  editor
+  viewer
+}
+
+/**
+ * =========================
+ * RECENT THOUGHTS
+ * =========================
+ */
+
+model RecentThought {
+  id           String            @id @default(uuid())
+  userId       String
+  targetType   ThoughtTargetType
+  targetId     String
+  lastViewedAt DateTime          @default(now())
+
+  @@unique([userId, targetType, targetId])
+  @@index([userId, lastViewedAt])
+}
+
+/**
+ * =========================
+ * SAVED THOUGHTS
+ * =========================
+ */
+
+model SavedThought {
+  id         String            @id @default(uuid())
+  userId     String
+  targetType ThoughtTargetType
+  targetId   String
+  savedAt    DateTime          @default(now())
+
+  @@unique([userId, targetType, targetId])
+  @@index([userId, savedAt])
+}
+
+/**
+ * =========================
+ * DOCUMENTS
+ * =========================
+ */
+
+model Document {
+  id        String   @id @default(uuid())
+  title     String
+  content   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  permissions DocumentPermission[]
+}
+
+/**
+ * =========================
+ * DOCUMENT PERMISSIONS
+ * =========================
+ */
+
+model DocumentPermission {
+  id         String       @id @default(uuid())
+  documentId String
+  userId     String
+  role       DocumentRole
+  createdAt  DateTime     @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+}
