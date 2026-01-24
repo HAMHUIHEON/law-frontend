@@ -6,6 +6,8 @@ import { useCaseStructure } from "./useCaseStructure";
 import { adaptCaseStructure } from "./adapters";
 import { CaseStructureView } from "./CaseStructureView";
 
+export const dynamic = "force-dynamic";
+
 export default function CaseIssuePage() {
   const { caseId, openSidebar } = useCaseUI();
   const { data, loading } = useCaseStructure(caseId);

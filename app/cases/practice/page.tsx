@@ -9,6 +9,7 @@ import { useCasePractice } from "./useCasePractice";
 import { adaptCasePractice } from "./adapters";
 import { CasePracticeView } from "./CasePracticeView";
 
+export const dynamic = "force-dynamic";
 
 export default function PracticePage() {
   const params = useSearchParams();

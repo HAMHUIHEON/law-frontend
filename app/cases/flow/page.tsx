@@ -5,6 +5,8 @@ import { useCaseUI } from "../CaseUIContext";
 import { useCaseFlow } from "./useCaseFlow";
 import { CaseFlowView } from "./CaseFlowView";
 
+export const dynamic = "force-dynamic";
+
 export default function CaseFlowPage() {
   const { caseId, openSidebar } = useCaseUI();
   const flow = useCaseFlow(caseId);
