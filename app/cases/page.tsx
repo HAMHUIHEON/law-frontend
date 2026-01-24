@@ -7,6 +7,7 @@ import { useCaseUI } from "./CaseUIContext";
 import { MainUploadError } from "./MainUploadError";
 
 type MainErrorType = "PDF_UNREADABLE" | null;
+
 export const dynamic = "force-dynamic";
 export default function CasesRootPage() {
   const sp = useSearchParams();

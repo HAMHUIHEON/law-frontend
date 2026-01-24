@@ -6,6 +6,9 @@ import { CaseUIProvider, useCaseUI } from "./CaseUIContext";
 import { useRouter } from "next/navigation";
 import CaseSidebar from "./CaseSidebar";
 import CasesTopBar from "./CasesTopBar";
+import { Suspense } from "react";
+
+
 const CASE_GREEN = "#065f46";
 
 /* ======================================================
@@ -234,7 +237,9 @@ function Shell({ children }: { children: React.ReactNode }) {
 export default function CaseLayout({ children }: { children: React.ReactNode }) {
   return (
     <CaseUIProvider initialCaseId={null}>
-      <Shell>{children}</Shell>
+      <Suspense fallback={null}>
+        <Shell>{children}</Shell>
+      </Suspense>
     </CaseUIProvider>
   );
 }
