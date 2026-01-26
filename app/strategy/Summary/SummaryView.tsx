@@ -28,6 +28,7 @@ const colors = {
   deep: "#4c5159ff",
 };
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 
 export function SummaryView({ bookId }: { bookId: string }) {
@@ -106,7 +107,7 @@ export function SummaryView({ bookId }: { bookId: string }) {
   useEffect(() => {
     const run = async () => {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/publications/a/${bookId}/exec-summary`
+        `${API_BASE}/api/publications/a/${bookId}/exec-summary`
       );
       const raw = await res.json();
       setVm(adaptExecSummary(raw));

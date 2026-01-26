@@ -90,7 +90,6 @@ export default function StrategyPage() {
       {viewMode === "RISK_TYPES" && (
         <RiskTypesView bookId={selectedBookId} />
       )}
-
       {viewMode === "MJU" && (
         <JuBlocksView bookId={selectedBookId} />
       )}
