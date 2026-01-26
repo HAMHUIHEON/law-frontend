@@ -14,7 +14,9 @@ export const dynamic = "force-dynamic";
 export default function PracticePage() {
   const params = useSearchParams();
   const urlCaseId = params.get("caseId");
-  const urlIssue = params.get("issue");
+  
+  const urlIssueParam = params.get("issue");
+  const urlIssue = urlIssueParam ?? undefined; // ✅ 핵심
   
   const { caseId, setCaseId, openSidebar } = useCaseUI();
 
@@ -39,7 +41,7 @@ export default function PracticePage() {
         <>
       <CasePracticeView
         vm={vm}
-        initialIssue={urlIssue} // 🔥 이슈 자동 선택
+        initialIssue={urlIssue} // ✅ undefined면 첫 issue 자동 선택
         onOpenMenu={() => {
           openSidebar();
           window.scrollTo({ top: 0, behavior: "smooth" });
