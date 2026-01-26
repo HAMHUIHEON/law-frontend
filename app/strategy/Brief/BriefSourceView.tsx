@@ -4,6 +4,7 @@
 
 import { useStrategyUI } from "../StrategyUIContext"; // ✅ 이 줄 추가
 import { PAGE_OFFSET_BY_BOOK } from "../pageoffset";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export function BriefSourceView({ bookId }: { bookId: string }) {
   const { briefPage, setBriefPage } = useStrategyUI();
@@ -45,7 +46,7 @@ export function BriefSourceView({ bookId }: { bookId: string }) {
     </div>
 
     <img
-    src={`http://127.0.0.1:8000/api/publications/${bookId}/source/page/${briefPage}`}
+    src={`${API_BASE}/api/publications/${bookId}/source/page/${briefPage}`}
     style={{ width: "100%" }}
     />
     </div>

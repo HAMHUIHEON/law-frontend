@@ -117,6 +117,8 @@ const LawUIContext = createContext<LawUIContextValue | null>(null);
  * Provider
  * ====================================================== */
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
 export function LawUIProvider({ children }: { children: React.ReactNode }) {
   /* ---------- Layout ---------- */
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -170,8 +172,8 @@ export function LawUIProvider({ children }: { children: React.ReactNode }) {
       try {
         const url =
           cleaned.length === 0
-            ? "http://127.0.0.1:8000/api/law/snapshot/by-date"
-            : `http://127.0.0.1:8000/api/law/snapshot/by-date?as_of=${cleaned}`;
+            ? `${API_BASE}/api/law/snapshot/by-date`
+            : `${API_BASE}/api/law/snapshot/by-date?as_of=${cleaned}`;
 
         const res = await fetch(url);
         const data = await res.json();
@@ -205,7 +207,7 @@ export function LawUIProvider({ children }: { children: React.ReactNode }) {
     const run = async () => {
       try {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/law/chapters?set_key=${encodeURIComponent(
+          `${API_BASE}/api/law/chapters?set_key=${encodeURIComponent(
             snapshot.set_key
           )}`,
           { signal: controller.signal }

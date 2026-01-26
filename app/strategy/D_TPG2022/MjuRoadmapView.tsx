@@ -30,6 +30,8 @@ interface MjuRoadmapViewProps {
   bookId: string;
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
 export function MjuRoadmapView({ bookId }: MjuRoadmapViewProps) {
   const { userId } = useAuth();
   const { setViewMode, setSelectedJudgeId } = useStrategyUI();
@@ -86,7 +88,7 @@ export function MjuRoadmapView({ bookId }: MjuRoadmapViewProps) {
         setError(null);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/publications/d/${bookId}/mju_list`
+          `${API_BASE}api/publications/d/${bookId}/mju_list`
         );
 
         if (!res.ok) {

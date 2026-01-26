@@ -1,9 +1,10 @@
 // C_RISK/risk.api.ts
 import { RiskTypologyResponse } from "./types";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export async function getRiskTypologyRaw(bookId: string): Promise<RiskTypologyResponse> {
   const res = await fetch(
-    `http://127.0.0.1:8000/api/publications/c/${encodeURIComponent(bookId)}/typology`
+    `${API_BASE}/api/publications/c/${encodeURIComponent(bookId)}/typology`
   );
 
   if (!res.ok) {

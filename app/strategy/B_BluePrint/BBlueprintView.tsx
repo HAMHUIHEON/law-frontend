@@ -30,6 +30,8 @@ const text = {
   label: { fontSize: 12, fontWeight: 600 },        // 행동/목적/조건 라벨
 };
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
 export function BBlueprintView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   
@@ -53,7 +55,7 @@ export function BBlueprintView({ bookId }: { bookId: string }) {
 
     const run = async () => {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/publications/b/${bookId}/flow`
+        `${API_BASE}/api/publications/b/${bookId}/flow`
       );
       const raw = await res.json();
 
@@ -82,7 +84,7 @@ export function BBlueprintView({ bookId }: { bookId: string }) {
 
     const run = async () => {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/publications/b/${bookId}/blueprints`
+        `${API_BASE}/api/publications/b/${bookId}/blueprints`
       );
       const raw = await res.json();
       const adapted = adaptBlueprintResponse(raw);

@@ -89,6 +89,7 @@ function articleIdToNo(articleId: string): string {
 /* ======================================================
  * Main
  * ====================================================== */
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export default function ArticleReadView() {
   const { userId } = useAuth();
@@ -157,7 +158,7 @@ export default function ArticleReadView() {
     setResolveErr(null);
 
     fetch(
-      `http://127.0.0.1:8000/api/law/articles/resolve?set_key=${encodeURIComponent(
+      `${API_BASE}/api/law/articles/resolve?set_key=${encodeURIComponent(
         setKey
       )}&q=${encodeURIComponent(q)}`,
       { signal: controller.signal }
@@ -202,7 +203,7 @@ export default function ArticleReadView() {
     setReadErr(null);
     setReadData(null);
 
-    const url = `http://127.0.0.1:8000/api/law/norm/article?law_name=${encodeURIComponent(
+    const url = `${API_BASE}/api/law/norm/article?law_name=${encodeURIComponent(
       selectedArticleRef.law_name
     )}&version_key=${encodeURIComponent(
       selectedArticleRef.version_key
@@ -287,7 +288,7 @@ export default function ArticleReadView() {
     setReverseErr(null);
 
     const url =
-      `http://127.0.0.1:8000/api/law/articles/${encodeURIComponent(
+      `${API_BASE}/api/law/articles/${encodeURIComponent(
         article_id
       )}/reverse/full` +
       `?set_key=${encodeURIComponent(setKey)}` +

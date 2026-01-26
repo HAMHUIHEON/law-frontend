@@ -13,6 +13,8 @@ import {
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
 const colors = {
   ink: "#111827",
   muted: "#585b60",
@@ -62,7 +64,7 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
         setError(null);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/publications/a/${bookId}/exec-summary`
+          `${API_BASE}/api/publications/a/${bookId}/exec-summary`
         );
 
         if (!res.ok) {

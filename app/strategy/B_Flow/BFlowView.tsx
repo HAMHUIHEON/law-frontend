@@ -11,6 +11,7 @@ import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export function BFlowView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
@@ -49,7 +50,7 @@ export function BFlowView({ bookId }: { bookId: string }) {
   };
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/publications/b/${bookId}/flow`)
+    fetch(`${API_BASE}/api/publications/b/${bookId}/flow`)
       .then(async (res) => {
         const json = await res.json();
         console.log("B1 FLOW RESPONSE =", json);

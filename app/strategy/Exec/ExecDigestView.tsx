@@ -17,6 +17,8 @@ const colors = {
   line: "#e5e7eb",
 };
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
 /* ---------- 공통 UI ---------- */
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -92,6 +94,7 @@ function Pill({
   );
 }
 
+
 /* ---------- 메인 ---------- */
 export function ExecDigestView({ bookId }: { bookId: string }) {
   // ✅ 모든 Hook은 최상단
@@ -137,7 +140,7 @@ export function ExecDigestView({ bookId }: { bookId: string }) {
   useEffect(() => {
     const run = async () => {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/publications/a/${bookId}/exec-digest`
+        `${API_BASE}/api/publications/a/${bookId}/exec-digest`
       );
       const json = await res.json();
       setVm(adaptExecDigest(json));
@@ -148,7 +151,7 @@ export function ExecDigestView({ bookId }: { bookId: string }) {
   const [summaryBlockIds, setSummaryBlockIds] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/publications/a/${bookId}/exec-summary`)
+    fetch(`${API_BASE}/api/publications/a/${bookId}/exec-summary`)
       .then((r) => r.json())
       .then((raw) => {
         const blocks = Array.isArray(raw?.executive_summary_blocks)

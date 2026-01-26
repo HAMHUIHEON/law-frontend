@@ -35,6 +35,7 @@ type ArtifactState = {
   D: boolean;
 };
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 
 export function PublicationSidebar() {
@@ -68,7 +69,7 @@ export function PublicationSidebar() {
   useEffect(() => {
     if (!selectedBookId) return;
 
-  fetch(`http://127.0.0.1:8000/api/publications/${selectedBookId}/artifacts`)
+  fetch(`${API_BASE}/api/publications/${selectedBookId}/artifacts`)
     .then(res => res.json())
     .then(data => {
       setArtifacts(data);
@@ -85,7 +86,7 @@ useEffect(() => {
 
   const run = async () => {
     const res = await fetch(
-      `http://127.0.0.1:8000/api/publications/a/${selectedBookId}/exec-summary`
+      `${API_BASE}/api/publications/a/${selectedBookId}/exec-summary`
     );
     const json = await res.json();
 
@@ -133,7 +134,7 @@ useEffect(() => {
 
   const run = async () => {
     const res = await fetch(
-      `http://127.0.0.1:8000/api/publications/b/${selectedBookId}/blueprints`
+      `${API_BASE}/api/publications/b/${selectedBookId}/blueprints`
     );
     const json = await res.json();
 
@@ -161,7 +162,7 @@ useEffect(() => {
 
   const run = async () => {
     const res = await fetch(
-      `http://127.0.0.1:8000/api/publications/c/${selectedBookId}/typology`
+      `${API_BASE}/api/publications/c/${selectedBookId}/typology`
     );
     const json = await res.json();
 
@@ -187,7 +188,7 @@ useEffect(() => {
 
     const run = async () => {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/publications/d/${selectedBookId}/mju_blocks`
+          `${API_BASE}/api/publications/d/${selectedBookId}/mju_blocks`
         );
       const json = await res.json();
 
@@ -227,7 +228,7 @@ useEffect(() => {
 
   useEffect(() => {
     const run = async () => {
-      const res = await fetch("http://127.0.0.1:8000/api/publications");
+      const res = await fetch(`${API_BASE}/api/publications`);
       const data = await res.json();
     setItems(
       (data.items ?? []).map((item: any) => ({

@@ -16,6 +16,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export function BApplicationMapView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
@@ -56,7 +57,7 @@ const handleSaveMap  = async () => {
     console.log("DEBUG bookId =", JSON.stringify(bookId));
     console.log(
       "DEBUG URL =",
-      `http://127.0.0.1:8000/api/publications/b/${bookId}/operational-map`
+      `${API_BASE}/api/publications/b/${bookId}/operational-map`
     );
 
     const run = async () => {
@@ -65,7 +66,7 @@ const handleSaveMap  = async () => {
         setError(null);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/publications/b/${bookId}/operational-map`
+          `${API_BASE}/api/publications/b/${bookId}/operational-map`
         );
 
         if (!res.ok) {

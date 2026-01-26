@@ -32,6 +32,8 @@ interface JuBlocksViewProps {
   bookId: string;
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
 export function JuBlocksView({ bookId }: JuBlocksViewProps) {
   const { userId } = useAuth();
   const {
@@ -82,7 +84,7 @@ useRecordStrategyTrace({
         setError(null);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/publications/d/${bookId}/mju_blocks`
+          `${API_BASE}/api/publications/d/${bookId}/mju_blocks`
         );
 
 

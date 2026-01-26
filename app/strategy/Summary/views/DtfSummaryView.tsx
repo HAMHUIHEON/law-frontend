@@ -18,6 +18,8 @@ const colors = {
   accent: "#6d28d9",
 };
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
 export function DtfSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const saveThought = useSaveThought(userId);
@@ -52,7 +54,7 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
   useEffect(() => {
     const run = async () => {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/publications/a/${bookId}/exec-summary`
+        `${API_BASE}/api/publications/a/${bookId}/exec-summary`
       );
       const json = await res.json();
       const adapted = adaptDtfExecSummaryBlocks(json);

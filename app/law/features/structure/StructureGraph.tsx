@@ -67,6 +67,7 @@ type RFNodeData = {
 /* ======================================================
  * Component
  * ====================================================== */
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export default function StructureGraph({
   snapshot,
@@ -86,7 +87,7 @@ export default function StructureGraph({
     setError(null);
 
     fetch(
-      `http://127.0.0.1:8000/api/law/chapters/${currentChapter}/structure?set_key=${snapshot.set_key}`
+      `${API_BASE}/api/law/chapters/${currentChapter}/structure?set_key=${snapshot.set_key}`
     )
       .then((res) => res.json())
       .then((data: RawGraph) => {

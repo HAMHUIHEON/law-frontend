@@ -13,6 +13,7 @@ import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
 
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export function FinalOverviewView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
@@ -49,7 +50,7 @@ export function FinalOverviewView({ bookId }: { bookId: string }) {
   useEffect(() => {
     const run = async () => {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/publications/a/${bookId}/head-overview`
+        `${API_BASE}/api/publications/a/${bookId}/head-overview`
       );
       const raw: FinalOverviewResponse = await res.json();
       setVm(adaptFinalOverview(raw));

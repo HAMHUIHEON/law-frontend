@@ -24,6 +24,7 @@ const colors = {
 interface BOSummaryViewProps {
   bookId: string;
 }
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export function BOSummaryView({ bookId }: BOSummaryViewProps) {
   const { userId } = useAuth();
@@ -67,7 +68,7 @@ export function BOSummaryView({ bookId }: BOSummaryViewProps) {
         setError(null);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/publications/a/${bookId}/exec-summary`
+          `${API_BASE}/api/publications/a/${bookId}/exec-summary`
         );
 
         if (!res.ok) {
