@@ -24,7 +24,7 @@ const colors = {
 
 export function FtcSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   const {

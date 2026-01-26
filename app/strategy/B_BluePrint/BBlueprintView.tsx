@@ -39,7 +39,7 @@ export function BBlueprintView({ bookId }: { bookId: string }) {
   const [currentBlockId, setCurrentBlockId] = useState<string | null>(null);
   const { selectedBlueprintBlockId, setSelectedBlueprintBlockId } = useStrategyUI();
   const [flowStageMap, setFlowStageMap] = useState<Record<string, string>>({});
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   useRecordStrategyTrace({

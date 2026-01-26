@@ -16,6 +16,7 @@ import { useSaveThought } from "@/app/hooks/useSaveThought";
 type Props = {
   bookId: string;
 };
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export function StrategicReadingGuideView({ bookId }: Props) {
   const { userId } = useAuth();
@@ -23,7 +24,7 @@ export function StrategicReadingGuideView({ bookId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { setViewMode, setSelectedSummaryBlockId } = useStrategyUI();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   // ✅ HEAD 뷰 진입 자체를 사고로 기록
@@ -62,7 +63,7 @@ export function StrategicReadingGuideView({ bookId }: Props) {
         setError(null);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/publications/a/${bookId}/head-reading-guide`
+          `${API_BASE}/api/publications/a/${bookId}/head-reading-guide`
         );
 
         if (!res.ok) {

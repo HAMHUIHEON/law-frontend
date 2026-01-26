@@ -22,7 +22,7 @@ const colors = {
 
 export function FatfSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   const {

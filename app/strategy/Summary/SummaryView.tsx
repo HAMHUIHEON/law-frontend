@@ -37,7 +37,7 @@ export function SummaryView({ bookId }: { bookId: string }) {
     useStrategyUI();
   const [vm, setVm] = useState<ExecSummaryVM | null>(null);
   const { index: sectionIndex } = useStep2Index(bookId);
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
     useRecordStrategyTrace({

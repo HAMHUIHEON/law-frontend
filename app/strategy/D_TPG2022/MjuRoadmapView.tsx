@@ -43,7 +43,7 @@ export function MjuRoadmapView({ bookId }: MjuRoadmapViewProps) {
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [collapsed, setCollapsed] = useState(false);
   const [currentBlockId, setCurrentBlockId] = useState<string | null>(null);
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   useRecordStrategyTrace({

@@ -18,7 +18,7 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
   const [items, setItems] = useState<RiskTypologyArticleVM[]>([]);
   const [current, setCurrent] = useState<RiskTypologyArticleVM | null>(null);
   const offset = PAGE_OFFSET_BY_BOOK[bookId] ?? 0;
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   const {

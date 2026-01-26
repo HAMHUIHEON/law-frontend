@@ -26,7 +26,7 @@ const colors = {
 
 export function EsgSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   const {

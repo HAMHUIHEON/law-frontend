@@ -23,7 +23,7 @@ export function BApplicationMapView({ bookId }: { bookId: string }) {
   const [vm, setVm] = useState<OperationalMapViewModel | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
 

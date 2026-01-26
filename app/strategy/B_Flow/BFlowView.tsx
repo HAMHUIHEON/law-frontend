@@ -19,7 +19,7 @@ export function BFlowView({ bookId }: { bookId: string }) {
   const { setViewMode, setBriefPage } = useStrategyUI();
   const offset = PAGE_OFFSET_BY_BOOK[bookId] ?? 0;
   const [currentBlockId, setCurrentBlockId] = useState<string | null>(null);
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   // ✅ 사고 트레이스 (state 기준, hook 규칙 100% 준수)

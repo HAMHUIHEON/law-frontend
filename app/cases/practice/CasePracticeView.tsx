@@ -31,7 +31,7 @@ export function CasePracticeView({
   initialIssue?: string | null;
 }) {
   const { userId } = useAuth();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [openLogic, setOpenLogic] = useState(false);
 
  // ✅ 여기서 undefined 제거 + 우선순위 적용

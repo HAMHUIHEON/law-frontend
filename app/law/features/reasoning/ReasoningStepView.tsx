@@ -74,7 +74,7 @@ export default function ReasoningStepView({ snapshot, currentChapter }: Props) {
    * ---------------------------- */
   const { userId } = useAuth();
   const { selectedIssueId } = useLawUI();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   const handleSaveCurrent = () => {

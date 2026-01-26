@@ -4,7 +4,6 @@
 import { useCallback } from "react";
 import { recordSavedThought } from "@/app/actions/recordSavedThought";
 
-
 type ThoughtType =
   | "article"
   | "semantic"
@@ -23,20 +22,8 @@ type SaveThoughtParams = {
   parentId: string;
 };
 
-export function useSaveThought(userId?: string | null) {
-  return useCallback(
-    async (params: SaveThoughtParams) => {
-      if (!userId) return;
-
-      await recordSavedThought({
-        userId,
-        // ⬇️ 여기서만 타입 다운캐스팅
-        targetType: params.targetType as any,
-        targetId: params.targetId,
-        parentType: params.parentType,
-        parentId: params.parentId,
-      });
-    },
-    [userId]
-  );
+export function useSaveThought() {
+  return useCallback(async (params: SaveThoughtParams) => {
+    await recordSavedThought(params);
+  }, []);
 }

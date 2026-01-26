@@ -46,7 +46,7 @@ export function JuBlocksView({ bookId }: JuBlocksViewProps) {
   const [vm, setVm] = useState<JudgementUnitsVM | null>(null);
   const [error, setError] = useState<string | null>(null);
   const offset = PAGE_OFFSET_BY_BOOK[bookId] ?? 0;
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
 useRecordStrategyTrace({

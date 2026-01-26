@@ -34,7 +34,7 @@ type Props = {
 export function CaseStructureView({ vm, onOpenMenu }: Props) {
 
   const { userId } = useAuth();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   
   const [selectedIssue, setSelectedIssue] = useState<string>(
     vm.issues[0]?.title ?? ""

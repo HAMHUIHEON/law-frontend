@@ -56,7 +56,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 export default function SemanticView({ snapshot, currentChapter }: Props) {
   const { userId } = useAuth();
   const { selectedIssueId } = useLawUI();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
 

@@ -108,7 +108,7 @@ export function ExecDigestView({ bookId }: { bookId: string }) {
     setSelectedSummaryBlockId(blockId);
     setViewMode("SUMMARY");
   };
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   useRecordStrategyTrace({

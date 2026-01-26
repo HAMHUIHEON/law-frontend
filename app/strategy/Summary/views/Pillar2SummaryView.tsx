@@ -28,7 +28,7 @@ const colors = {
 
 export function Pillar2SummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   

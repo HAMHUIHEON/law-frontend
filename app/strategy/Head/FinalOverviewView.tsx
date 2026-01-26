@@ -18,7 +18,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 export function FinalOverviewView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const [vm, setVm] = useState<FinalOverviewVM | null>(null);
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
   useRecordStrategyTrace({

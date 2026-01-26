@@ -118,3 +118,20 @@ create policy "server delete saved_thoughts"
 on saved_thoughts
 for delete using (true);
 
+
+--
+alter table saved_thoughts
+add constraint saved_thoughts_target_type_check
+check (
+  target_type in (
+    'case',
+    'law',
+    'strategy',
+    'document',
+    'block',
+    'article',
+    'semantic',
+    'reasoning',
+    'summary'
+  )
+);

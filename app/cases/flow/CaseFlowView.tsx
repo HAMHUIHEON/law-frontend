@@ -14,7 +14,7 @@ type Props = {
 export function CaseFlowView({ data, onOpenMenu }: Props) {
   const [showAppendix, setShowAppendix] = useState(false);
   const { userId } = useAuth();
-  const saveThought = useSaveThought(userId);
+  const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
 const handleSaveCurrent = () => {
