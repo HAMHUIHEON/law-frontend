@@ -67,7 +67,7 @@ function Sidebar() {
               style={styles.input}
             />
             <div style={styles.hint}>
-              20.12.22 이후부터 가능, 현행법은 새로고침
+              21.03.16 이후부터 조회 가능, 현행법은 기본 값임
             </div>
           </div>
         </details>
