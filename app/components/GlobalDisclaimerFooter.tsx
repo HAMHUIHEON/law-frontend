@@ -17,13 +17,14 @@ export function GlobalDisclaimerFooter() {
         ...styles.base,
         ...(isPublic ? styles.public : styles.internal),
         ...(isEnter ? styles.enterOffset : {}),
-        ...(isLaw ? styles.lawOffset : {}),
+        ...(isLaw ? styles.law : {}),
       }}
     >
       <p
         style={{
           ...styles.textBase,
           ...(isPublic ? styles.textPublic : styles.textInternal),
+          ...(isLaw ? styles.textLaw : {}),
         }}
       >
         본 서비스는 AI 기반 정보 제공 도구로, 오류나 누락이 있을 수 있습니다.
@@ -38,9 +39,9 @@ const styles: Record<string, React.CSSProperties> = {
   base: {
     position: "fixed",
     left: 0,
+    bottom: 0,
     width: "100%",
     zIndex: 1000,
-    bottom: 0,
   },
 
   /* ================= Main / Enter ================= */
@@ -50,12 +51,11 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "#111827",
   },
 
-  /* 🔹 /enter: 카드 보호 */
   enterOffset: {
     bottom: -24,
   },
 
-  /* ================= Law / Service ================= */
+  /* ================= Internal (default) ================= */
 
   internal: {
     padding: "6px 12px",
@@ -63,9 +63,10 @@ const styles: Record<string, React.CSSProperties> = {
     pointerEvents: "none",
   },
 
-  /* 🔹 /law 전용: 저장 버튼 + scroll panel 회피 */
-  lawOffset: {
-    bottom: -72, // 🔑 Reasoning / Semantic 하단 UI 회피
+  /* ================= Law ================= */
+
+  law: {
+    padding: "4px 12px", // 🔑 높이 최소화
   },
 
   /* ================= Text ================= */
@@ -74,7 +75,7 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: "960px",
     margin: "0 auto",
     textAlign: "center",
-    lineHeight: 1.6,
+    lineHeight: 1.5,
   },
 
   textPublic: {
@@ -86,5 +87,11 @@ const styles: Record<string, React.CSSProperties> = {
   textInternal: {
     fontSize: "11px",
     color: "rgba(0,0,0,0.35)",
+  },
+
+  textLaw: {
+    fontSize: "10.5px", // 🔑 더 작게
+    lineHeight: 1.4,
+    color: "rgba(0,0,0,0.28)", // 🔑 더 약하게
   },
 };
