@@ -114,6 +114,11 @@ export default function CaseSidebar() {
       const normalized = normalizeCaseId(String(json.case_id ?? ""));
       if (!normalized) throw new Error("서버에서 유효한 사건번호를 받지 못했습니다.");
 
+      // ✅ 캐시 히트인 경우
+      if (json.cache_hit) {
+        setMainError("CACHE_HIT");   // 🔑 핵심
+      }
+
       startCase(normalized);
       router.push(`/cases?case_id=${encodeURIComponent(normalized)}`);
 

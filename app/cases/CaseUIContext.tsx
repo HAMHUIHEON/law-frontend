@@ -7,7 +7,11 @@ import { useRecordRecentThought } from "@/app/hooks/useRecordRecentThought";
 
 
 export type CaseViewMode = "HOME" | "FLOW" | "STRUCTURE" | "PRACTICE";
-export type MainErrorType = "PDF_UNREADABLE" | null ;
+type MainErrorType =
+  | "PDF_UNREADABLE"
+  | "CACHE_HIT"
+  | null;
+
 
 type CaseUIState = {
   // data
@@ -29,8 +33,9 @@ type CaseUIState = {
   closeSidebar: () => void;
 
   // ✅ 추가
-  mainError: string | null;
-  setMainError: (v: string | null) => void;
+  mainError: MainErrorType;
+  setMainError: (v: MainErrorType) => void;
+
   
   // ✅ “세션 제어” 공용 API
   startCase: (nextCaseId: string) => void;
@@ -52,7 +57,8 @@ export function CaseUIProvider({
 
   // ✅ Law 레이어 방식 추가
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
-  const [mainError, setMainError] = useState<string | null>(null);
+  const [mainError, setMainError] = useState<MainErrorType>(null);
+  
 
   // ✅ 세션 키: 사건이 바뀌면 증가 → 하위 컴포넌트 key로 재마운트
   const [sessionKey, setSessionKey] = useState<number>(0);

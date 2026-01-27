@@ -5,10 +5,12 @@ import { useEffect, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCaseUI } from "./CaseUIContext";
 import { MainUploadError } from "./MainUploadError";
+import { MainUploadCachedNotice } from "./MainUploadCachedNotice";
 
-type MainErrorType = "PDF_UNREADABLE" | null;
+type MainErrorType = "PDF_UNREADABLE" | "CACHE_HIT" | null;
 
 export const dynamic = "force-dynamic";
+
 export default function CasesRootPage() {
   const sp = useSearchParams();
   const { caseId, startCase, mainError } = useCaseUI();
@@ -52,8 +54,10 @@ export default function CasesRootPage() {
             </ul>
           </>
         )}
+      {/* {!mainError && 기본 안내} */}
+      {mainError === "PDF_UNREADABLE" && <MainUploadError />}
+      {mainError === "CACHE_HIT" && <MainUploadCachedNotice />}
 
-        {mainError === "PDF_UNREADABLE" && <MainUploadError />}
       </div>
     </div>
   );
