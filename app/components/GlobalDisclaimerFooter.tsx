@@ -1,19 +1,22 @@
 "use client";
 
+
+
 import { usePathname } from "next/navigation";
 
 export function GlobalDisclaimerFooter() {
   const pathname = usePathname();
 
-  // 🔑 퍼블릭(메인/분기) vs 서비스 화면 분기
-  const isPublic =
-    pathname === "/" || pathname.startsWith("/enter");
+  const isMain = pathname === "/";
+  const isEnter = pathname.startsWith("/enter");
+  const isPublic = isMain || isEnter;
 
   return (
     <footer
       style={{
         ...styles.base,
         ...(isPublic ? styles.public : styles.internal),
+        ...(isEnter ? styles.enterOffset : {}),
       }}
     >
       <p
@@ -39,11 +42,18 @@ const styles: Record<string, React.CSSProperties> = {
     zIndex: 1000,
   },
 
-  /* 🔹 메인 / 분기 페이지 (지금 네가 만족한 상태 유지) */
+  /* 🔹 메인 페이지 */
   public: {
+    bottom: 0,
     padding: "24px 16px 32px",
     backgroundColor: "#111827",
   },
+
+  /* 🔹 /enter 분기 페이지 전용 오프셋 */
+  enterOffset: {
+    bottom: -24, // 🔑 카드 영역 보호 (핵심)
+  },
+
 
   /* 🔹 /cases 같은 화이트 실사용 화면 */
   internal: {
