@@ -1,7 +1,5 @@
 "use client";
 
-
-
 import { usePathname } from "next/navigation";
 
 export function GlobalDisclaimerFooter() {
@@ -9,6 +7,8 @@ export function GlobalDisclaimerFooter() {
 
   const isMain = pathname === "/";
   const isEnter = pathname.startsWith("/enter");
+  const isLaw = pathname.startsWith("/law");
+
   const isPublic = isMain || isEnter;
 
   return (
@@ -17,6 +17,7 @@ export function GlobalDisclaimerFooter() {
         ...styles.base,
         ...(isPublic ? styles.public : styles.internal),
         ...(isEnter ? styles.enterOffset : {}),
+        ...(isLaw ? styles.lawOffset : {}),
       }}
     >
       <p
@@ -33,36 +34,42 @@ export function GlobalDisclaimerFooter() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  /* 공통 */
+  /* ================= Base ================= */
   base: {
     position: "fixed",
-    bottom: 0,
     left: 0,
     width: "100%",
     zIndex: 1000,
+    bottom: 0,
   },
 
-  /* 🔹 메인 페이지 */
+  /* ================= Main / Enter ================= */
+
   public: {
-    bottom: 0,
     padding: "24px 16px 32px",
     backgroundColor: "#111827",
   },
 
-  /* 🔹 /enter 분기 페이지 전용 오프셋 */
+  /* 🔹 /enter: 카드 보호 */
   enterOffset: {
-    bottom: -24, // 🔑 카드 영역 보호 (핵심)
+    bottom: -24,
   },
 
+  /* ================= Law / Service ================= */
 
-  /* 🔹 /cases 같은 화이트 실사용 화면 */
   internal: {
     padding: "6px 12px",
     backgroundColor: "transparent",
-    pointerEvents: "none", // 🔑 UX 간섭 완전 제거
+    pointerEvents: "none",
   },
 
-  /* 텍스트 공통 */
+  /* 🔹 /law 전용: 저장 버튼 + scroll panel 회피 */
+  lawOffset: {
+    bottom: -72, // 🔑 Reasoning / Semantic 하단 UI 회피
+  },
+
+  /* ================= Text ================= */
+
   textBase: {
     maxWidth: "960px",
     margin: "0 auto",
@@ -70,16 +77,14 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.6,
   },
 
-  /* 퍼블릭 화면 텍스트 */
   textPublic: {
     fontSize: "13px",
     letterSpacing: "0.01em",
     color: "rgba(255,255,255,0.4)",
   },
 
-  /* 서비스 화면 텍스트 */
   textInternal: {
     fontSize: "11px",
-    color: "rgba(0,0,0,0.35)", // 🔑 흰 배경 전용
+    color: "rgba(0,0,0,0.35)",
   },
 };
