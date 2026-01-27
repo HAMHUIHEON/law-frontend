@@ -131,7 +131,7 @@ const depthColors = {
 const styles = {
   container: {
     minHeight: "100vh",
-    padding: "80px 24px 160px", // 🔑 footer 높이 + 여유
+    padding: "60px 24px 100px", // 🔑 footer 높이 + 여유
     display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
@@ -160,7 +160,7 @@ utilityButton: {
     fontSize: "32px",
     fontWeight: 500,
     color: "rgba(255,255,255,0.88)",
-    marginBottom: "52px",   // ↓ 기존 48px → 32px
+    marginBottom: "48px",   // ↓ 기존 48px → 32px
     lineHeight: 1.3,
   },
 
