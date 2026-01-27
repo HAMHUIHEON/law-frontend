@@ -48,7 +48,7 @@ export default function CasesRootPage() {
             >
               <li>📎 업로드 가능한 파일은 <strong>PDF 형식</strong>만 지원합니다.</li>
               <li>📑 파일명은 <strong>법원명_사건번호.pdf</strong> 형식이어야 합니다.</li>
-              <li>⏳ 분석에는 약 <strong>3~5분</strong> 정도 소요될 수 있습니다.</li>
+              <li>⏳ 분석에는 약 <strong>5-10분</strong> 정도 소요될 수 있습니다.</li>
             </ul>
           </>
         )}
