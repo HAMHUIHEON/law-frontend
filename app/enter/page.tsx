@@ -131,7 +131,7 @@ const depthColors = {
 const styles = {
   container: {
     minHeight: "100vh",
-    padding: "80px 24px 100px", // 위쪽을 더 위로가
+    padding: "80px 24px 160px", // 🔑 footer 높이 + 여유
     display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
