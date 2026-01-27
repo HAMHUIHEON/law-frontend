@@ -13,8 +13,11 @@ export function GlobalDisclaimerFooter() {
 
 const styles: Record<string, React.CSSProperties> = {
   footer: {
-    position: "fixed",        // 🔑 핵심
+    position: "fixed",
+    bottom: 0,          // 🔑 필수
+    left: 0,            // 🔑 필수
     width: "100%",
+    zIndex: 1000,       // 🔑 다른 레이어 위로     // 🔑 핵심
     padding: "24px 16px 32px",
     backgroundColor: "#111827",
   },
