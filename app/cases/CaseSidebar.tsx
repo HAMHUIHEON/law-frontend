@@ -18,12 +18,14 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
  */
 function normalizeCaseId(raw: string): string | null {
   const v = raw.trim();
-  // 가장 일반적인 판례 번호 패턴
-  const m = v.match(/\d{4}[가-힣]+\d+/);
+
+  // 2자리 또는 4자리 연도 + 한글 사건유형 + 숫자
+  const m = v.match(/\b(\d{2}|\d{4})[가-힣]{1,3}\d+\b/);
   if (!m) return null;
 
   return m[0];
 }
+
 
 export default function CaseSidebar() {
   const router = useRouter();
