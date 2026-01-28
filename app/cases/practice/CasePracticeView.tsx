@@ -180,6 +180,36 @@ const handleSaveCurrent = () => {
               <MessageCard title="이 판례가 남긴 기준" text={vm.summary.riskView.precedent} locked={isLocked} />
             </div>
           </section>
+
+          {isLocked && (
+            <div
+              style={{
+                marginTop: 24,
+                padding: "16px 20px",
+                borderRadius: 12,
+                border: "1px solid #e5e7eb",
+                background: "#f9fafb",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+              }}
+            >
+              <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6 }}>
+                이 판례의 <strong>핵심 쟁점 · 판단 흐름 · 실무 메시지</strong>는  
+                <br />
+                <strong>구독 후 전체 확인</strong>할 수 있습니다.
+              </p>
+
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe")}
+              >
+                구독하기
+              </button>
+            </div>
+          )}
+
         </section>
 
         {/* ================= Proof Area ================= */}
@@ -234,7 +264,7 @@ const handleSaveCurrent = () => {
                       marginBottom: 10,
                     }}
                   >
-                    <h3 style={styles.issueTitle}>{currentChain.issue}</h3>
+                  <h3 style={styles.issueTitle}>{currentChain.issue}</h3>
                   {!isLocked && (
                   <button
                     onClick={handleSaveCurrent}
