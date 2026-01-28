@@ -8,6 +8,8 @@ import { IssueList } from "./IssueList";
 import { IssueDetail } from "./IssueDetail";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getCaseAccess } from "../access";
 
 type IssueVM = {
   title: string;
@@ -36,6 +38,9 @@ export function CaseStructureView({ vm, onOpenMenu }: Props) {
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   
+  const userAccess = useUserAccessLevel();
+  const caseAccess = getCaseAccess(userAccess, "B");
+
   const [selectedIssue, setSelectedIssue] = useState<string>(
     vm.issues[0]?.title ?? ""
   );
@@ -56,6 +61,9 @@ export function CaseStructureView({ vm, onOpenMenu }: Props) {
       parentType: "case",
       parentId: vm.meta.caseNumber,
     });
+
+
+
   };
   return (
     <main style={styles.container}>
@@ -75,6 +83,7 @@ export function CaseStructureView({ vm, onOpenMenu }: Props) {
           />
 
           <IssueDetail issue={current}
+                access={caseAccess} 
                 onSave={handleSaveCurrent}
            />
         </div>

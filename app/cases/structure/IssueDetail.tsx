@@ -1,6 +1,8 @@
 // app/cases/structure/IssueDetail.tsx
 "use client";
 
+type AccessLevel = "FULL" | "PARTIAL" | "LOCKED";
+
 type Props = {
   issue: {
     title: string;
@@ -8,14 +10,26 @@ type Props = {
     defendant: string[];
     court: string[];
   } | null;
-  onSave?: () => void;   // ✅ 저장 콜백만 받음
+  access: AccessLevel;        // 🔥 추가
+  onSave?: () => void;
 };
 
-export function IssueDetail({ issue, onSave }: Props) {
+export function IssueDetail({ issue, access,  onSave }: Props) {
   if (!issue) return null;
 
+  const isLocked = access !== "FULL";
+
   return (
-    <section className="ui-scroll" style={styles.issueDetail}>
+    <section
+      className="ui-scroll"
+      style={{
+        ...styles.issueDetail,
+        position: "relative",
+        filter: isLocked ? "blur(6px)" : "none",
+        pointerEvents: isLocked ? "none" : "auto",
+        userSelect: isLocked ? "none" : "auto",
+      }}
+    >
       {/* 카드 헤더 */}
       <div
         style={{
@@ -57,6 +71,19 @@ export function IssueDetail({ issue, onSave }: Props) {
       <Block title="🧑‍⚖️ 원고 주장" items={issue.plaintiff} />
       <Block title="🏛️ 피고 주장" items={issue.defendant} />
       <Block title="⚖️ 법원의 판단" items={issue.court} />
+      {/* 🔒 블러 오버레이 */}
+      {isLocked && (
+        <div style={lockOverlayStyle}>
+          <p style={{ fontSize: 14, fontWeight: 600 }}>
+            이 판례의 판단 구조는  
+            <br />
+            <strong>구독 후 확인할 수 있습니다</strong>
+          </p>
+          <button style={ctaButtonStyle}>
+            구독하고 전체 보기
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -83,9 +110,11 @@ function Block({
     </section>
   );
 }
+
+
 const styles = {
 
-  caseNumber: {
+caseNumber: {
   fontSize: "13.5px",
   fontWeight: 600,
   color: "#047857", // 짙은 초록 (emerald-700 계열)
@@ -93,19 +122,19 @@ const styles = {
   letterSpacing: "0.02em",
 },
 
-  container: {
+container: {
     padding: "36px 12px",
     backgroundColor: "#f5f6f8",
     minHeight: "100vh",
   },
 
-  title: {
+title: {
     fontSize: "28px",
     fontWeight: 600,
     marginBottom: "20px",
   },
 
-  summaryBox: {
+summaryBox: {
     width: "100%",
     marginBottom: "32px",
     backgroundColor: "#ffffff",
@@ -116,14 +145,14 @@ const styles = {
 
   },
 
-  layout: {
+layout: {
     display: "flex",
     gap: "24px",
     maxWidth: "1200px",
     margin: "0 auto",
   },
 
-  issueList: {
+issueList: {
     width: "240px",
     backgroundColor: "#ffffff",
     borderRadius: "12px",
@@ -135,7 +164,7 @@ const styles = {
 
   },
 
-  issueButton: {
+issueButton: {
     width: "100%",
     textAlign: "left" as const,
     padding: "10px 12px",
@@ -147,13 +176,13 @@ const styles = {
     color: "#374151",
   },
 
-  issueActive: {
+issueActive: {
     backgroundColor: "#ecfdf5",
     color: "#065f46",
     fontWeight: 600,
   },
 
-  issueDetail: {
+issueDetail: {
     flex: 1,
     backgroundColor: "#ffffff",
     borderRadius: "12px",
@@ -165,30 +194,30 @@ const styles = {
 
   },
 
-  issueTitle: {
+issueTitle: {
     fontSize: "16px",
     fontWeight: 700,
     marginBottom: "20px",
   },
 
-  block: {
+block: {
     marginBottom: "24px",
   },
 
-  blockTitle: {
+blockTitle: {
     fontSize: "14px",
     fontWeight: 700,
     marginBottom: "8px",
   },
 
-  blockText: {
+blockText: {
     fontSize: "13px",
     lineHeight: 1.8,
     marginBottom: "10px",
     color: "#374151",
     whiteSpace: "pre-wrap" as const,
   },
-  empty: {
+empty: {
     fontSize: "13px",
     color: "#9ca3af",
   },
@@ -253,5 +282,36 @@ summaryContent: {
   color: "#374151",
   maxWidth: "880px",
 },
+};
 
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
+
+const saveButtonStyle: React.CSSProperties = {
+  fontSize: 12,
+  padding: "6px 10px",
+  borderRadius: 8,
+  border: "1px solid #e5e7eb",
+  background: "#ffffff",
+  cursor: "pointer",
 };
