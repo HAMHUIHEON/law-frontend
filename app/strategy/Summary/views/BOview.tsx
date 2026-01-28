@@ -13,6 +13,10 @@ import {
 } from "../adapters/BestPracticesBOBlocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
+
 
 const colors = {
   ink: "#111827",
@@ -30,6 +34,10 @@ export function BOSummaryView({ bookId }: BOSummaryViewProps) {
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
 
   const {
     selectedSummaryBlockId,
@@ -251,8 +259,30 @@ export function BOSummaryView({ bookId }: BOSummaryViewProps) {
 
       {/* 핵심 메시지 */}
       <Section title="핵심 메시지">
-      <CollapsibleBulletList items={block.coreMessages} />
-       </Section>
+        <div style={{ position: "relative" }}>
+          {/* 🔹 블러 대상 */}
+          <div style={blurStyle(isLocked)}>
+            <CollapsibleBulletList items={block.coreMessages} />
+          </div>
+
+          {/* 🔒 오버레이 (첫 섹션만) */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 요약 분석은
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
+        </div>
+      </Section>
 
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
       
@@ -260,9 +290,11 @@ export function BOSummaryView({ bookId }: BOSummaryViewProps) {
       {block.bestPractices.length > 0 && (
         <>
           <Section title="모범 관행">
-            {block.bestPractices.map((bp, idx) => (
-              <BestPracticeCard key={idx} bp={bp} />
-            ))}
+            <div style={blurStyle(isLocked)}>
+              {block.bestPractices.map((bp, idx) => (
+                <BestPracticeCard key={idx} bp={bp} />
+              ))}
+            </div>
           </Section>
 
           <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
@@ -272,32 +304,43 @@ export function BOSummaryView({ bookId }: BOSummaryViewProps) {
 
       {/* 정책적 근거 */}
       <Section title="정책적 근거">
-      <CollapsibleBulletList items={block.policyRationales} />
+        <div style={blurStyle(isLocked)}>
+          <CollapsibleBulletList items={block.policyRationales} />
+        </div>
       </Section>
+
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
 
       {/* 이행 수단 */}
       <Section title="이행 수단">
-        <CollapsibleBulletList items={block.implementationMeasures} />
+        <div style={blurStyle(isLocked)}>
+          <CollapsibleBulletList items={block.implementationMeasures} />
+        </div>
       </Section>
+
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
       {/* 위험 요인 */}
       <Section title="리스크 요인">
-        <CollapsibleBulletList items={block.riskFactors} />
+        <div style={blurStyle(isLocked)}>
+          <CollapsibleBulletList items={block.riskFactors} />
+        </div>
       </Section>
+
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
       {/* 주요 도전 과제 */}
       {block.challenges.length > 0 && (
         <>
           <Section title="주요 도전 과제">
-            {block.challenges.map(
-              (ch: BoChallengeJson, idx: number) => (
-                <ChallengeCard key={idx} ch={ch} />
-              )
-            )}
+            <div style={blurStyle(isLocked)}>
+              {block.challenges.map(
+                (ch: BoChallengeJson, idx: number) => (
+                  <ChallengeCard key={idx} ch={ch} />
+                )
+              )}
+            </div>
           </Section>
 
           <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
@@ -308,29 +351,32 @@ export function BOSummaryView({ bookId }: BOSummaryViewProps) {
       {/* 국가별 사례 */}
       {block.countryExamples.length > 0 && (
         <Section title="국가별 사례">
-          {block.countryExamples.map(
-            (ex: BoCountryExampleJson, idx: number) => (
-              <div
-                key={idx}
-                style={{ marginBottom: 10, fontSize: 14 }}
-              >
-                <strong>{ex.country}</strong>: {ex.summary}
-              </div>
-            )
-          )}
+          <div style={blurStyle(isLocked)}>
+            {block.countryExamples.map(
+              (ex: BoCountryExampleJson, idx: number) => (
+                <div key={idx} style={{ marginBottom: 10, fontSize: 14 }}>
+                  <strong>{ex.country}</strong>: {ex.summary}
+                </div>
+              )
+            )}
+          </div>
         </Section>
       )}
 
       {/* 국제 기준 및 참조 */}
       <Section title="국제 기준 및 참조">
-        <BulletList items={block.internationalReferences} />
+        <div style={blurStyle(isLocked)}>
+          <BulletList items={block.internationalReferences} />
+        </div>
       </Section>
+
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
-
-
+      
       {/* 향후 검토 과제 */}
       <Section title="향후 검토 과제">
-        <BulletList items={block.deferredIssues} />
+        <div style={blurStyle(isLocked)}>
+          <BulletList items={block.deferredIssues} />
+        </div>
       </Section>
     </article>
       </>
@@ -338,6 +384,34 @@ export function BOSummaryView({ bookId }: BOSummaryViewProps) {
 }
 
 /* ---------- 작은 문서용 UI 헬퍼 ---------- */
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
+
 function CollapsibleBulletList({
   items,
   previewCount = 3,

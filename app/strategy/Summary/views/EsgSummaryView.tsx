@@ -11,6 +11,10 @@ import {
 } from "../adapters/EndShellGameBlocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
+
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
@@ -28,6 +32,10 @@ export function EsgSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
 
   const {
     selectedSummaryBlockId,
@@ -263,6 +271,8 @@ export function EsgSummaryView({ bookId }: { bookId: string }) {
 
       {/* 1. 핵심 요약 (카드 X, 그냥 본문 스타일) */}
       <Section title="전문적 조력자에 대한 이해와 대응">
+      <div style={{ position: "relative" }}>
+      <div style={blurStyle(isLocked)}>
         {s.coreMessage && (
           <p
             style={{
@@ -279,33 +289,63 @@ export function EsgSummaryView({ bookId }: { bookId: string }) {
             {s.coreMessage}
           </p>
         )}
+        </div>
+        </div>
+        {/* 🔒 오버레이 (첫 섹션만) */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 요약 분석은
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
       <Divider />
+
         {s.keyFindings.length > 0 && (
           <SubHeading>주요 발견</SubHeading>
         )}
+        <div style={blurStyle(isLocked)}>
         {s.keyFindings.length > 0 && (
       <CollapsibleBulletList items={s.keyFindings} previewCount={3} small />
         )}
+        </div>
       <Divider />
+
         {s.mechanisms.length > 0 && (
-            <>
-            <SubHeading style={{ marginTop: 10 }}>작동 메커니즘</SubHeading>
-            <CollapsibleBulletList items={s.mechanisms} previewCount={3} small />
-            </>
+        <>
+        <SubHeading style={{ marginTop: 10 }}>작동 메커니즘</SubHeading>
+        <div style={blurStyle(isLocked)}>
+        <CollapsibleBulletList items={s.mechanisms} previewCount={3} small />
+        </div>
+        </>
         )}
+
       <Divider />
+
         {s.riskFactors.length > 0 && (
-            <>
-            <SubHeading style={{ marginTop: 10 }}>리스크 요인</SubHeading>
-            <CollapsibleBulletList items={s.riskFactors} previewCount={3} small />
-            </>
+        <>
+        <SubHeading style={{ marginTop: 10 }}>리스크 요인</SubHeading>
+        <div style={blurStyle(isLocked)}>
+        <CollapsibleBulletList items={s.riskFactors} previewCount={3} small />
+        </div>
+        </>
         )}
       </Section>
 
       <Divider />
+
       {/* 2. 요구 사항 / 운영 요소 / 협력 축 */}
       {s.requirements.length > 0 && (
         <Section title="요구 사항">
+          <div style={blurStyle(isLocked)}>
           {s.requirements.map((r, i) => (
             <BlockGroup key={i}>
               <BlockLabel>{r.label}</BlockLabel>
@@ -334,11 +374,15 @@ export function EsgSummaryView({ bookId }: { bookId: string }) {
             )}
             </BlockGroup>
           ))}
+          </div>
         </Section>
       )}
+
       <Divider />
+
       {s.operationalElements.length > 0 && (
         <Section title="운영 요소">
+          <div style={blurStyle(isLocked)}>
           {s.operationalElements.map((o, i) => (
             <BlockGroup key={i}>
               <BlockLabel>{o.label}</BlockLabel>
@@ -367,11 +411,15 @@ export function EsgSummaryView({ bookId }: { bookId: string }) {
 
             </BlockGroup>
           ))}
+          </div>
         </Section>
       )}
+
       <Divider />
+
       {s.cooperationDimensions.length > 0 && (
         <Section title="정보 연계 및 공조 체계">
+           <div style={blurStyle(isLocked)}>
           {s.cooperationDimensions.map((c, i) => (
             <BlockGroup key={i}>
               <BlockLabel>{c.label}</BlockLabel>
@@ -401,13 +449,17 @@ export function EsgSummaryView({ bookId }: { bookId: string }) {
 
             </BlockGroup>
           ))}
+          </div>
         </Section>
       )}
+
       <Divider />
+
       {/* 3. 이행 / 권고 */}
       {(s.implementationMeasures.length > 0 ||
         s.recommendedActions.length > 0) && (
         <Section title="이행 · 권고">
+          <div style={blurStyle(isLocked)}>
           {s.implementationMeasures.length > 0 && (
             <>
               <SubHeading>이행 수단</SubHeading>
@@ -428,29 +480,39 @@ export function EsgSummaryView({ bookId }: { bookId: string }) {
               <BulletList items={s.recommendedActions} />
             </>
           )}
+          </div>
         </Section>
       )}
+
       <Divider />
+
       {/* 4. 이행상 도전 과제 */}
       {s.implementationChallenges.length > 0 && (
         <Section title="이행상 도전 과제">
+          <div style={blurStyle(isLocked)}>
           {s.implementationChallenges.map((ch, i) => (
             <ChallengeBlock key={i} ch={ch} />
           ))}
-          
+          </div>
         </Section>
       )}
       <Divider />
+
       {/* 5. 향후 검토 과제 / 근거 */}
       {s.deferredQuestions.length > 0 && (
         <Section title="향후 검토 과제">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={s.deferredQuestions} />
+          </div>
         </Section>
       )}
       <Divider />
+
       {s.evidenceAnchors.length > 0 && (
         <Section title="인용 · 근거 ">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={s.evidenceAnchors} />
+          </div>
         </Section>
       )}
     </article>
@@ -461,6 +523,33 @@ export function EsgSummaryView({ bookId }: { bookId: string }) {
 /* ======================
  * UI Components
  * ====================== */
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function SourceLinkInline({
   pageStart,

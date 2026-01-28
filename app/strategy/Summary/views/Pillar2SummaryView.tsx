@@ -15,6 +15,9 @@ import {
 } from "../adapters/Pillar2Blocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
 
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
@@ -31,7 +34,11 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
-  
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
+
   const {
     selectedSummaryBlockId,
     setSelectedSummaryBlockId,
@@ -218,8 +225,7 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
           paddingBottom: 12,
           borderBottom: `1px solid ${colors.line}`,
         }}
-      >
-        <h1
+      ><h1
           style={{
             fontSize: 20,
             fontWeight: 700,
@@ -233,18 +239,38 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
 
       {block.definitions.length > 0 && (
         <>
-
         <Section title="용어 정의">
+        <div style={{ position: "relative" }}>
+        <div style={blurStyle(isLocked)}>
         <CollapsibleBlockGroup
             items={block.definitions}
             renderItem={(d, i) => <DefinitionBlock key={i} d={d} />}
         />
+          </div>
+          {/* 🔒 잠금 오버레이 + CTA */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 용어 해설은
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
+          </div>
         </Section>
         </>
       )}
 
       {(p.structuralRole || p.coreMessage) && (
         <Section title="GloBE 규칙 체계 내 해당 섹션의 역할">
+          <div style={blurStyle(isLocked)}>
           {p.structuralRole && (
             <p style={{ marginTop: 0 }}>{p.structuralRole}</p>
           )}
@@ -262,24 +288,28 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
             </p>
           )}
         </Section>
+        </div>
         </Section>
       )}
       <Divider />
 
       {p.keyConcepts.length > 0 && (
         <Section title="주요 개념">
+        <div style={blurStyle(isLocked)}>
         <CollapsibleBlockGroup
             items={p.keyConcepts}
             renderItem={(k, i) => (
             <Block key={i} title={k.label} text={k.description} />
             )}
         />
+        </div>
         </Section>
       )}
       <Divider />
 
       {p.mainRules.length > 0 && (
         <Section title="주요 규칙">
+          <div style={blurStyle(isLocked)}>
           <CollapsibleBlockGroup
             items={p.mainRules}
             renderItem={(r, i) => (
@@ -298,6 +328,7 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
               </div>
             )}
           />
+          </div>
         </Section>
       )}
 
@@ -306,6 +337,7 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
 
       {p.quantitativeParameters.length > 0 && (
         <Section title="정량 기준">
+          <div style={blurStyle(isLocked)}>
           <CollapsibleBlockGroup
             items={p.quantitativeParameters}
             renderItem={(q, i) => (
@@ -324,6 +356,7 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
               </div>
             )}
           />
+          </div>
         </Section>
       )}
 
@@ -332,7 +365,7 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
 
       {p.interactionsAndDependencies.length > 0 && (
         <Section title="연계·의존 관계">
-
+        <div style={blurStyle(isLocked)}>
         <CollapsibleBlockGroup
             items={p.interactionsAndDependencies}
             renderItem={(d, i) => (
@@ -343,22 +376,26 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
             />
             )}
         />
+        </div>
         </Section>
       )}
       <Divider />
 
       {p.electionsAndSafeHarbours.length > 0 && (
         <Section title="선택 규정 및 세이프하버">
+        <div style={blurStyle(isLocked)}>
         <CollapsibleBlockGroup
             items={p.electionsAndSafeHarbours}
             renderItem={(e, i) => <ElectionBlock key={i} e={e} />}
         />
+        </div>
         </Section>
       )}
       <Divider />
 
       {p.implementationChallenges.length > 0 && (
         <Section title="이행상 쟁점">
+          <div style={blurStyle(isLocked)}>
           <CollapsibleBlockGroup
             items={p.implementationChallenges}
             renderItem={(c, i) => (
@@ -377,6 +414,7 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
               </div>
             )}
           />
+          </div>
         </Section>
       )}
 
@@ -384,7 +422,9 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
 
       {p.openPolicyQuestions.length > 0 && (
         <Section title="열린 정책 쟁점">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={p.openPolicyQuestions} />
+        </div>
         </Section>
       )}
     </article>
@@ -395,6 +435,33 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
 /* ======================
  * Components
  * ====================== */
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function SourceLinkInline({
   pageStart,

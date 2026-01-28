@@ -10,6 +10,9 @@ import {
 } from "../adapters/FatfRecommendations2012Blocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
@@ -24,6 +27,10 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
 
   const {
     selectedSummaryBlockId,
@@ -35,7 +42,7 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
   const [vm, setVm] = useState<FatfExecSummarySourceBlocksVM | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-    const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState(false);
   // 저장 버튼 클릭 핸들러
   const handleSaveSummary = async () => {
     if (!userId || !selectedSummaryBlockId || saving) return;
@@ -298,15 +305,40 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
       {/* 2. 적용 범위 / 범위·적용대상 */}
       {s.scopeAndCoverage.length > 0 && (
         <Section title="적용 범위">
-          <BulletList items={s.scopeAndCoverage} />
+          <div style={{ position: "relative" }}>
+            {/* 🔹 블러 대상 내용 */}
+            <div style={blurStyle(isLocked)}>
+              <BulletList items={s.scopeAndCoverage} />
+            </div>
+
+            {/* 🔒 잠금 오버레이 + 버튼 */}
+            {isLocked && (
+              <div style={lockOverlayStyle}>
+                <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                  이 전략 분석은
+                  <br />
+                  <strong>구독 후 전체 확인할 수 있습니다</strong>
+                </p>
+                <button
+                  style={ctaButtonStyle}
+                  onClick={() => router.push("/me/subscribe?from=strategy")}
+                >
+                  구독하고 전체 보기
+                </button>
+              </div>
+            )}
+          </div>
         </Section>
       )}
       <Divider />
 
+
       {/* 3. 최소 요구 조치 */}
       {s.minimumRequiredMeasures.length > 0 && (
         <Section title="최소 요구 조치">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={s.minimumRequiredMeasures} />
+          </div>
         </Section>
       )}
       <Divider />
@@ -315,6 +347,7 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
       {(s.implementationMechanisms.length > 0 ||
         s.supervisionAndEnforcement.length > 0) && (
         <Section title="이행·감독 구조">
+          <div style={blurStyle(isLocked)}>
           {s.implementationMechanisms.length > 0 && (
             <>
               <SubHeading>이행 메커니즘</SubHeading>
@@ -335,6 +368,7 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
               <BulletList items={s.supervisionAndEnforcement} />
             </>
           )}
+          </div>
         </Section>
       )}
       <Divider />
@@ -342,7 +376,9 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
       {/* 5. 국가 재량·유연성 */}
       {s.flexibilityAndNationalDiscretion.length > 0 && (
         <Section title="국가 재량과 유연성">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={s.flexibilityAndNationalDiscretion} />
+          </div>
         </Section>
       )}
       <Divider />
@@ -350,7 +386,9 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
       {/* 6. 반복되는 취약 지점 */}
       {s.typicalGapsOrFailureModes.length > 0 && (
         <Section title="반복되는 취약 지점">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={s.typicalGapsOrFailureModes} />
+          </div>
         </Section>
       )}
       <Divider />
@@ -358,7 +396,9 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
       {/* 7. 이행상 도전 과제 */}
       {s.implementationChallenges.length > 0 && (
         <Section title="이행상 도전 과제">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={s.implementationChallenges} />
+          </div>
         </Section>
       )}
       <Divider />
@@ -366,7 +406,9 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
       {/* 8. 연계·의존 관계 */}
       {s.crossReferenceAndDependencies.length > 0 && (
         <Section title="연계·의존 관계">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={s.crossReferenceAndDependencies} />
+          </div>
         </Section>
       )}
       <Divider />
@@ -374,7 +416,9 @@ export function FatfSummaryView({ bookId }: { bookId: string }) {
       {/* 9. 독자 참고 메모 */}
       {s.notesForReaders.length > 0 && (
         <Section title="독자 참고 메모">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={s.notesForReaders} />
+          </div>
         </Section>
       )}
     </article>
@@ -413,6 +457,35 @@ function SourceLinkInline({
     </button>
   );
 }
+
+
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function Section({
   title,

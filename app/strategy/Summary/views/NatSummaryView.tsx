@@ -10,6 +10,9 @@ import {
 } from "../adapters/NationalStrategyTaxCrimeBlocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
@@ -26,7 +29,11 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
-  
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
+
   
   const {
     selectedSummaryBlockId,
@@ -228,6 +235,9 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
       {block.nationalStrategy && (
         <>
           <Section title="국가 전략 인식 구조">
+            <div style={{ position: "relative" }}>
+            {/* 🔹 블러 대상 내용 */}
+            <div style={blurStyle(isLocked)}>
             <p
               style={{
                 fontSize: 14,
@@ -268,10 +278,29 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
               </span>
               <span>{block.nationalStrategy.stateOfUnderstanding}</span>
             </p>
+            </div>
+            {/* 🔒 잠금 오버레이 + 버튼 */}
+            {isLocked && (
+              <div style={lockOverlayStyle}>
+                <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                  이 전략 분석은
+                  <br />
+                  <strong>구독 후 전체 확인할 수 있습니다</strong>
+                </p>
+                <button
+                  style={ctaButtonStyle}
+                  onClick={() => router.push("/me/subscribe?from=strategy")}
+                >
+                  구독하고 전체 보기
+                </button>
+              </div>
+            )}
+            </div>
           </Section>
 
           {block.nationalStrategy.analyticalAssets.length > 0 && (
             <Section title="분석 자산(Analytical assets)">
+              <div style={blurStyle(isLocked)}>
               {block.nationalStrategy.analyticalAssets.map((a, i) => (
                 <Card key={i} title={a.label}>
                   <p
@@ -302,11 +331,13 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
                   )}
                 </Card>
               ))}
+              </div>
             </Section>
           )}
 
           {block.nationalStrategy.constrainedThinking.length > 0 && (
             <Section title="제한된 사고의 오류와 교정">
+              <div style={blurStyle(isLocked)}>
               {block.nationalStrategy.constrainedThinking.map((c, i) => (
             <Card key={i}>
               {/* 기존 인식 */}
@@ -393,11 +424,13 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
               </div>
             </Card>
               ))}
+              </div>
             </Section>
           )}
 
           {block.nationalStrategy.legitimateVariations.length > 0 && (
-            <Section title="정책 설계상의 정당한 다양성">
+            <Section title="정책 설계상의 다양성">
+              <div style={blurStyle(isLocked)}>
               {block.nationalStrategy.legitimateVariations.map((v, i) => (
                 <Card key={i}>
                   <p
@@ -412,11 +445,13 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
                   <p style={{ marginBottom: 0 }}>{v.justification}</p>
                 </Card>
               ))}
+              </div>
             </Section>
           )}
 
           {block.nationalStrategy.deferredPolicyQuestions.length > 0 && (
             <Section title="추후 검토할 정책 쟁점">
+              <div style={blurStyle(isLocked)}>
               {block.nationalStrategy.deferredPolicyQuestions.map(
                 (q, i) => (
                 <Card key={i}>
@@ -479,6 +514,7 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
 
                 )
               )}
+              </div>
             </Section>
           )}
         </>
@@ -489,6 +525,7 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
         <>
 
           <Section title="국가별 사례 분석 (Case-based learning)">
+            <div style={blurStyle(isLocked)}>
             <Card>
               <p style={{ marginBottom: 12 }}>
                 <strong>운용 제도:</strong>{" "}
@@ -523,11 +560,13 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
                 }
               </p>
             </Card>
+            </div>
           </Section>
 
           {block.caseBasedLearning.strategyComponentsInPractice.length >
             0 && (
             <Section title="실제 적용된 전략 구성요소">
+              <div style={blurStyle(isLocked)}>
               {block.caseBasedLearning.strategyComponentsInPractice.map(
                 (s, i) => (
                   <Card key={i} title={s.component_label}>
@@ -539,11 +578,13 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
                   </Card>
                 )
               )}
+              </div>
             </Section>
           )}
 
           {block.caseBasedLearning.implementationPatterns.length > 0 && (
             <Section title="운용 방식(Implementation patterns)">
+              <div style={blurStyle(isLocked)}>
               {block.caseBasedLearning.implementationPatterns.map(
                 (p, i) => (
                   <Card key={i} title={p.pattern_label}>
@@ -572,11 +613,13 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
                   </Card>
                 )
               )}
+              </div>
             </Section>
           )}
 
           {block.caseBasedLearning.transferableInsights.length > 0 && (
             <Section title="정책 시사점">
+               <div style={blurStyle(isLocked)}>
               {block.caseBasedLearning.transferableInsights.map(
                 (t, i) => (
                   <Card key={i}>
@@ -603,11 +646,13 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
                   </Card>
                 )
               )}
+              </div>
             </Section>
           )}
 
           {block.caseBasedLearning.caseSpecificLimits.length > 0 && (
             <Section title="사례 적용상의 제약 조건">
+              <div style={blurStyle(isLocked)}>
               {block.caseBasedLearning.caseSpecificLimits.map(
                 (l, i) => (
                   <Card key={i}>
@@ -625,6 +670,7 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
                   </Card>
                 )
               )}
+              </div>
             </Section>
           )}
         </>
@@ -635,6 +681,33 @@ export function NatSummaryView({ bookId }: { bookId: string }) {
 }
 
 /* ---------- UI Helpers ---------- */
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function Section({
   title,

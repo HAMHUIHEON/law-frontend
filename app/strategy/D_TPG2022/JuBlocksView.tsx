@@ -18,6 +18,9 @@ import { PAGE_OFFSET_BY_BOOK } from "../pageoffset";
 import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../access";
+import { useRouter } from "next/navigation";
 
 
 const colors = {
@@ -42,6 +45,10 @@ export function JuBlocksView({ bookId }: JuBlocksViewProps) {
     setViewMode,
     setBriefPage,
   } = useStrategyUI();
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "MJU");
+  const isLocked = access !== "FULL";
 
   const [vm, setVm] = useState<JudgementUnitsVM | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -292,101 +299,131 @@ useRecordStrategyTrace({
           marginBottom: 12,
         }}
       >
-        {/* <span>block_id: {block.blockId}</span>
-        {block.judgementId && (
-          <span>judgement_id: {block.judgementId}</span>
-        )}
-        {block.sectionKey && (
-          <span style={{ wordBreak: "break-all" }}>
-            section_key: {block.sectionKey}
-          </span>
-        )}
-        {pageRange.pageStart !== null && pageRange.pageEnd !== null && (
-          <span>
-            p.{pageRange.pageStart}–{pageRange.pageEnd}
-          </span>
-        )} */}
       </div>
 
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
       {/* 핵심 질문 */}
       <Section title="핵심 판단 질문">
-        {block.core_question ? (
-          <p style={{ fontSize: 14 }}>{block.core_question}</p>
-        ) : (
-          <EmptyText />
-        )}
+        <div style={{ position: "relative", minHeight: 120 }}>
+          <div style={blurStyle(isLocked)}>
+            {block.core_question ? (
+              <p style={{ fontSize: 14 }}>{block.core_question}</p>
+            ) : (
+              <EmptyText />
+            )}
+          </div>
+
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 전략 설계도는
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
+        </div>
       </Section>
 
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
       {/* 이 블록이 필요한 이유 */}
       <Section title="이 판단 기준이 필요한 이유">
-        {block.why_this_exists ? (
-          <p style={{ fontSize: 14 }}>{block.why_this_exists}</p>
-        ) : (
-          <EmptyText />
-        )}
+        <div style={{ position: "relative", minHeight: 80 }}>
+          <div style={blurStyle(isLocked)}>
+            {block.why_this_exists ? (
+              <p style={{ fontSize: 14 }}>{block.why_this_exists}</p>
+            ) : (
+              <EmptyText />
+            )}
+          </div>
+        </div>
       </Section>
 
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
       {/* 필수 개념 */}
       <Section title="필수 개념 (Mandatory concepts)">
-        {block.mandatory_concepts.length > 0 ? (
-          block.mandatory_concepts.map(
-            (mc: JuMandatoryConceptJson, idx: number) => (
-              <MandatoryConceptCard key={idx} mc={mc} />
-            )
-          )
-        ) : (
-          <EmptyText />
-        )}
+        <div style={{ position: "relative", minHeight: 120 }}>
+          <div style={blurStyle(isLocked)}>
+            {block.mandatory_concepts.length > 0 ? (
+              block.mandatory_concepts.map(
+                (mc: JuMandatoryConceptJson, idx: number) => (
+                  <MandatoryConceptCard key={idx} mc={mc} />
+                )
+              )
+            ) : (
+              <EmptyText />
+            )}
+          </div>
+        </div>
       </Section>
 
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
+
 
       {/* 판단 절차 (Decision flow) */}
       <Section title="판단 절차 (Decision flow)">
-        {block.decision_flow.length > 0 ? (
-          block.decision_flow.map(
-            (step: JuDecisionFlowStepJson, idx: number) => (
-              <DecisionFlowCard key={idx} step={step} />
-            )
-          )
-        ) : (
-          <EmptyText />
-        )}
+        <div style={{ position: "relative", minHeight: 140 }}>
+          <div style={blurStyle(isLocked)}>
+            {block.decision_flow.length > 0 ? (
+              block.decision_flow.map(
+                (step: JuDecisionFlowStepJson, idx: number) => (
+                  <DecisionFlowCard key={idx} step={step} />
+                )
+              )
+            ) : (
+              <EmptyText />
+            )}
+          </div>
+        </div>
       </Section>
 
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
+
 
       {/* 관련 원문 / 네비게이션 */}
       <Section title="관련 원문 및 참고 (Navigation)">
-        {block.navigation ? (
-      <NavigationSection
-        navigation={block.navigation}
-        onOpenPage={(pageStart) => {
-          setBriefPage(pageStart + 2);
-          setViewMode("BRIEFS");
-        }}
-      />
-        ) : (
-          <EmptyText />
-        )}
+        <div style={{ position: "relative", minHeight: 100 }}>
+          <div style={blurStyle(isLocked)}>
+            {block.navigation ? (
+              <NavigationSection
+                navigation={block.navigation}
+                onOpenPage={(pageStart) => {
+                  setBriefPage(pageStart + 2);
+                  setViewMode("BRIEFS");
+                }}
+              />
+            ) : (
+              <EmptyText />
+            )}
+          </div>
+        </div>
       </Section>
 
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
+
       {/* 한계와 주의점 */}
       <Section title="한계와 주의점 (Boundaries)">
-        {block.boundaries ? (
-          <BoundariesSection boundaries={block.boundaries} />
-        ) : (
-          <EmptyText />
-        )}
+        <div style={{ position: "relative", minHeight: 80 }}>
+          <div style={blurStyle(isLocked)}>
+            {block.boundaries ? (
+              <BoundariesSection boundaries={block.boundaries} />
+            ) : (
+              <EmptyText />
+            )}
+          </div>
+        </div>
       </Section>
+
     </article>
         </>
   );
@@ -395,6 +432,34 @@ useRecordStrategyTrace({
 /* ============================== */
 /* 공통 UI 컴포넌트               */
 /* ============================== */
+
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function Section({
   title,
@@ -662,21 +727,6 @@ function DecisionFlowCard({ step }: { step: JuDecisionFlowStepJson }) {
           )}
         </div>
       )}
-
-      {/* Stop condition
-      {step.stop_if && (
-        <div
-          style={{
-            marginTop: 12,
-            paddingTop: 8,
-            borderTop: `1px dashed ${colors.line}`,
-            fontSize: 12,
-            color: colors.muted,
-          }}
-        >
-          ⛔ 판단 종료 조건: {step.stop_if}
-        </div>
-      )} */}
     </div>
   );
 }
@@ -892,3 +942,4 @@ function BoundariesSection({ boundaries }: { boundaries: JuBoundariesJson }) {
     </div>
   );
 }
+

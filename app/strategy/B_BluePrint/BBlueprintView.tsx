@@ -41,7 +41,7 @@ export function BBlueprintView({ bookId }: { bookId: string }) {
   const router = useRouter();
   const [index, setIndex] = useState<BlueprintIndex | null>(null);
   const [currentBlockId, setCurrentBlockId] = useState<string | null>(null);
-  const { selectedBlueprintBlockId, setSelectedBlueprintBlockId } = useStrategyUI();
+  const {selectedBlueprintBlockId, setSelectedBlueprintBlockId } = useStrategyUI();
   const [flowStageMap, setFlowStageMap] = useState<Record<string, string>>({});
   const userAccess = useUserAccessLevel();
   const access = getStrategyAccess(userAccess, "BLUEPRINTS");
@@ -292,8 +292,6 @@ const handleSaveBlock = async () => {
           <StrategyList actions={blueprint.actions} />
         </div>
       </Section>
-
-
 
       <Section title="의사 결정">
         <div style={blurStyle(isLocked)}>

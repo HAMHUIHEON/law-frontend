@@ -12,6 +12,9 @@ import {
 } from "../adapters/FightingTaxCrime2ndEditionBlocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
@@ -26,6 +29,10 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
 
   const {
     selectedSummaryBlockId,
@@ -324,6 +331,10 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
       {/* 1. 이 원칙의 취지 / 정책 논리 */}
       {(t.coreMessage || t.policyRationale.length > 0) && (
         <Section title="이 원칙의 취지">
+          <div style={{ position: "relative" }}>
+
+          {/* 🔹 블러 대상 내용 */}
+          <div style={blurStyle(isLocked)}>
           {t.coreMessage && (
             <p
               style={{
@@ -337,20 +348,40 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
               {t.coreMessage}
             </p>
           )}
-
           {t.policyRationale.length > 0 && (
             <div style={{ marginTop: t.coreMessage ? 8 : 0 }}>
               <SubHeading>정책적 근거</SubHeading>
               <CollapsibleBulletList items={t.policyRationale} previewCount={3} small />
             </div>
           )}
+           </div>
+
+            {/* 🔒 잠금 오버레이 + 버튼 */}
+            {isLocked && (
+              <div style={lockOverlayStyle}>
+                <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                  이 전략 분석은
+                  <br />
+                  <strong>구독 후 전체 확인할 수 있습니다</strong>
+                </p>
+                <button
+                  style={ctaButtonStyle}
+                  onClick={() => router.push("/me/subscribe?from=strategy")}
+                >
+                  구독하고 전체 보기
+                </button>
+              </div>
+            )}
+          </div>
         </Section>
       )}
+
       <Divider />
 
       {/* 2. 법적 요건 */}
       {t.legalRequirements.length > 0 && (
         <Section title="법적 요건">
+          <div style={blurStyle(isLocked)}>
           {t.legalRequirements.map((lr, idx) => (
             <div key={idx} style={{ marginBottom: 16 }}>
               <BlockLabel>{lr.label}</BlockLabel>
@@ -383,6 +414,7 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
             )}
             </div>
           ))}
+          </div>
         </Section>
       )}
       <Divider />
@@ -390,6 +422,7 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
       {/* 3. 운영 요소 */}
       {t.operationalElements.length > 0 && (
         <Section title="운영 요소">
+        <div style={blurStyle(isLocked)}>
           {t.operationalElements.map((op, idx) => (
             <div key={idx} style={{ marginBottom: 16 }}>
               <BlockLabel>{op.label}</BlockLabel>
@@ -420,6 +453,7 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
             )}
             </div>
           ))}
+          </div>
         </Section>
       )}
       <Divider />
@@ -427,6 +461,7 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
       {/* 4. 연계·공조 구조 */}
       {t.cooperationDimensions.length > 0 && (
         <Section title="연계·공조 구조">
+          <div style={blurStyle(isLocked)}>
           {t.cooperationDimensions.map((co, idx) => (
             <div key={idx} style={{ marginBottom: 16 }}>
               <BlockLabel>{co.label}</BlockLabel>
@@ -448,16 +483,19 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
               )}
             </div>
           ))}
+          </div>
         </Section>
       )}
       <Divider />
 
       {/* 5. 이행상 어려움 */}
       {t.implementationChallenges.length > 0 && (
-        <Section title="이행상 어려움">
+        <Section title="이행상 도전과제">
+           <div style={blurStyle(isLocked)}>
           {t.implementationChallenges.map((ch, idx) => (
             <ChallengeBlock key={idx} ch={ch} />
           ))}
+          </div>
         </Section>
       )}
       <Divider />
@@ -465,9 +503,11 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
       {/* 6. 사례 요약 */}
       {t.caseHighlights.length > 0 && (
         <Section title="사례 요약">
+          <div style={blurStyle(isLocked)}>
           {t.caseHighlights.map((c, idx) => (
             <CaseHighlightBlock key={idx} ch={c} />
           ))}
+          </div>
         </Section>
       )}
       <Divider />
@@ -475,7 +515,9 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
       {/* 7. 남은 쟁점 */}
       {t.deferredQuestions.length > 0 && (
         <Section title="추후 논의">
+          <div style={blurStyle(isLocked)}>
           <BulletList items={t.deferredQuestions} />
+          </div>
         </Section>
       )}
     </article>
@@ -486,6 +528,33 @@ export function FtcSummaryView({ bookId }: { bookId: string }) {
 /* ======================
  * UI Components
  * ====================== */
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function SourceLinkInline({
   pageStart,

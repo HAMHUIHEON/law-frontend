@@ -11,6 +11,9 @@ import {
 } from "../adapters/TaxCrimeInvestigationManualBlocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
@@ -24,6 +27,11 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
+
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
 
   const {
     selectedSummaryBlockId,
@@ -190,7 +198,27 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
 
       {/* ===== Module Role ===== */}
       <Section title="수사 체계 내 역할과 기능">
+        <div style={{ position: "relative" }}>
+        <div style={blurStyle(isLocked)}>
         <p>{m.module_role_in_investigation_lifecycle}</p>
+        </div>
+        {/* 🔒 잠금 오버레이 + CTA */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 해설은
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
+        </div>
       </Section>
 
       {/* ===== Objectives ===== */}
@@ -203,16 +231,19 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
 
       {/* ===== Must-have subsections ===== */}
       <Section title="매뉴얼 필수 구성 요소">
+        <div style={blurStyle(isLocked)}>
         {m.must_have_subsections_in_manual.map((s, i) => (
           <Card key={i} title={s.name}>
         <p style={{ marginBottom: 10 ,fontWeight:500}}>{s.purpose}</p>
             <BulletList items={s.typical_content} />
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* ===== Key procedures ===== */}
       <Section title="핵심 절차 · 의사결정 흐름">
+        <div style={blurStyle(isLocked)}>
         {m.key_procedures_or_decision_flows.map((p, i) => (
           <Card key={i} title={p.label}>
             <p>{p.description}</p>
@@ -239,10 +270,12 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
             )}
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* ===== Internal stakeholders ===== */}
       <Section title="내부 이해관계자와 책임">
+        <div style={blurStyle(isLocked)}>
         {m.internal_stakeholders_and_responsibilities.map((s, i) => (
           <Card key={i} title={s.actor}>
 
@@ -259,10 +292,12 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
             <BulletList items={s.typical_points_of_interaction} />
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* ===== External stakeholders ===== */}
       <Section title="외부 기관과의 협업">
+        <div style={blurStyle(isLocked)}>
         {m.external_stakeholders_and_interfaces.map((e, i) => (
           <Card key={i} title={e.counterpart}>
             <p>{e.purpose}</p>
@@ -280,10 +315,12 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
             <BulletList items={e.coordination_risks} />
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* ===== National variations ===== */}
       <Section title="국가별 제도 요소">
+        <div style={blurStyle(isLocked)}>
         {m.legitimate_national_variations.map((v, i) => (
           <Card key={i} title={v.dimension}>
           {/* 미세 구분선 */}
@@ -296,10 +333,12 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
             <p>{v.justification}</p>
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* ===== Risks ===== */}
       <Section title="기능 부재·취약으로 인한 위험">
+        <div style={blurStyle(isLocked)}>
         {m.risks_if_module_is_weak_or_missing.map((r, i) => (
           <Card key={i}>
             <p style={{ fontWeight: 600, marginBottom: 6 }}>
@@ -319,10 +358,12 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
             <BulletList items={r.downstream_consequences} />
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* ===== Deferred questions ===== */}
       <Section title="추후 정책 판단 과제">
+        <div style={blurStyle(isLocked)}>
         {m.deferred_policy_questions.map((q, i) => (
           <Card key={i}>
             <p style={{ marginBottom: 10 }}>
@@ -335,6 +376,7 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
             </p>
           </Card>
         ))}
+        </div>
       </Section>
     </article>
           </>
@@ -342,6 +384,34 @@ export function TcimSummaryView({ bookId }: { bookId: string }) {
 }
 
 /* ---------- UI helpers ---------- */
+
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function Section({
   title,

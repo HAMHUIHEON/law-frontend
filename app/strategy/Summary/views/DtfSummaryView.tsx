@@ -10,6 +10,9 @@ import {
 } from "../adapters/DividendTaxFraudBlocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
 
 const colors = {
   ink: "#111827",
@@ -24,6 +27,10 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
 
   const {
     selectedSummaryBlockId,
@@ -168,6 +175,8 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
 
       {/* 핵심 메시지 */}
       <Section title="핵심 메시지">
+      <div style={{ position: "relative" }}>
+      <div style={blurStyle(isLocked)}>
         <div
           style={{
             paddingLeft: 12,
@@ -178,25 +187,50 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
         >
           {s.core_message}
         </div>
+        </div>
+        {/* 🔒 오버레이 (첫 섹션만) */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 요약 분석은
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
+        </div>
       </Section>
 
       {/* 주요 발견 */}
       <Section title="주요 발견">
+      <div style={blurStyle(isLocked)}>
         <CollapsibleBulletList items={s.key_findings} />
+      </div>
       </Section>
 
       {/* 작동 메커니즘 */}
       <Section title="작동 메커니즘">
+      <div style={blurStyle(isLocked)}>
         <CollapsibleBulletList items={s.mechanisms} />
+      </div>
       </Section>
 
       {/* 리스크 요인 */}
       <Section title="리스크 요인">
+      <div style={blurStyle(isLocked)}>
         <CollapsibleBulletList items={s.risk_factors} />
+      </div>
       </Section>
 
       {/* 제도적 요구사항 */}
       <Section title="제도적 요구사항">
+      <div style={blurStyle(isLocked)}>
         {s.requirements.map((r, i) => (
           <Card key={i} title={r.label}>
           {/* 미세 구분선 */}
@@ -216,10 +250,12 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
             )}
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* 운영 요소 */}
       <Section title="운영 요소">
+        <div style={blurStyle(isLocked)}>
         {s.operational_elements.map((o, i) => (
           <Card key={i} title={o.label}>
             
@@ -239,10 +275,12 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
             )}
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* 협력 차원 */}
       <Section title="협력 차원">
+        <div style={blurStyle(isLocked)}>
         {s.cooperation_dimensions.map((c, i) => (
           <Card key={i} title={c.label}>
             <p style={{ marginBottom: c.sub_points.length ? 8 : 0,
@@ -262,10 +300,12 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
             )}
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* 실행상 도전 과제 */}
       <Section title="실행상 도전 과제">
+        <div style={blurStyle(isLocked)}>
         {s.implementation_challenges.map((ch, i) => (
           <Card key={i}>
             <p style={{ marginBottom: 6 }}>
@@ -277,11 +317,14 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
             <BulletList items={ch.response} />
           </Card>
         ))}
+        </div>
       </Section>
 
       {/* 근거 자료 */}
       <Section title="근거 자료">
+        <div style={blurStyle(isLocked)}>
         <BulletList items={s.evidence_anchors} />
+       </div>
       </Section>
     </article>
     </>
@@ -289,6 +332,33 @@ export function DtfSummaryView({ bookId }: { bookId: string }) {
 }
 
 /* ================= 공통 컴포넌트 ================= */
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function SourceLinkInline({
   pageStart,

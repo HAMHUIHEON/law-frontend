@@ -11,10 +11,18 @@ import { PAGE_OFFSET_BY_BOOK } from "../pageoffset";
 import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../access";
+import { useRouter } from "next/navigation";
 
 
 export function RiskTypesView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "RISK_TYPES");
+  const isLocked = access !== "FULL";
+
   const [items, setItems] = useState<RiskTypologyArticleVM[]>([]);
   const [current, setCurrent] = useState<RiskTypologyArticleVM | null>(null);
   const offset = PAGE_OFFSET_BY_BOOK[bookId] ?? 0;
@@ -248,16 +256,37 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
         >
           왜 지금 중요한가
         </h3>
-        <div style={{ paddingLeft: 10 }}>
-        <div
-          style={{
-            paddingLeft: 24,
-            borderLeft: "3px solid #6d28d9",
-            color: "#374151",
-          }}
-        >
-          <p>{current.whyNow.text}</p>
+        <div style={{ position: "relative" }}>
+        {/* 🔹 내용 (블러 대상) */}
+        <div style={blurStyle(isLocked)}>
+          <div style={{ paddingLeft: 10 }}>
+            <div
+              style={{
+                paddingLeft: 24,
+                borderLeft: "3px solid #6d28d9",
+                color: "#374151",
+              }}
+            >
+              <p>{current.whyNow.text}</p>
+            </div>
+          </div>
         </div>
+          {/* 🔒 오버레이 (첫 섹션에만) */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 리스크 분석은
+                <br />
+                <strong>구독 후 전체 내용을 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -266,6 +295,8 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
         <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>
           범죄 구조·작동 방식
         </h3>
+
+        <div style={blurStyle(isLocked)}>
         <div style={{ paddingLeft: 12 }}>
         {current.sections.structuralPattern.map((item, idx) => (
           <div
@@ -289,6 +320,7 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
           </div>
         ))}
         </div>
+        </div>
       </section>
 
       {/* 제도적·환경적 가능 요인 */}
@@ -296,6 +328,7 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
         <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>
           제도적·환경적 가능 요인
         </h3>
+        <div style={blurStyle(isLocked)}>
 
         <ul
           style={{
@@ -313,6 +346,7 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
             </li>
           ))}
         </ul>
+        </div>
       </section>
 
       {/* 주요 탐지 신호 */}
@@ -320,6 +354,7 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
         <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>
           주요 탐지 신호
         </h3>
+        <div style={blurStyle(isLocked)}>
         <div style={{ paddingLeft: 10 }}>
         {current.sections.detectionSignals.map((item, idx) => (
         <div
@@ -347,6 +382,7 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
         </div>
         ))}
         </div>
+        </div>
       </section>
 
     </article>
@@ -357,6 +393,33 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
 /* ------------------------------
    하위 컴포넌트
 -------------------------------- */
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function Section({
   title,

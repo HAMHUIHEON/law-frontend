@@ -10,6 +10,9 @@ import {
 } from "../adapters/TaxCrimeInvestigationMaturityModelBlocks.adapter";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../../access";
+import { useRouter } from "next/navigation";
 
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
@@ -25,6 +28,11 @@ export function TciMmSummaryView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
+
+  const router = useRouter();
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "SUMMARY");
+  const isLocked = access !== "FULL";
 
   const {
     selectedSummaryBlockId,
@@ -203,12 +211,35 @@ export function TciMmSummaryView({ bookId }: { bookId: string }) {
       </header>
 
       <Section title="핵심 요약">
+        <div style={{ position: "relative" }}>
+        <div style={blurStyle(isLocked)}>
         <p style={{ fontSize: 15, fontWeight: 500 }}>{m.core_message}</p>
+        </div>
+
+        {/* 🔒 잠금 오버레이 + CTA */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 요약 해설은
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
+        </div>
       </Section>
       <Divider />
 
       <Section title="현행 제도에 대한 진단">
+        <div style={blurStyle(isLocked)}>
         <CollapsibleBulletList items={m.state_of_understanding} />
+      </div>
       </Section>
 
       <OptionalSection title="기본 법제 요건" items={m.requirements} />
@@ -224,13 +255,42 @@ export function TciMmSummaryView({ bookId }: { bookId: string }) {
   );
 }
 
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 function OptionalSection({
   title,
   items,
+  locked,
 }: {
   title: string;
   items?: string[];
+  locked?: boolean;
 }) {
   if (!items || items.length === 0) return null;
 
@@ -238,7 +298,10 @@ function OptionalSection({
     <>
       <Divider />
       <Section title={title}>
-        <CollapsibleBulletList items={items} />
+        {/* 🔒 내용만 블러 */}
+        <div style={blurStyle(!!locked)}>
+          <CollapsibleBulletList items={items} />
+        </div>
       </Section>
     </>
   );
