@@ -73,6 +73,7 @@ export function CaseUIProvider({
   });
 
   const startCase = useCallback((nextCaseId: string) => {
+    // 🔑 "분석/조회 화면으로 진입"할 때만 쓰는 API
     setMainError(null);
     setViewMode("FLOW");
     setCaseId(nextCaseId);

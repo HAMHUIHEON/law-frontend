@@ -118,9 +118,13 @@ export default function CaseSidebar() {
 
       // ✅ 캐시 히트인 경우
       if (json.cache_hit) {
-        setMainError("CACHE_HIT");   // 🔑 핵심
+        setMainError("CACHE_HIT");
+        setCaseId(normalized);   // 🔑 조회칸에 바로 앉힘 (UX 유지)
+        router.push(`/cases?case_id=${encodeURIComponent(normalized)}`);
+        return;                 // 🔑 startCase 절대 타지 않음
       }
 
+      // 신규 판례만 여기로
       startCase(normalized);
       router.push(`/cases?case_id=${encodeURIComponent(normalized)}`);
 
