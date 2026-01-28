@@ -16,7 +16,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 export function BFlowView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
   const [vm, setVm] = useState<FlowViewModel | null>(null);
-  const { setViewMode, setBriefPage } = useStrategyUI();
+  const { setViewMode, setBriefPage, setSelectedBlueprintBlockId } = useStrategyUI();
   const offset = PAGE_OFFSET_BY_BOOK[bookId] ?? 0;
   const [currentBlockId, setCurrentBlockId] = useState<string | null>(null);
   const saveThought = useSaveThought();
@@ -161,8 +161,9 @@ return (
         key={block.id}
         block={block}
         onView={() => {
-        // ✅ 여기서만 사고 발생
-        setCurrentBlockId(block.id);
+          setCurrentBlockId(block.id);              // 사고 기록용
+          setSelectedBlueprintBlockId(block.id);    // 🔑 Blueprint 선택
+          setViewMode("BLUEPRINTS");                 // 🔑 화면 전환
         }}
         onOpenSource={() => {
           setCurrentBlockId(block.id); // 🔥 source 열어도 사고로 인정
@@ -187,21 +188,32 @@ function FlowBlockCard({
 }) {
   return (
     <section
-      onClick={onView}
       style={{
         marginBottom: 40,
         paddingBottom: 24,
         borderBottom: "1px solid #e5e7eb",
-        cursor: "pointer",
       }}
     >
       {/* 블록 ID */}
       <div
+        onClick={(e) => {
+          e.stopPropagation();
+          onView();
+        }}
         style={{
           fontSize: 12,
           fontWeight: 600,
           color: "#6b7280",
           marginBottom: 6,
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = "#6d28d9";
+          e.currentTarget.style.textDecoration = "underline";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = "#6b7280";
+          e.currentTarget.style.textDecoration = "none";
         }}
       >
         {block.id}
