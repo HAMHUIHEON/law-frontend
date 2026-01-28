@@ -15,6 +15,10 @@ import { getBlueprintById } from "./blueprint.index";
 import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getStrategyAccess } from "../access";
+import { useRouter } from "next/navigation";
+
 
 /* ========================
    MAIN VIEW
@@ -34,11 +38,14 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export function BBlueprintView({ bookId }: { bookId: string }) {
   const { userId } = useAuth();
-  
+  const router = useRouter();
   const [index, setIndex] = useState<BlueprintIndex | null>(null);
   const [currentBlockId, setCurrentBlockId] = useState<string | null>(null);
   const { selectedBlueprintBlockId, setSelectedBlueprintBlockId } = useStrategyUI();
   const [flowStageMap, setFlowStageMap] = useState<Record<string, string>>({});
+  const userAccess = useUserAccessLevel();
+  const access = getStrategyAccess(userAccess, "BLUEPRINTS");
+  const isLocked = access !== "FULL";
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
@@ -205,6 +212,7 @@ const handleSaveBlock = async () => {
         maxWidth: 960,
         lineHeight: 1.8,
         color: "#111827",
+        position: "relative", //오버레이 기준
       }}
     >      
     
@@ -238,37 +246,116 @@ const handleSaveBlock = async () => {
 
 
       <Section title="착수·개시 계기">
-        <ParagraphList items={blueprint.entryTriggers} />
+        <div
+          style={{
+            position: "relative",
+          }}
+        >
+          {/* 🔹 블러 대상 내용 */}
+          <div
+            style={{
+              filter: isLocked ? "blur(6px)" : "none",
+              pointerEvents: isLocked ? "none" : "auto",
+              userSelect: isLocked ? "none" : "auto",
+            }}
+          >
+            <ParagraphList items={blueprint.entryTriggers} />
+          </div>
+
+          {/* 🔒 잠금 오버레이 (첫 섹션에만) */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 전략 설계도는
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
+        </div>
       </Section>
 
-        <Section title="조사 전략">
-        <StrategyList actions={blueprint.actions} />
-        </Section>
+      <Section title="조사 전략">
+        <div
+          style={{
+            filter: isLocked ? "blur(6px)" : "none",
+            pointerEvents: isLocked ? "none" : "auto",
+            userSelect: isLocked ? "none" : "auto",
+          }}
+        >
+          <StrategyList actions={blueprint.actions} />
+        </div>
+      </Section>
+
 
 
       <Section title="의사 결정">
-        {blueprint.decisionPoints.map((d, i) => (
-          <DecisionBlock key={i} decision={d} />
-        ))}
+        <div style={blurStyle(isLocked)}>
+          {blueprint.decisionPoints.map((d, i) => (
+            <DecisionBlock key={i} decision={d} />
+          ))}
+        </div>
       </Section>
 
       <Section title="이관·확대 경로">
-        {blueprint.escalationPaths.map((e, i) => (
-          <EscalationBlock key={i} path={e} />
-        ))}
+        <div style={blurStyle(isLocked)}>
+          {blueprint.escalationPaths.map((e, i) => (
+            <EscalationBlock key={i} path={e} />
+          ))}
+        </div>
       </Section>
 
       <Section title="중단 기준">
-        <TightList items={blueprint.stopLines} />
+        <div style={blurStyle(isLocked)}>
+          <TightList items={blueprint.stopLines} />
+        </div>
       </Section>
 
       <Section title="필수 산출물">
-        <TightList items={blueprint.requiredArtifacts} />
+        <div style={blurStyle(isLocked)}>
+          <TightList items={blueprint.requiredArtifacts} />
+        </div>
       </Section>
+
     </article>
      </>
   );
 }
+
+const blurStyle = (locked: boolean): React.CSSProperties => ({
+  filter: locked ? "blur(6px)" : "none",
+  pointerEvents: locked ? "none" : "auto",
+  userSelect: locked ? "none" : "auto",
+});
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
+
 function Section({
   title,
   children,
