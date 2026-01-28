@@ -1,8 +1,14 @@
 // app/me/subscribe/page.tsx
 "use client";
 
+import { Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
+/* =========================
+ * COPY (네가 만든 거 그대로)
+ * ========================= */
 const COPY_BY_FROM = {
   case: {
     heroTitle: (
@@ -42,6 +48,8 @@ const COPY_BY_FROM = {
       "판례 업로드 및 분석 실행",
       "저장 · 재열람 · 사고 히스토리 관리",
     ],
+    afterPath: "/cases",
+    cta: "구독하여 전체 판례 분석 보기",
   },
 
   law: {
@@ -65,18 +73,18 @@ const COPY_BY_FROM = {
         판단의 흐름 속에서 정리해 줍니다.
       </>
     ),
-  whyLocked: (
-    <>
-      이러한 해석 단계는
-      <br />
-      법령을 정리해 보여주는 것을 넘어
-      <br />
-      판단의 흐름을 이해하기 위한
-      <br />
-      분석 자료 성격의 콘텐츠이기 때문에
-      <strong> 구독자 전용</strong>으로 제공됩니다.
-    </>
-  ),
+    whyLocked: (
+      <>
+        이러한 해석 단계는
+        <br />
+        법령을 정리해 보여주는 것을 넘어
+        <br />
+        판단의 흐름을 이해하기 위한
+        <br />
+        분석 자료 성격의 콘텐츠이기 때문에
+        <strong> 구독자 전용</strong>으로 제공됩니다.
+      </>
+    ),
     benefits: [
       "법령 해석(Semantic) 단계 열람",
       "적용 요건 · 효과 · 예외 구조화된 정리",
@@ -84,6 +92,8 @@ const COPY_BY_FROM = {
       "조문 ↔ 판단 단계 간 연계 탐색",
       "해석·검토 내용 저장 및 재열람",
     ],
+    afterPath: "/law",
+    cta: "구독하여 전체 법령 분석 보기",
   },
 
   strategy: {
@@ -121,17 +131,19 @@ const COPY_BY_FROM = {
       "사고 단계별 구조화된 정리",
       "전략 사고 저장 및 재활용",
     ],
+    afterPath: "/strategy",
+    cta: "구독하여 전체 전략 보기",
   },
 } as const;
 
-
-export default function SubscribePage() {
+/* =========================
+ * Inner (실제 페이지)
+ * ========================= */
+function SubscribePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") ?? "case";
-  const copy =
-    COPY_BY_FROM[from as "case" | "law" | "strategy"] ??
-    COPY_BY_FROM.case;
+  const from = (searchParams.get("from") ?? "case") as keyof typeof COPY_BY_FROM;
+  const copy = COPY_BY_FROM[from] ?? COPY_BY_FROM.case;
 
   return (
     <main
@@ -143,149 +155,125 @@ export default function SubscribePage() {
       }}
     >
       <div style={{ maxWidth: 820, margin: "0 auto" }}>
-        {/* ================= HERO ================= */}
+        {/* HERO */}
         <section style={{ marginBottom: 64 }}>
-          <h1
-            style={{
-              fontSize: 34,
-              fontWeight: 700,
-              lineHeight: 1.25,
-              marginBottom: 18,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {copy.heroTitle}
-          </h1>
-
-          <p
-            style={{
-              fontSize: 16,
-              lineHeight: 1.8,
-              color: "rgba(255,255,255,0.65)",
-              maxWidth: 680,
-            }}
-          >
-            {copy.heroDesc}
-            </p>
+          <h1 style={heroTitleStyle}>{copy.heroTitle}</h1>
+          <p style={heroDescStyle}>{copy.heroDesc}</p>
         </section>
 
-        {/* ================= WHY LOCKED ================= */}
+        {/* WHY LOCKED */}
         <section style={{ marginBottom: 72 }}>
-        <h2 style={sectionTitle}>지금 보고 계셨던 분석에 대해</h2>
-
-        <p style={paragraph}>
-        {copy.whyLocked}
-        </p>
-
+          <h2 style={sectionTitle}>지금 보고 계셨던 분석에 대해</h2>
+          <p style={paragraph}>{copy.whyLocked}</p>
         </section>
 
-        {/* ================= WHAT YOU GET ================= */}
+        {/* BENEFITS */}
         <section style={{ marginBottom: 72 }}>
           <h2 style={sectionTitle}>구독 시 이용할 수 있는 내용</h2>
-
           <ul style={{ paddingLeft: 18, lineHeight: 1.9 }}>
-          {copy.benefits.map((item, idx) => (
-            <li key={idx}>✅ {item}</li>
-          ))}
+            {copy.benefits.map((b, i) => (
+              <li key={i}>✅ {b}</li>
+            ))}
           </ul>
         </section>
 
-        {/* ================= WHO IT IS FOR ================= */}
-        <section style={{ marginBottom: 72 }}>
-          <h2 style={sectionTitle}>이 서비스는 이런 분을 위한 것입니다</h2>
-
-          <ul style={{ paddingLeft: 18, lineHeight: 1.9 }}>
-            <li>
-              판례를 단순히 요약하는 것이 아니라
-              <strong> 왜 그렇게 판단됐는지</strong>를 이해하고 싶은 분
-            </li>
-            <li>
-              실무에서 판례를
-              <strong> 구조적으로 인용</strong>해야 하는 분
-            </li>
-            <li>
-              판례 읽는 감각을
-              <strong> 사고 체계로 만들고 싶은 분</strong>
-            </li>
-          </ul>
-        </section>
-
-        {/* ================= CTA ================= */}
-        <section
-          style={{
-            borderTop: "1px solid rgba(255,255,255,0.12)",
-            paddingTop: 48,
-            textAlign: "center",
-          }}
-        >
-          <p
-            style={{
-              fontSize: 20,
-              fontWeight: 600,
-              marginBottom: 12,
-            }}
-          >
-            월 구독
-          </p>
-
-          <p
-            style={{
-              fontSize: 28,
-              fontWeight: 700,
-              marginBottom: 28,
-            }}
-          >
-            ₩ XX,XXX / 월
-          </p>
+        {/* CTA */}
+        <section style={ctaSectionStyle}>
+          <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>월 구독</p>
+          <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ XX,XXX / 월</p>
 
           <button
             onClick={async () => {
               await fetch("/api/me/subscribe", { method: "POST" });
-              router.push("/cases"); // 구독 후 다시 판례로
+              router.push(copy.afterPath);
             }}
-            style={{
-              padding: "14px 22px",
-              borderRadius: 10,
-              border: "1px solid #ffffff",
-              background: "#ffffff",
-              color: "#0f172a",
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            style={ctaButtonStyle}
           >
-            구독하여 전체 판례 분석 보기
+            {copy.cta}
           </button>
-
-          <p
-            style={{
-              marginTop: 14,
-              fontSize: 12,
-              color: "rgba(255,255,255,0.55)",
-            }}
+         <p
+              style={{
+                marginTop: 14,
+                fontSize: 12,
+                color: "rgba(255,255,255,0.55)",
+                lineHeight: 1.6,
+                maxWidth: 640,
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
             >
-            구독 멤버십은 결제일로부터 7일 이내에 서비스를 이용하지 않은 경우에 한해 환불이 가능합니다.
-            <br />
-            이미 구독 서비스를 이용했거나, 결제일로부터 7일이 지난 경우에는 환불이 제공되지 않습니다.
-            <br /><br />
-            멤버십 해지는 언제든 ‘계정’ 페이지에서 가능하며,
-            해지하더라도 현재 결제 주기가 끝날 때까지는 구독 기능을 계속 이용하실 수 있습니다.
+              구독 멤버십은 결제일로부터 7일 이내에 서비스를 이용하지 않은 경우에 한해 환불이 가능합니다.
+              <br />
+              이미 구독 서비스를 이용했거나, 결제일로부터 7일이 지난 경우에는 환불이 제공되지 않습니다.
+              <br /><br />
+              멤버십 해지는 언제든 ‘계정’ 페이지에서 가능하며,
+              해지하더라도 현재 결제 주기가 끝날 때까지는 구독 기능을 계속 이용하실 수 있습니다.
             </p>
-        </section>
+          </section>
+
+
       </div>
     </main>
   );
 }
 
-const sectionTitle: React.CSSProperties = {
+/* =========================
+ * Suspense Wrapper
+ * ========================= */
+export default function SubscribePage() {
+  return (
+    <Suspense fallback={<p style={{ padding: 32 }}>불러오는 중…</p>}>
+      <SubscribePageInner />
+    </Suspense>
+  );
+}
+
+/* =========================
+ * Styles
+ * ========================= */
+const heroTitleStyle = {
+  fontSize: 34,
+  fontWeight: 700,
+  lineHeight: 1.25,
+  marginBottom: 18,
+  letterSpacing: "-0.01em",
+};
+
+const heroDescStyle = {
+  fontSize: 16,
+  lineHeight: 1.8,
+  color: "rgba(255,255,255,0.65)",
+  maxWidth: 680,
+};
+
+const sectionTitle = {
   fontSize: 18,
   fontWeight: 600,
   marginBottom: 16,
 };
 
-const paragraph: React.CSSProperties = {
+const paragraph = {
   fontSize: 15,
   lineHeight: 1.9,
   color: "rgba(255,255,255,0.7)",
-  marginBottom: 16,
 };
+
+const ctaSectionStyle = {
+  borderTop: "1px solid rgba(255,255,255,0.12)",
+  paddingTop: 48,
+  textAlign: "center" as const,
+};
+
+const ctaButtonStyle = {
+  padding: "14px 22px",
+  borderRadius: 10,
+  border: "1px solid #ffffff",
+  background: "#ffffff",
+  color: "#0f172a",
+  fontSize: 15,
+  fontWeight: 600,
+  cursor: "pointer",
+};
+
+
+
