@@ -56,4 +56,5 @@ export type MyPageVM = {
   saved: SavedThought[];
   traces: ThoughtTrace[];  // ✅ 반드시 필요
   documents: MyDocument[];
+  accessLevel: "GUEST" | "MEMBER" | "SUBSCRIBER"; // ✅ 이 줄만 추가
 };

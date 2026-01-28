@@ -9,6 +9,7 @@ import { SavedThoughtItem } from "./SavedThoughtItem";
 export const dynamic = "force-dynamic";
 
 const mockData: MyPageVM = {
+  accessLevel: "GUEST", // ✅ 추가
   recent: [],
   traces: [],          // ✅ 추가
   saved: [],
@@ -21,6 +22,14 @@ async function getMyPageVM(): Promise<MyPageVM> {
   if (!userId) {
     return mockData;
   }
+
+  const { data: accessRow } = await supabaseAdmin
+    .from("user_access_levels")
+    .select("access_level")
+    .eq("user_id", userId)
+    .single();
+
+  const accessLevel = accessRow?.access_level ?? "MEMBER";
 
  // ✅ 기존 recent_thoughts 유지
   const { data, error } = await supabaseAdmin
@@ -88,6 +97,7 @@ if (traceErr) {
 
   return {
     ...mockData,
+    accessLevel,
     recent: (data ?? []).map((row: any) => ({
       id: row.id,
       title: buildRecentTitle(row),
@@ -253,6 +263,50 @@ export default async function MyPage() {
         ))
         )}
       </section>
+      <section style={styles.section}>
+      <h2 style={styles.sectionTitle}>멤버십</h2>
+      {vm.accessLevel === "SUBSCRIBER" ? (
+        <>
+          <p style={styles.empty}>
+            현재 <strong>구독 멤버십</strong>을 이용 중입니다.
+          </p>
+
+          <button
+            style={{
+              marginTop: 12,
+              fontSize: 13,
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid rgba(255,255,255,0.35)",
+              background: "transparent",
+              color: "rgba(255,255,255,0.8)",
+              cursor: "pointer",
+            }}
+            onClick={async () => {
+              await fetch("/api/me/unsubscribe", { method: "POST" });
+              window.location.reload();
+            }}
+          >
+            멤버십 해지
+          </button>
+
+          <p style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+            해지 시 현재 결제 주기가 끝날 때까지 구독 기능을 이용할 수 있습니다.
+          </p>
+        </>
+      ) : (
+        <>
+          <p style={styles.empty}>
+            현재 무료 멤버십을 이용 중입니다.
+          </p>
+
+          <Link href="/me/subscribe" style={{ fontSize: 13, color: "#fff" }}>
+            구독 멤버십 알아보기 →
+          </Link>
+        </>
+      )}
+    </section>
+
     </main>
   );
 }
