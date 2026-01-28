@@ -23,6 +23,11 @@ export async function GET() {
     .eq("user_id", userId)
     .single();
 
+  // 3️⃣ row 없음 → MEMBER
+  if (!data) {
+    return NextResponse.json({ access_level: "MEMBER" });
+  }
+  
   // 3️⃣ row 없으면 → MEMBER (로그인만 한 상태)
   if (error || !data) {
     return NextResponse.json({ access_level: "MEMBER" });

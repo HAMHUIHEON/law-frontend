@@ -1,7 +1,7 @@
 //app/cases/access.ts
 
 
-import { UserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import type { UserAccessLevel } from "@/app/types/access";
 
 export type CaseReportType = "A" | "B" | "C";
 

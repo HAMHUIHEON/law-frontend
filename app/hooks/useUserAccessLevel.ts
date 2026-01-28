@@ -4,8 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-
-export type UserAccessLevel = "GUEST" | "MEMBER" | "SUBSCRIBER";
+import type { UserAccessLevel } from "@/app/types/access";
 
 export function useUserAccessLevel(): UserAccessLevel {
   const { userId } = useAuth();

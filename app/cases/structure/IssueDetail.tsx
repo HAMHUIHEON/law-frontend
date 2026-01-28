@@ -101,7 +101,7 @@ export function IssueDetail({ issue, access,  onSave }: Props) {
           </button> */}
           <button
           style={ctaButtonStyle}
-          onClick={() => router.push("/me/subscribe")}
+          onClick={() => router.push("/me/subscribe?from=case")}
         >
           구독하고 전체 보기
         </button>

@@ -1,10 +1,137 @@
 // app/me/subscribe/page.tsx
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+
+const COPY_BY_FROM = {
+  case: {
+    heroTitle: (
+      <>
+        판례를 읽다 보면
+        <br />
+        어디서부터 생각해야 할지
+        <br />
+        막히는 순간이 있습니다
+      </>
+    ),
+    heroDesc: (
+      <>
+        이 서비스는 판결의 결론이 아니라,
+        <br />
+        법원이 어떤 순서로 판단했는지를
+        <br />
+        쟁점과 논증 구조로 따라가도록 설계되었습니다.
+      </>
+    ),
+    whyLocked: (
+      <>
+        이러한 분석은
+        <br />
+        판례를 읽는 단계를 넘어
+        <br />
+        판단의 기준을
+        <br />
+        자신의 사고 자산으로 만드는 영역이기 때문에
+        <strong> 구독자 전용</strong>으로 제공됩니다.
+      </>
+    ),
+    benefits: [
+      "판례의 쟁점별 논증 구조 전체",
+      "법원이 판단에 이르기까지의 사고 흐름",
+      "각 쟁점에서 적용된 법리와 기준",
+      "판례 업로드 및 분석 실행",
+      "저장 · 재열람 · 사고 히스토리 관리",
+    ],
+  },
+
+  law: {
+    heroTitle: (
+      <>
+        법령을 보다 보면
+        <br />
+        어디까지가 요건이고
+        <br />
+        어디서 판단이 갈리는지
+        <br />
+        흐려지는 순간이 있습니다
+      </>
+    ),
+    heroDesc: (
+      <>
+        이 서비스는 조문을 나열하지 않고,
+        <br />
+        적용 요건 · 효과 · 예외를
+        <br />
+        판단의 흐름 속에서 정리해 줍니다.
+      </>
+    ),
+  whyLocked: (
+    <>
+      이러한 해석 단계는
+      <br />
+      법령을 정리해 보여주는 것을 넘어
+      <br />
+      판단의 흐름을 이해하기 위한
+      <br />
+      분석 자료 성격의 콘텐츠이기 때문에
+      <strong> 구독자 전용</strong>으로 제공됩니다.
+    </>
+  ),
+    benefits: [
+      "법령 해석(Semantic) 단계 열람",
+      "적용 요건 · 효과 · 예외 구조화된 정리",
+      "판단 단계(Reasoning) 흐름 전체",
+      "조문 ↔ 판단 단계 간 연계 탐색",
+      "해석·검토 내용 저장 및 재열람",
+    ],
+  },
+
+  strategy: {
+    heroTitle: (
+      <>
+        전략은
+        <br />
+        정보가 아니라
+        <br />
+        사고의 순서입니다
+      </>
+    ),
+    heroDesc: (
+      <>
+        이 영역은
+        <br />
+        쟁점을 어떻게 세우고
+        <br />
+        어떤 판단 순서로 밀고 갈지를
+        <br />
+        구조로 보여줍니다.
+      </>
+    ),
+    whyLocked: (
+      <>
+        이 기능은
+        <br />
+        사고 과정을 자산화하는 영역이기 때문에
+        <strong> 구독자 전용</strong>으로 제공됩니다.
+      </>
+    ),
+    benefits: [
+      "전략 단위 사고 구조 전체 열람",
+      "쟁점 설정 → 판단 흐름 설계 방식",
+      "사고 단계별 구조화된 정리",
+      "전략 사고 저장 및 재활용",
+    ],
+  },
+} as const;
+
 
 export default function SubscribePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") ?? "case";
+  const copy =
+    COPY_BY_FROM[from as "case" | "law" | "strategy"] ??
+    COPY_BY_FROM.case;
 
   return (
     <main
@@ -27,11 +154,7 @@ export default function SubscribePage() {
               letterSpacing: "-0.01em",
             }}
           >
-            판례를 읽다 보면
-            <br />
-            어디서부터 생각해야 할지
-            <br />
-            막히는 순간이 있습니다
+            {copy.heroTitle}
           </h1>
 
           <p
@@ -42,39 +165,18 @@ export default function SubscribePage() {
               maxWidth: 680,
             }}
           >
-            이 페이지는 그런 순간을 위해 만들어졌습니다.
-            <br />
-            판결의 결론이 아니라,
-            <br />
-            법원이 어떤 순서로 판단했는지를
-            <br />
-            하나씩 따라가 볼 수 있도록 돕습니다.
+            {copy.heroDesc}
             </p>
         </section>
 
         {/* ================= WHY LOCKED ================= */}
         <section style={{ marginBottom: 72 }}>
-          <h2 style={sectionTitle}>지금 보고 계셨던 분석에 대해</h2>
+        <h2 style={sectionTitle}>지금 보고 계셨던 분석에 대해</h2>
 
-          <p style={paragraph}>
-            C 리포트는 판결 내용을 요약하는 대신,
-            <br />
-            쟁점이 어떻게 정리되고
-            <br />
-            어떤 논증을 거쳐 결론에 이르렀는지를
-            <br />
-            구조 그대로 보여주는 분석입니다.
-            </p>
+        <p style={paragraph}>
+        {copy.whyLocked}
+        </p>
 
-          <p style={paragraph}>
-              실제 업무에서
-            <br />
-            “왜 이런 판단이 나왔는지”를 설명해야 할 때,
-            <br />
-            이 구조가 그대로 기준이 되기 때문에
-            <br />
-            <strong> 구독자 전용</strong>으로 제공됩니다.
-          </p>
         </section>
 
         {/* ================= WHAT YOU GET ================= */}
@@ -82,11 +184,9 @@ export default function SubscribePage() {
           <h2 style={sectionTitle}>구독 시 이용할 수 있는 내용</h2>
 
           <ul style={{ paddingLeft: 18, lineHeight: 1.9 }}>
-            <li>✅ 판례의 쟁점별 논증 구조 전체</li>
-            <li>✅ 법원이 판단에 이르기까지의 사고 흐름</li>
-            <li>✅ 각 쟁점에서 적용된 법리와 기준</li>
-            <li>✅ 판례 업로드 및 분석 실행</li>
-            <li>✅ 저장 · 재열람 · 사고 히스토리 관리</li>
+          {copy.benefits.map((item, idx) => (
+            <li key={idx}>✅ {item}</li>
+          ))}
           </ul>
         </section>
 

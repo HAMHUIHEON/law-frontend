@@ -14,6 +14,9 @@ import { useLawUI } from "../../LawUIContext";
 import { useAuth } from "@clerk/nextjs";
 import { useRecordThoughtTrace } from "@/app/actions/useRecordThoughtTrace";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getLawAccess } from "../../access";
+import { useRouter } from "next/navigation";
 
 /* ======================================================
  * Types
@@ -76,6 +79,13 @@ export default function ReasoningStepView({ snapshot, currentChapter }: Props) {
   const { selectedIssueId } = useLawUI();
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
+
+  const userAccess = useUserAccessLevel();
+  const access = getLawAccess(userAccess, "REASONING"); 
+  const isLocked = access !== "FULL";
+  const router = useRouter();
+
+
 
   const handleSaveCurrent = () => {
     if (!userId) return;
@@ -282,30 +292,62 @@ return (
       </aside>
 
       {/* RIGHT: STEP DETAIL */}
-      <section style={styles.stepDetail} className="ui-scroll">
-        {currentStep && (
-          <>
-            <h2 style={styles.stepTitle}>
-              단계 {currentStep.step_id}
-              {currentStep.step_type && (
-                <span style={styles.stepType}>
-                  · {STEP_TYPE_LABEL[currentStep.step_type] ?? currentStep.step_type}
-                </span>
-              )}
-            </h2>
+        <section
+          style={{
+            ...styles.stepDetail,
+            position: "relative",
+          }}
+          className="ui-scroll"
+        >
+          {/* 🔹 내용 레이어 */}
+          <div
+            style={{
+              filter: isLocked ? "blur(6px)" : "none",
+              pointerEvents: isLocked ? "none" : "auto",
+              userSelect: isLocked ? "none" : "auto",
+            }}
+          >
+            {currentStep && (
+              <>
+                <h2 style={styles.stepTitle}>
+                  단계 {currentStep.step_id}
+                  {currentStep.step_type && (
+                    <span style={styles.stepType}>
+                      · {STEP_TYPE_LABEL[currentStep.step_type] ?? currentStep.step_type}
+                    </span>
+                  )}
+                </h2>
 
-            {currentStep.description && (
-              <p style={styles.blockText}>{currentStep.description}</p>
+                {currentStep.description && (
+                  <p style={styles.blockText}>{currentStep.description}</p>
+                )}
+
+                <MiniBlock title="🧷 기준 요건" items={currentStep.conditions} />
+                <MiniBlock title="⚖️ 적용 효과" items={currentStep.effects} />
+                <MiniBlock title="🚧 예외 조건" items={currentStep.exceptions} />
+                <MiniBlock title="🧮 산식 · 절차" items={currentStep.methods} />
+                <MiniBlock title="📖 근거 조문" items={currentStep.based_on} />
+              </>
             )}
+          </div>
 
-            <MiniBlock title="🧷 기준 요건" items={currentStep.conditions} />
-            <MiniBlock title="⚖️ 적용 효과" items={currentStep.effects} />
-            <MiniBlock title="🚧 예외 조건" items={currentStep.exceptions} />
-            <MiniBlock title="🧮 산식 · 절차" items={currentStep.methods} />
-            <MiniBlock title="📖 근거 조문" items={currentStep.based_on} />
-          </>
-        )}
-      </section>
+          {/* 🔒 잠금 오버레이 */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 법령 검토 단계는
+                <br />
+                <strong>구독 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=law")}
+              >
+                구독하고 전체 보기
+              </button>
+            </div>
+          )}
+        </section>
 
     </div>
   </div>
@@ -341,6 +383,30 @@ function MiniBlock({
 /* ======================================================
  * Styles (SemanticView 톤과 통일)
  * ====================================================== */
+
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
+
 const styles = {
   /* ================= Layout ================= */
 

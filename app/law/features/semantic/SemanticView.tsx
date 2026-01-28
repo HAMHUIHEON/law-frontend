@@ -14,6 +14,10 @@ import { useLawUI } from "../../LawUIContext";
 import { useAuth } from "@clerk/nextjs";
 import { useRecordThoughtTrace } from "@/app/actions/useRecordThoughtTrace";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getLawAccess } from "../../access";
+import { useRouter } from "next/navigation";
+
 
 /* ======================================================
  * Types
@@ -59,7 +63,11 @@ export default function SemanticView({ snapshot, currentChapter }: Props) {
   const saveThought = useSaveThought();
   const [showHint, setShowHint] = useState(false);
 
-
+  const userAccess = useUserAccessLevel();
+  const access = getLawAccess(userAccess, "SEMANTIC"); // or "REASONING"
+  const isLocked = access !== "FULL";
+  const router = useRouter();
+  
   const handleSaveCurrent = () => {
     if (!userId) return;
     if (!snapshot?.set_key) return;
@@ -238,8 +246,22 @@ export default function SemanticView({ snapshot, currentChapter }: Props) {
           </aside>
 
           {/* Issue Detail */}
-          <section style={styles.issueDetail} className="ui-scroll">
-            {/* ✅ 여기서 “빈 화면” 방지: currentIssue 없으면 안내문 */}
+          <section
+            style={{
+              ...styles.issueDetail,
+              position: "relative", // 🔥 오버레이 기준
+            }}
+            className="ui-scroll"
+          >            
+            {/* 🔹 내용 레이어 */}
+          <div
+            style={{
+              filter: isLocked ? "blur(6px)" : "none",
+              pointerEvents: isLocked ? "none" : "auto",
+              userSelect: isLocked ? "none" : "auto",
+            }}
+          >
+          {/* ✅ 여기서 “빈 화면” 방지: currentIssue 없으면 안내문 */}
             {!currentIssue ? (
               <div style={styles.emptyPanel}>
                 <div style={styles.emptyTitle}>이슈를 선택해 주세요</div>
@@ -260,7 +282,25 @@ export default function SemanticView({ snapshot, currentChapter }: Props) {
                 />
               </>
             )}
-          </section>
+            </div>
+              {/* 🔒 잠금 오버레이 */}
+              {isLocked && (
+                <div style={lockOverlayStyle}>
+                  <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                    이 법령 해석 단계는
+                    <br />
+                    <strong>구독 후 전체 확인할 수 있습니다</strong>
+                  </p>
+                  <button
+                    style={ctaButtonStyle}
+                    onClick={() => router.push("/me/subscribe?from=law")}
+                  >
+                    구독하고 전체 보기
+                  </button>
+                </div>
+              )}
+            </section>
+
         </div>
       </div>
     </main>
@@ -356,6 +396,28 @@ function Block({
 /* ======================================================
  * Styles
  * ====================================================== */
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};
 
 const styles: Record<string, React.CSSProperties> = {
   /* ================= Page ================= */

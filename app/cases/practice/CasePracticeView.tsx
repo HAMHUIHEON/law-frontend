@@ -203,7 +203,7 @@ const handleSaveCurrent = () => {
 
               <button
                 style={ctaButtonStyle}
-                onClick={() => router.push("/me/subscribe")}
+                onClick={() => router.push("/me/subscribe?from=case")}
               >
                 구독하기
               </button>
@@ -312,7 +312,8 @@ const handleSaveCurrent = () => {
                 </p>
                 <button
                   style={ctaButtonStyle}
-                  onClick={() => router.push("/me/subscribe")}
+                  onClick={() => router.push("/me/subscribe?from=case")}
+
                 >
                   구독하고 전체 보기
                 </button>
