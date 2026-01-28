@@ -25,63 +25,70 @@ export function IssueDetail({ issue, access,  onSave }: Props) {
       style={{
         ...styles.issueDetail,
         position: "relative",
-        filter: isLocked ? "blur(6px)" : "none",
-        pointerEvents: isLocked ? "none" : "auto",
-        userSelect: isLocked ? "none" : "auto",
       }}
     >
-      {/* 카드 헤더 */}
+      {/* 🔹 blur 대상 컨테이너 */}
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 12,
+          filter: isLocked ? "blur(6px)" : "none",
+          pointerEvents: isLocked ? "none" : "auto",
+          userSelect: isLocked ? "none" : "auto",
         }}
       >
-        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>
-          {issue.title}
-        </h3>
-        {onSave && (
-          <button
-            onClick={onSave}
-            style={{
-              fontSize: 12,
-              padding: "6px 10px",
-              borderRadius: 8,
-              border: "1px solid #e5e7eb",
-              background: "#ffffff",
-              color: "#374151",
-              cursor: "pointer",
-              transition: "all 120ms ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "#9ca3af";
-              e.currentTarget.style.color = "#111827";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#e5e7eb";
-              e.currentTarget.style.color = "#374151";
-            }}
-          >
-            저장
-          </button>
-        )}
+        {/* 카드 헤더 */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 12,
+          }}
+        >
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>
+            {issue.title}
+          </h3>
+
+          {onSave && (
+            <button
+              onClick={onSave}
+              style={{
+                fontSize: 12,
+                padding: "6px 10px",
+                borderRadius: 8,
+                border: "1px solid #e5e7eb",
+                background: "#ffffff",
+                color: "#374151",
+                cursor: "pointer",
+                transition: "all 120ms ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#9ca3af";
+                e.currentTarget.style.color = "#111827";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "#e5e7eb";
+                e.currentTarget.style.color = "#374151";
+              }}
+            >
+              저장
+            </button>
+          )}
+        </div>
+
+        <Block title="🧑‍⚖️ 원고 주장" items={issue.plaintiff} />
+        <Block title="🏛️ 피고 주장" items={issue.defendant} />
+        <Block title="⚖️ 법원의 판단" items={issue.court} />
       </div>
-      <Block title="🧑‍⚖️ 원고 주장" items={issue.plaintiff} />
-      <Block title="🏛️ 피고 주장" items={issue.defendant} />
-      <Block title="⚖️ 법원의 판단" items={issue.court} />
-      {/* 🔒 블러 오버레이 */}
+
+      {/* 🔒 overlay는 blur 바깥 */}
       {isLocked && (
         <div style={lockOverlayStyle}>
-          <p style={{ fontSize: 14, fontWeight: 600 }}>
-            이 판례의 판단 구조는  
+          <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+            이 판례의 판단 구조는
             <br />
             <strong>구독 후 확인할 수 있습니다</strong>
           </p>
-          <button style={ctaButtonStyle}>
-            구독하고 전체 보기
-          </button>
+          <button style={ctaButtonStyle}>구독하고 전체 보기</button>
         </div>
       )}
     </section>
