@@ -88,7 +88,15 @@ export function IssueDetail({ issue, access,  onSave }: Props) {
             <br />
             <strong>구독 후 확인할 수 있습니다</strong>
           </p>
-          <button style={ctaButtonStyle}>구독하고 전체 보기</button>
+          <button
+            style={ctaButtonStyle}
+            onClick={async () => {
+              await fetch("/api/me/subscribe", { method: "POST" });
+              window.location.reload();
+            }}
+          >
+            구독하고 전체 보기
+          </button>
         </div>
       )}
     </section>

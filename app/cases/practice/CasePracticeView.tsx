@@ -8,6 +8,8 @@ import { MessageCard } from "./components/MessageCard";
 import { styles } from "./styles";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
 import { useAuth } from "@clerk/nextjs";
+import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
+import { getCaseAccess } from "../access";
 
 
 
@@ -33,6 +35,11 @@ export function CasePracticeView({
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [openLogic, setOpenLogic] = useState(false);
+
+  const userAccess = useUserAccessLevel();
+  const caseAccess = getCaseAccess(userAccess, "C");
+  const isLocked = caseAccess !== "FULL";
+
 
  // ✅ 여기서 undefined 제거 + 우선순위 적용
   const initialSelected = initialIssue ?? vm.chains[0]?.issue ?? null;
@@ -180,7 +187,21 @@ const handleSaveCurrent = () => {
             </aside>
 
             {/* RIGHT */}
-            <section className="ui-scroll" style={styles.issueDetail}>
+            <section
+              className="ui-scroll"
+              style={{
+                ...styles.issueDetail,
+                position: "relative",
+              }}
+            >
+              {/* ✅ 내용 레이어 */}
+              <div
+                style={{
+                  filter: isLocked ? "blur(6px)" : "none",
+                  pointerEvents: isLocked ? "none" : "auto",
+                  userSelect: isLocked ? "none" : "auto",
+                }}
+              >
               {currentChain && (
                 <>
                   {/* 🔹 카드 헤더 */}
@@ -194,9 +215,8 @@ const handleSaveCurrent = () => {
                     }}
                   >
                     <h3 style={styles.issueTitle}>{currentChain.issue}</h3>
-
+                  {!isLocked && (
                   <button
-                  
                     onClick={handleSaveCurrent}
                     style={{
                       flexShrink: 0,   
@@ -219,9 +239,8 @@ const handleSaveCurrent = () => {
                     }}
                   >
                     저장
-                    
                   </button>
-
+                  )}
 
                   </div>
 
@@ -233,8 +252,22 @@ const handleSaveCurrent = () => {
                   <LogicBlock label="✅ 소결" text={currentChain.miniConclusion} />
                 </>
               )}
+              </div>
+              {isLocked && (
+              <div style={lockOverlayStyle}>
+                <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                  이 판례의 논증 구조는
+                  <br />
+                  <strong>구독 후 전체 확인할 수 있습니다</strong>
+                </p>
+                <button style={ctaButtonStyle}>
+                  구독하고 전체 보기
+                </button>
+              </div>
+            )}
+
             </section>
-          </div>
+          </div>          
         </section>
 
         <button style={styles.backButton} onClick={onOpenMenu}>
@@ -244,3 +277,26 @@ const handleSaveCurrent = () => {
     </main>
   );
 }
+
+const lockOverlayStyle: React.CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  background: "rgba(255,255,255,0.75)",
+  backdropFilter: "blur(2px)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12,
+  zIndex: 10,
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  fontSize: 13,
+  cursor: "pointer",
+};

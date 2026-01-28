@@ -135,3 +135,101 @@ check (
     'summary'
   )
 );
+
+
+-- =========================================
+-- user_subscriptions: Clerk userId 기반 구독 상태 테이블
+-- =========================================
+
+-- 0) uuid 생성 함수 필요(대부분 기본 있음). 없으면 Supabase 기본 확장에 포함.
+-- create extension if not exists "pgcrypto";  -- 필요 시만 (에러 나면 주석 해제하고 실행)
+
+create table if not exists public.user_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+
+  user_id text not null,                 -- Clerk userId
+  plan text not null,                    -- 예: 'CASE_PRO'
+  status text not null,                  -- 'active' | 'inactive'
+
+  started_at timestamptz not null default now(),
+  ended_at timestamptz null,
+
+  created_at timestamptz not null default now()
+);
+
+-- 1) 활성 구독은 유저당 1개만
+create unique index if not exists uniq_active_subscription_per_user
+on public.user_subscriptions (user_id)
+where status = 'active';
+
+-- 2) 조회 성능 인덱스
+create index if not exists idx_user_subscriptions_user_id
+on public.user_subscriptions (user_id);
+
+-- 3) RLS 켜기
+alter table public.user_subscriptions enable row level security;
+
+-- 4) 정책은 중복 생성 방지 위해 먼저 제거
+drop policy if exists "user can read own subscription" on public.user_subscriptions;
+drop policy if exists "service role can write subscriptions" on public.user_subscriptions;
+
+-- 5) 본인만 조회 가능 (로그인 유저)
+create policy "user can read own subscription"
+on public.user_subscriptions
+for select
+using (
+  auth.uid()::text = user_id
+);
+
+-- 6) 쓰기(insert/update/delete)는 service_role만
+create policy "service role can write subscriptions"
+on public.user_subscriptions
+for all
+using (auth.role() = 'service_role')
+with check (auth.role() = 'service_role');
+
+
+
+-- Supabase SQL Editor
+-- user_access_levels : SSOT for subscription / permission
+
+create extension if not exists "pgcrypto";
+
+-- 1️⃣ 테이블
+create table if not exists user_access_levels (
+  user_id text primary key,
+
+  -- GUEST: 비로그인 / 기본
+  -- MEMBER: 로그인만
+  -- SUBSCRIBER: 결제 완료
+  access_level text not null
+    check (access_level in ('GUEST', 'MEMBER', 'SUBSCRIBER')),
+
+  updated_at timestamptz not null default now()
+);
+
+-- 2️⃣ RLS 활성화
+alter table user_access_levels enable row level security;
+
+-- 3️⃣ 기존 정책 정리 (있어도 에러 안 나게)
+drop policy if exists "deny all select" on user_access_levels;
+drop policy if exists "deny all insert" on user_access_levels;
+drop policy if exists "deny all update" on user_access_levels;
+drop policy if exists "deny all delete" on user_access_levels;
+
+-- 4️⃣ 클라이언트 접근 전면 차단 (server-only)
+create policy "deny all select"
+on user_access_levels
+for select using (false);
+
+create policy "deny all insert"
+on user_access_levels
+for insert with check (false);
+
+create policy "deny all update"
+on user_access_levels
+for update using (false);
+
+create policy "deny all delete"
+on user_access_levels
+for delete using (false);

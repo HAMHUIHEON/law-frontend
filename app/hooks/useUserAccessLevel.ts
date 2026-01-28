@@ -2,18 +2,28 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 
 export type UserAccessLevel = "GUEST" | "MEMBER" | "SUBSCRIBER";
 
 export function useUserAccessLevel(): UserAccessLevel {
   const { userId } = useAuth();
+  const [level, setLevel] = useState<UserAccessLevel>("GUEST");
 
-  if (!userId) return "GUEST";
+  useEffect(() => {
+    if (!userId) {
+      setLevel("GUEST");
+      return;
+    }
 
-  // 🔥 오늘은 전부 MEMBER로 본다
-  return "MEMBER";
+    fetch("/api/me/access")
+      .then((r) => r.json())
+      .then((d) => {
+        setLevel(d.access_level ?? "MEMBER");
+      })
+      .catch(() => setLevel("MEMBER"));
+  }, [userId]);
 
-  // 나중에:
-  // return hasActiveSubscription ? "SUBSCRIBER" : "MEMBER";
+  return level;
 }
