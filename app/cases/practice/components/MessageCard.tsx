@@ -12,7 +12,7 @@ function splitKoreanSentences(text: string): string[] {
     .filter(Boolean);
 }
 
-export function MessageCard({ title, text }: { title: string; text: string }) {
+export function MessageCard({ title, text,locked }: { title: string; text: string;   locked?: boolean; }) {
   const [open, setOpen] = useState(false);
 
   const sentences = splitKoreanSentences(text);
@@ -22,6 +22,14 @@ export function MessageCard({ title, text }: { title: string; text: string }) {
   return (
     <div style={styles.card}>
       <p style={styles.cardTitle}>{title}</p>
+            {/* 🔒 내용만 블러 */}
+      <div
+        style={{
+          filter: locked ? "blur(6px)" : "none",
+          pointerEvents: locked ? "none" : "auto",
+          userSelect: locked ? "none" : "auto",
+        }}
+      >
       <p style={styles.cardText}>{lead}</p>
 
       {rest.length > 0 && (
@@ -36,6 +44,7 @@ export function MessageCard({ title, text }: { title: string; text: string }) {
             {s}
           </p>
         ))}
+        </div>
     </div>
   );
 }

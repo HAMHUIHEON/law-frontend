@@ -1,6 +1,8 @@
 // app/cases/structure/IssueDetail.tsx
 "use client";
 
+import { useRouter } from "next/navigation";
+
 type AccessLevel = "FULL" | "PARTIAL" | "LOCKED";
 
 type Props = {
@@ -18,7 +20,7 @@ export function IssueDetail({ issue, access,  onSave }: Props) {
   if (!issue) return null;
 
   const isLocked = access !== "FULL";
-
+  const router = useRouter();
   return (
     <section
       className="ui-scroll"
@@ -88,7 +90,7 @@ export function IssueDetail({ issue, access,  onSave }: Props) {
             <br />
             <strong>구독 후 확인할 수 있습니다</strong>
           </p>
-          <button
+          {/* <button
             style={ctaButtonStyle}
             onClick={async () => {
               await fetch("/api/me/subscribe", { method: "POST" });
@@ -96,7 +98,14 @@ export function IssueDetail({ issue, access,  onSave }: Props) {
             }}
           >
             구독하고 전체 보기
-          </button>
+          </button> */}
+          <button
+          style={ctaButtonStyle}
+          onClick={() => router.push("/me/subscribe")}
+        >
+          구독하고 전체 보기
+        </button>
+
         </div>
       )}
     </section>

@@ -10,6 +10,7 @@ import { useSaveThought } from "@/app/hooks/useSaveThought";
 import { useAuth } from "@clerk/nextjs";
 import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
 import { getCaseAccess } from "../access";
+import { useRouter } from "next/navigation";
 
 
 
@@ -35,6 +36,7 @@ export function CasePracticeView({
   const { userId } = useAuth();
   const saveThought = useSaveThought();
   const [openLogic, setOpenLogic] = useState(false);
+  const router = useRouter();
 
   const userAccess = useUserAccessLevel();
   const caseAccess = getCaseAccess(userAccess, "C");
@@ -92,7 +94,15 @@ const handleSaveCurrent = () => {
               <p style={styles.sectionTitle}>이 사건의 핵심 쟁점</p>
               <div style={styles.sectionDivider} />
             </div>
-
+            
+            {/* 🔒 내용만 블러 */}
+            <div
+              style={{
+                filter: isLocked ? "blur(6px)" : "none",
+                pointerEvents: isLocked ? "none" : "auto",
+                userSelect: isLocked ? "none" : "auto",
+              }}
+            >
             <ul style={styles.ul}>
               {vm.summary.coreIssues.map((item, idx) => (
                 <li key={idx} style={styles.li}>
@@ -105,6 +115,7 @@ const handleSaveCurrent = () => {
                 </li>
               ))}
             </ul>
+            </div>
           </section>
 
           {/* 법원이 본 관점 */}
@@ -113,7 +124,15 @@ const handleSaveCurrent = () => {
               <p style={styles.sectionTitle}>법원이 내린 주요 판단</p>
               <div style={styles.sectionDivider} />
             </div>
-
+            {/* 🔒 내용 전체를 하나의 레이어로 묶어서 블러 */}
+            <div
+              style={{
+                filter: isLocked ? "blur(6px)" : "none",
+                pointerEvents: isLocked ? "none" : "auto",
+                userSelect: isLocked ? "none" : "auto",
+              }}
+            >
+            {/* 판단 요지 */}
             <div>
               <ul style={styles.ul}>
                 {splitKoreanSentences(vm.summary.judicialHow).map((p, i) => (
@@ -145,6 +164,7 @@ const handleSaveCurrent = () => {
                 </ul>
               </>
             )}
+            </div>
           </section>
 
           {/* 실무 메시지 */}
@@ -155,9 +175,9 @@ const handleSaveCurrent = () => {
             </div>
 
             <div style={styles.messageGrid}>
-              <MessageCard title="납세자에게" text={vm.summary.riskView.taxpayer} />
-              <MessageCard title="과세관청에게" text={vm.summary.riskView.authority} />
-              <MessageCard title="이 판례가 남긴 기준" text={vm.summary.riskView.precedent} />
+              <MessageCard title="납세자에게" text={vm.summary.riskView.taxpayer} locked={isLocked} />
+              <MessageCard title="과세관청에게" text={vm.summary.riskView.authority} locked={isLocked} />
+              <MessageCard title="이 판례가 남긴 기준" text={vm.summary.riskView.precedent} locked={isLocked} />
             </div>
           </section>
         </section>
@@ -260,9 +280,13 @@ const handleSaveCurrent = () => {
                   <br />
                   <strong>구독 후 전체 확인할 수 있습니다</strong>
                 </p>
-                <button style={ctaButtonStyle}>
+                <button
+                  style={ctaButtonStyle}
+                  onClick={() => router.push("/me/subscribe")}
+                >
                   구독하고 전체 보기
                 </button>
+
               </div>
             )}
 
