@@ -249,7 +249,7 @@ export default async function MyPage() {
           lineHeight: 1.6,
         }}
       >
-        사고를 정확한 위치로 다시 불러오는 기능을 고도화 중입니다.
+        # 해당 기능은 현재 준비 중입니다.
       </p>
       </section>
 

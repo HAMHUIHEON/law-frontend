@@ -214,6 +214,7 @@ function SubscribePageInner() {
               fontSize: 13,
               color: "rgba(255,255,255,0.45)",
               cursor: "pointer",
+              textAlign: "center" as const,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "rgba(255,255,255,0.7)";
