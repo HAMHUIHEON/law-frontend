@@ -12,35 +12,36 @@ type PortOneWebhookPayload = {
 export async function POST(req: Request) {
   const body = (await req.json()) as PortOneWebhookPayload;
 
-  // ✅ 0) 무조건 원문 로그 (테스트 끝나면 지워도 됨)
   console.log("[portone:webhook] payload:", body);
 
   const { merchant_uid, status } = body;
 
-  // ✅ 1) paid 아닌 경우 로그만 남기고 종료
+  // 1️⃣ 결제 성공만 처리
   if (status !== "paid") {
-    console.log("[portone:webhook] non-paid status:", status);
     return NextResponse.json({ ok: true });
   }
 
-  // 2️⃣ merchant_uid 검증
   if (!merchant_uid) {
     console.error("[portone:webhook] missing merchant_uid");
     return NextResponse.json({ error: "missing merchant_uid" }, { status: 400 });
   }
 
-  if (!merchant_uid.startsWith("subscribe_")) {
-    console.error("[portone:webhook] invalid merchant_uid:", merchant_uid);
-    return NextResponse.json({ error: "invalid merchant_uid" }, { status: 400 });
+  // 2️⃣ 주문 조회 (🔥 파싱 없음)
+  const { data: order, error: orderErr } = await supabaseAdmin
+    .from("payment_orders")
+    .select("user_id")
+    .eq("merchant_uid", merchant_uid)
+    .single();
+
+  if (orderErr || !order) {
+    console.error("[portone:webhook] order not found:", merchant_uid);
+    return NextResponse.json({ error: "order not found" }, { status: 404 });
   }
 
-  // ✅ 핵심: prefix 제거 방식
-  const userId = merchant_uid.slice("subscribe_".length);
-  console.log("[portone:webhook] parsed userId:", userId);
+  const userId = order.user_id;
 
-  
-  // ✅ 3) DB 반영 + 에러 체크
-  const { error } = await supabaseAdmin
+  // 3️⃣ 구독 권한 부여 (SSOT)
+  const { error: accessErr } = await supabaseAdmin
     .from("user_access_levels")
     .upsert({
       user_id: userId,
@@ -48,10 +49,16 @@ export async function POST(req: Request) {
       updated_at: new Date().toISOString(),
     });
 
-  if (error) {
-    console.error("[portone:webhook] db error:", error);
+  if (accessErr) {
+    console.error("[portone:webhook] access update failed:", accessErr);
     return NextResponse.json({ error: "db error" }, { status: 500 });
   }
+
+  // 4️⃣ 주문 상태 업데이트 (선택이지만 강력 추천)
+  await supabaseAdmin
+    .from("payment_orders")
+    .update({ status: "paid" })
+    .eq("merchant_uid", merchant_uid);
 
   return NextResponse.json({ ok: true });
 }

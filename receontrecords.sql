@@ -233,3 +233,11 @@ for update using (false);
 create policy "deny all delete"
 on user_access_levels
 for delete using (false);
+
+-- 결제 주문 테이블 (merchant_uid ↔ user_id 매핑)
+create table if not exists payment_orders (
+  merchant_uid text primary key,   -- PG 주문번호
+  user_id text not null,            -- Clerk userId
+  status text not null default 'pending', -- pending | paid | failed
+  created_at timestamptz not null default now()
+);
