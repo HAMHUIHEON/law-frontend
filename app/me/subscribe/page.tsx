@@ -201,7 +201,7 @@ function SubscribePageInner() {
             // 3️⃣ 결제 요청
             IMP.request_pay(
               {
-                pg: "html5_inicis", // 테스트용 (카카오페이도 가능)
+                pg: "inicis_unified", // 테스트용 (카카오페이도 가능)
                 pay_method: "card",
                 merchant_uid,
                 name: "월 구독 멤버십",
