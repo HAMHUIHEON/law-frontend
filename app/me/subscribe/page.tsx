@@ -3,6 +3,7 @@
 
 import { Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 export const dynamic = "force-dynamic";
 
@@ -136,6 +137,7 @@ const COPY_BY_FROM = {
 function SubscribePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { userId } = useAuth();
   const from = (searchParams.get("from") ?? "case") as keyof typeof COPY_BY_FROM;
   const copy = COPY_BY_FROM[from] ?? COPY_BY_FROM.case;
 
@@ -176,15 +178,53 @@ function SubscribePageInner() {
           <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>월 구독</p>
           <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ XX,XXX / 월</p>
 
-          <button
-            onClick={async () => {
-              await fetch("/api/me/subscribe", { method: "POST" });
-              router.push(copy.afterPath);
-            }}
-            style={ctaButtonStyle}
-          >
-            {copy.cta}
-          </button>
+        <button
+          onClick={async () => {
+            const IMP = (window as any).IMP;
+            if (!IMP) {
+              alert("결제 모듈 로딩 실패");
+              return;
+            }
+
+            // 1️⃣ 포트원 초기화
+            IMP.init("imp05017267"); // 포트원 대시보드에서 본 imp_XXXX
+
+            // 2️⃣ merchant_uid 생성 (🔥 중요)
+            if (!userId) {
+              alert("로그인이 필요합니다");
+              return;
+            }
+
+            const merchant_uid = `subscribe_${userId}_${Date.now()}`;
+
+
+            // 3️⃣ 결제 요청
+            IMP.request_pay(
+              {
+                pg: "html5_inicis", // 테스트용 (카카오페이도 가능)
+                pay_method: "card",
+                merchant_uid,
+                name: "월 구독 멤버십",
+                amount: 1000, // 테스트 금액 (원)
+                buyer_email: "test@test.com",
+                buyer_name: "테스트 사용자",
+              },
+              (rsp: any) => {
+                if (rsp.success) {
+                  alert("결제 요청 완료!");
+                  // ❗ 여기서 권한 바꾸지 마
+                  // webhook이 처리함
+                  router.push(copy.afterPath);
+                } else {
+                  alert("결제 실패: " + rsp.error_msg);
+                }
+              }
+            );
+          }}
+          style={ctaButtonStyle}
+        >
+          {copy.cta}
+        </button>
          <p
               style={{
                 marginTop: 14,
