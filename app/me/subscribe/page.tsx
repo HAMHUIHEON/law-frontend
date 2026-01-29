@@ -205,26 +205,27 @@ function SubscribePageInner() {
               현재 결제 주기가 끝날 때까지는 구독 기능을 계속 이용하실 수 있습니다.
             </p>          
           </section>
-          <button
-            onClick={() => router.push(copy.afterPath)}
-            style={{
-              marginTop: 24,
-              background: "none",
-              border: "none",
-              fontSize: 13,
-              color: "rgba(255,255,255,0.45)",
-              cursor: "pointer",
-              textAlign: "center" as const,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "rgba(255,255,255,0.7)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "rgba(255,255,255,0.45)";
-            }}
-          >
-            ← 이전 화면으로 돌아가기
-          </button>
+          <div style={{ textAlign: "center" }}>
+            <button
+              onClick={() => router.push(copy.afterPath)}
+              style={{
+                marginTop: 24,
+                background: "none",
+                border: "none",
+                fontSize: 13,
+                color: "rgba(255,255,255,0.45)",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "rgba(255,255,255,0.7)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "rgba(255,255,255,0.45)";
+              }}
+            >
+              ← 이전 화면으로 돌아가기
+            </button>
+          </div>
       </div>
     </main>
   );
