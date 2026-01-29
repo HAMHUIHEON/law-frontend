@@ -38,16 +38,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "order not found" }, { status: 404 });
   }
 
+
   const userId = order.user_id;
 
-  // 3️⃣ 구독 권한 부여 (SSOT)
+
+  // 3️⃣ 구독 권한 부여 + 종료일 설정 (SSOT)
+  const now = new Date();
+  const endAt = new Date(now);
+  endAt.setMonth(endAt.getMonth() + 1);
+
   const { error: accessErr } = await supabaseAdmin
     .from("user_access_levels")
     .upsert({
       user_id: userId,
       access_level: "SUBSCRIBER",
-      updated_at: new Date().toISOString(),
+      subscription_end_at: endAt.toISOString(), // ⭐ 핵심
+      cancelled_at: null,                        // 해지 안 된 상태
+      updated_at: now.toISOString(),
     });
+
 
   if (accessErr) {
     console.error("[portone:webhook] access update failed:", accessErr);

@@ -241,3 +241,9 @@ create table if not exists payment_orders (
   status text not null default 'pending', -- pending | paid | failed
   created_at timestamptz not null default now()
 );
+
+
+---“구독은 해지해도 기간까지 유지된다”를 DB가 표현할 수 있게 만들기
+alter table user_access_levels
+add column if not exists subscription_end_at timestamptz,
+add column if not exists cancelled_at timestamptz;
