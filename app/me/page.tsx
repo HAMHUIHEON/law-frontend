@@ -3,7 +3,6 @@ import { auth } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/app/lib/supabaseServer";
 import { MyPageVM, ThoughtTrace } from "@/types/me";
 import Link from "next/link";
-import { buildSavedThoughtHref } from "@/app/lib/savedThoughtHref";
 import { SavedThoughtItem } from "./SavedThoughtItem";
 
 export const dynamic = "force-dynamic";
@@ -236,22 +235,25 @@ export default async function MyPage() {
           <p style={styles.empty}>다시 읽고 싶은 사고를 저장해보세요.</p>
         ) : (
         vm.saved.map((item) => (
-          <SavedThoughtItem
-            key={item.id}
-            title={item.title}
-            href={buildSavedThoughtHref({
-              target_type: item.targetType,
-              target_id: item.targetId,
-              parent_type: item.parentType,
-              parent_id: item.parentId,
-            })}
-          />
+        <SavedThoughtItem
+          key={item.id}
+          title={item.title}
+        />
         ))
-
         )}
+        <p
+        style={{
+          marginTop: 12,
+          fontSize: 12,
+          color: "rgba(255,255,255,0.45)",
+          lineHeight: 1.6,
+        }}
+      >
+        사고를 정확한 위치로 다시 불러오는 기능을 고도화 중입니다.
+      </p>
       </section>
 
-      <section style={styles.section}>
+      {/* <section style={styles.section}>
         <h2 style={styles.sectionTitle}>나의 서재</h2>
         {vm.documents.length === 0 ? (
           <p style={styles.empty}>나만의 문서를 만들어보세요.</p>
@@ -262,7 +264,8 @@ export default async function MyPage() {
           </p>
         ))
         )}
-      </section>
+      </section> */}
+      
       <section style={styles.section}>
       <h2 style={styles.sectionTitle}>멤버십</h2>
       {vm.accessLevel === "SUBSCRIBER" ? (

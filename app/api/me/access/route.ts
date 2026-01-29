@@ -8,23 +8,7 @@ import { supabaseAdmin } from "@/app/lib/supabaseServer";
  * GET /api/me/access
  * returns: { access_level: "GUEST" | "MEMBER" | "SUBSCRIBER" }
  */
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const devAccess = searchParams.get("devAccess");
-
-  // 🔧 개발자용 강제 override
-  if (process.env.NODE_ENV === "development" && devAccess) {
-    if (devAccess === "guest") {
-      return NextResponse.json({ access_level: "GUEST" });
-    }
-    if (devAccess === "member") {
-      return NextResponse.json({ access_level: "MEMBER" });
-    }
-    if (devAccess === "subscriber") {
-      return NextResponse.json({ access_level: "SUBSCRIBER" });
-    }
-  }
-  
+export async function GET() {
   const { userId } = await auth();
 
   // 1️⃣ 비로그인 → GUEST

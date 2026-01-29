@@ -1,4 +1,6 @@
 //app/lib/savedThogutHref.ts
+// NOTE:
+// 정확한 위치 복원이 가능해질 때 다시 사용 예정
 
 import { ThoughtTargetType } from "@/types/me";
 

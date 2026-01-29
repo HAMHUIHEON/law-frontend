@@ -46,7 +46,6 @@ const COPY_BY_FROM = {
       "법원이 판단에 이르기까지의 사고 흐름",
       "각 쟁점에서 적용된 법리와 기준",
       "판례 업로드 및 분석 실행",
-      "저장 · 재열람 · 사고 히스토리 관리",
     ],
     afterPath: "/cases",
     cta: "구독하여 전체 판례 분석 보기",
@@ -86,7 +85,6 @@ const COPY_BY_FROM = {
       "적용 요건 · 효과 · 예외 구조화된 정리",
       "판단 단계(Reasoning) 흐름 전체",
       "조문 ↔ 판단 단계 간 연계 탐색",
-      "해석·검토 내용 저장 및 재열람",
     ],
     afterPath: "/law",
     cta: "구독하여 전체 법령 분석 보기",
@@ -118,6 +116,7 @@ const COPY_BY_FROM = {
         이 기능은
         <br />
         사고 과정을 자산화하는 영역이기 때문에
+        <br />
         <strong> 구독자 전용</strong>으로 제공됩니다.
       </>
     ),
@@ -125,7 +124,6 @@ const COPY_BY_FROM = {
       "전략 단위 사고 구조 전체 열람",
       "쟁점 설정 → 판단 흐름 설계 방식",
       "사고 단계별 구조화된 전략 정리",
-      "전략 사고 저장 및 재활용",
     ],
     afterPath: "/strategy",
     cta: "구독하여 전체 전략 보기",
@@ -207,8 +205,25 @@ function SubscribePageInner() {
               현재 결제 주기가 끝날 때까지는 구독 기능을 계속 이용하실 수 있습니다.
             </p>          
           </section>
-
-
+          <button
+            onClick={() => router.push(copy.afterPath)}
+            style={{
+              marginTop: 24,
+              background: "none",
+              border: "none",
+              fontSize: 13,
+              color: "rgba(255,255,255,0.45)",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "rgba(255,255,255,0.7)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "rgba(255,255,255,0.45)";
+            }}
+          >
+            ← 이전 화면으로 돌아가기
+          </button>
       </div>
     </main>
   );
