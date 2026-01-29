@@ -201,7 +201,7 @@ function SubscribePageInner() {
             // 3️⃣ 결제 요청
             IMP.request_pay(
               {
-                pg: "inicis_unified", // 테스트용 (카카오페이도 가능)
+                pg: "html5_inicis", // 
                 pay_method: "card",
                 merchant_uid,
                 name: "월 구독 멤버십",
@@ -211,7 +211,7 @@ function SubscribePageInner() {
               },
               (rsp: any) => {
                 if (rsp.success) {
-                  alert("결제 요청 완료!");
+                  alert("결제가 완료되었습니다.");
                   // ❗ 여기서 권한 바꾸지 마
                   // webhook이 처리함
                   router.push(copy.afterPath);
@@ -247,7 +247,7 @@ function SubscribePageInner() {
           </section>
           <div style={{ textAlign: "center" }}>
             <button
-              onClick={() => router.push(copy.afterPath)}
+              onClick={() => router.push("/me")}
               style={{
                 marginTop: 24,
                 background: "none",
