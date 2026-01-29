@@ -271,35 +271,24 @@ export default async function MyPage() {
             현재 <strong>구독 멤버십</strong>을 이용 중입니다.
           </p>
 
-          <button
+          <Link
+            href="/me/unsubscribe"
             style={{
               marginTop: 12,
+              display: "inline-block",
               fontSize: 13,
               padding: "8px 12px",
               borderRadius: 8,
               border: "1px solid rgba(255,255,255,0.35)",
-              background: "transparent",
               color: "rgba(255,255,255,0.8)",
-              cursor: "pointer",
-            }}
-            onClick={async () => {
-              await fetch("/api/me/unsubscribe", { method: "POST" });
-              window.location.reload();
             }}
           >
             멤버십 해지
-          </button>
-
-          <p style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
-            해지 시 현재 결제 주기가 끝날 때까지 구독 기능을 이용할 수 있습니다.
-          </p>
+          </Link>
         </>
       ) : (
         <>
-          <p style={styles.empty}>
-            현재 무료 멤버십을 이용 중입니다.
-          </p>
-
+          <p style={styles.empty}>현재 무료 멤버십을 이용 중입니다.</p>
           <Link href="/me/subscribe" style={{ fontSize: 13, color: "#fff" }}>
             구독 멤버십 알아보기 →
           </Link>
