@@ -252,7 +252,24 @@ function SubscribePageInner() {
               멤버십 해지는 언제든 ‘계정’ 페이지에서 가능하며 해지하더라도,
               <br />
               현재 결제 주기가 끝날 때까지는 구독 기능을 계속 이용하실 수 있습니다.
-            </p>          
+            </p> 
+            <p
+                style={{
+                  marginTop: 12,
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.45)",
+                  lineHeight: 1.6,
+                  maxWidth: 640,
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+              >
+                본 구독은 1개월 이용권 결제 방식으로 제공됩니다.
+                <br />
+                이용 기간 종료 전에 안내를 드리며,
+                원하시는 경우 언제든 다시 구독하실 수 있습니다.
+              </p>
+                      
           </section>
           <div style={{ textAlign: "center" }}>
             <button
