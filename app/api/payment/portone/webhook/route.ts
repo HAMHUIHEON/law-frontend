@@ -23,21 +23,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  // ✅ 2) merchant_uid 검증
+  // 2️⃣ merchant_uid 검증
   if (!merchant_uid) {
     console.error("[portone:webhook] missing merchant_uid");
     return NextResponse.json({ error: "missing merchant_uid" }, { status: 400 });
   }
 
-  const parts = merchant_uid.split("_");
-  if (parts.length < 3 || parts[0] !== "subscribe") {
+  if (!merchant_uid.startsWith("subscribe_")) {
     console.error("[portone:webhook] invalid merchant_uid:", merchant_uid);
     return NextResponse.json({ error: "invalid merchant_uid" }, { status: 400 });
   }
 
-  const userId = parts.slice(1, -1).join("_");
+  // ✅ 핵심: prefix 제거 방식
+  const userId = merchant_uid.slice("subscribe_".length);
   console.log("[portone:webhook] parsed userId:", userId);
 
+  
   // ✅ 3) DB 반영 + 에러 체크
   const { error } = await supabaseAdmin
     .from("user_access_levels")

@@ -214,7 +214,7 @@ function SubscribePageInner() {
                   alert("결제가 완료되었습니다.");
                   // ❗ 여기서 권한 바꾸지 마
                   // webhook이 처리함
-                  router.push(copy.afterPath);
+                  router.push("/me");
                 } else {
                   alert("결제 실패: " + rsp.error_msg);
                 }

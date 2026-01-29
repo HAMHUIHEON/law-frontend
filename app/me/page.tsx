@@ -292,7 +292,7 @@ export default async function MyPage() {
       ) : (
         <>
           <p style={styles.empty}>현재 무료 멤버십을 이용 중입니다.</p>
-          <Link href="/me/subscribe" style={{ fontSize: 13, color: "#fff" }}>
+          <Link href="/me/subscribe" style={{ marginTop:13, fontSize: 13, color: "#fff" }}>
             구독 멤버십 알아보기 →
           </Link>
         </>
