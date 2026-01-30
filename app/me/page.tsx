@@ -1,4 +1,5 @@
 // law-frontend/app/me/page.tsx
+
 import { auth } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/app/lib/supabaseServer";
 import { MyPageVM, ThoughtTrace } from "@/types/me";
@@ -13,8 +14,70 @@ const mockData: MyPageVM = {
   traces: [],          // ✅ 추가
   saved: [],
   documents: [],
+  caseUsage: {
+    limit: 10,
+    used: 0,
+    remaining: 10,
+    cases: [],
+  },
 };
 
+type CaseUsageVM = {
+  limit: number;
+  used: number;
+  remaining: number;
+  cases: string[];
+};
+
+async function fetchCaseUsage(userId: string): Promise<CaseUsageVM> {
+  const { getToken } = await auth();
+  const token = await getToken();
+
+  if (!token) {
+    return {
+      limit: 10,
+      used: 0,
+      remaining: 10,
+      cases: [],
+    };
+  }
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? process.env.API_BASE;
+  if (!API_BASE) {
+    return {
+      limit: 10,
+      used: 0,
+      remaining: 10,
+      cases: [],
+    };
+  }
+
+  const res = await fetch(`${API_BASE}/me/case-usage`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    return {
+      limit: 10,
+      used: 0,
+      remaining: 10,
+      cases: [],
+    };
+  }
+
+  const json = (await res.json()) as CaseUsageVM;
+
+  return {
+    limit: typeof json.limit === "number" ? json.limit : 10,
+    used: typeof json.used === "number" ? json.used : 0,
+    remaining: typeof json.remaining === "number" ? json.remaining : 10,
+    cases: Array.isArray(json.cases) ? json.cases.map(String) : [],
+  };
+}
 async function getMyPageVM(): Promise<MyPageVM> {
   const { userId } = await auth();
 
@@ -94,6 +157,8 @@ if (traceErr) {
     title: buildTraceTitle(row),
   }));
 
+  const caseUsage = await fetchCaseUsage(userId);
+
   return {
     ...mockData,
     accessLevel,
@@ -117,8 +182,10 @@ if (traceErr) {
 
       savedAt: row.saved_at ?? "",
     })),
+    caseUsage, // ✅ 추가
   }
 }
+
 
 function buildRecentTitle(row: {
   target_type: string;
@@ -251,6 +318,37 @@ export default async function MyPage() {
       >
         # 해당 기능은 현재 준비 중입니다.
       </p>
+      </section>
+
+      <section style={styles.section}>
+        <h2 style={styles.sectionTitle}>이번 달 판례 분석 사용량</h2>
+
+        <p style={styles.empty}>
+          이번 달 {vm.caseUsage.limit}건 중{" "}
+          <strong style={{ color: "rgba(255,255,255,0.85)" }}>
+            {vm.caseUsage.used}건
+          </strong>{" "}
+          사용 (잔여 {vm.caseUsage.remaining}건)
+        </p>
+
+        {vm.caseUsage.cases.length === 0 ? (
+          <p style={styles.empty}>아직 분석한 판례가 없습니다.</p>
+        ) : (
+          vm.caseUsage.cases.map((caseId) => (
+            <p key={caseId} style={styles.empty}>
+              <Link
+                href={`/case/${caseId}`}
+                style={{
+                  color: "rgba(255,255,255,0.75)",
+                  textDecoration: "underline",
+                  textUnderlineOffset: 3,
+                }}
+              >
+                사건 {caseId}
+              </Link>
+            </p>
+          ))
+        )}
       </section>
 
       {/* <section style={styles.section}>

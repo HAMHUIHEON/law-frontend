@@ -247,3 +247,31 @@ create table if not exists payment_orders (
 alter table user_access_levels
 add column if not exists subscription_end_at timestamptz,
 add column if not exists cancelled_at timestamptz;
+
+
+---구독자 업로드앤 런 분석 횟수 표 만들기--
+create table if not exists public.case_analysis_usage (
+  id uuid primary key default gen_random_uuid(),
+
+  user_id text not null,                 -- Clerk userId
+  case_id text not null,
+
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_case_usage_user_month
+on public.case_analysis_usage (user_id, created_at);
+
+alter table public.case_analysis_usage enable row level security;
+
+-- 읽기는 본인만
+create policy "user can read own case usage"
+on public.case_analysis_usage
+for select
+using (auth.uid()::text = user_id);
+
+-- 쓰기는 service_role만
+create policy "service role can write case usage"
+on public.case_analysis_usage
+for insert
+with check (auth.role() = 'service_role');

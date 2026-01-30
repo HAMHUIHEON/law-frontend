@@ -51,10 +51,19 @@ export type MyDocument = {
   updatedAt: string; // ISO
 };
 
+
+export type CaseUsageVM = {
+  limit: number;
+  used: number;
+  remaining: number;
+  cases: string[];
+};
+
 export type MyPageVM = {
   recent: RecentThought[];
   saved: SavedThought[];
   traces: ThoughtTrace[];  // ✅ 반드시 필요
   documents: MyDocument[];
   accessLevel: "GUEST" | "MEMBER" | "SUBSCRIBER"; // ✅ 이 줄만 추가
+  caseUsage: CaseUsageVM;
 };
