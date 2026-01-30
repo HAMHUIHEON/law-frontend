@@ -143,7 +143,7 @@ const styles = {
   },
 topUtility: {
   position: "absolute" as const,
-  top: "28px",
+  top: "20px",
   right: "32px",
   display: "flex",
   gap: "16px",

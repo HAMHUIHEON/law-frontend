@@ -16,50 +16,67 @@ export default function TermsPage() {
 
         <h1 style={styles.title}>이용약관</h1>
 
-        <div style={styles.content}>
-          <h3>이용약관 요약</h3>
-          <ul>
-            <li>본 서비스는 정보 제공을 목적으로 합니다.</li>
+        {/* 이용약관 요약 */}
+        <div style={styles.block}>
+          <h3 style={styles.blockTitle}>이용약관 요약</h3>
+
+          <p style={styles.paragraph}>
+            본 서비스는 판례·법령·전략 자료에 대한
+            <strong> 분석 및 정보 제공을 목적</strong>으로 합니다.
+          </p>
+
+          <ul style={styles.list}>
             <li>
               서비스 이용 및 그 결과에 대한 책임은
-              <strong> 이용자에게 귀속</strong>됩니다.
+              <strong> 이용자 본인에게 귀속</strong>됩니다.
             </li>
             <li>
-              회사는 제공 정보의 정확성·완전성을
+              제공되는 정보의 정확성·완전성·최신성에 대해
               <strong> 보장하지 않습니다.</strong>
             </li>
             <li>
-              회사는 서비스 내용 및 기능을
-              사전 고지 후 변경할 수 있습니다.
+              서비스의 내용, 기능, 구성은
+              사전 고지 후 변경될 수 있습니다.
             </li>
             <li>
-              계정 공유 및 부정 사용은
+              계정 공유, 자동화 접근, 부정 사용이 확인될 경우
               서비스 이용이 제한될 수 있습니다.
             </li>
           </ul>
 
           <p style={styles.notice}>
-            자세한 이용약관 전문은 본 페이지의 내용을 기준으로 합니다.
+            본 요약은 이해를 돕기 위한 안내이며,
+            본 페이지의 전체 내용이 약관으로 적용됩니다.
+          </p>
+        </div>
+
+        {/* 환불 정책 */}
+        <div style={styles.block}>
+          <h3 style={styles.blockTitle}>환불 정책</h3>
+
+          <p style={styles.paragraph}>
+            구독 결제에 대한 환불은 아래 기준에 따라 처리됩니다.
           </p>
 
-          <hr />
-
-          <h3>환불 정책</h3>
-          <ul>
-            <li>결제일로부터 <strong>7일 이내</strong></li>
+          <ul style={styles.list}>
             <li>
-              <strong>서비스 이용 기록이 없는 경우에 한해</strong> 환불 가능
+              결제일로부터 <strong>7일 이내</strong>
             </li>
-            <li>서비스 이용 이력이 있는 경우 환불 불가</li>
+            <li>
+              <strong>서비스 이용 이력이 없는 경우에 한해</strong> 환불 가능
+            </li>
+            <li>
+              서비스 이용 이력이 있는 경우 환불 불가
+            </li>
             <li>
               구독 해지 시에도
-              결제 기간 종료일까지 이용 가능
+              결제된 이용 기간 종료일까지는 서비스 이용 가능
             </li>
           </ul>
 
           <p style={styles.notice}>
             환불 요청은 고객센터 또는
-            회사가 지정한 방법을 통해 접수할 수 있습니다.
+            운영자가 안내한 방법을 통해 접수할 수 있습니다.
           </p>
         </div>
       </section>
@@ -90,17 +107,36 @@ const styles: Record<string, React.CSSProperties> = {
   title: {
     fontSize: "28px",
     fontWeight: 600,
-    marginBottom: "32px",
+    marginBottom: "40px",
+    color: "rgba(255,255,255,0.9)",
+    letterSpacing: "-0.01em",
+  },
+
+  block: {
+    marginBottom: "48px",
+  },
+  blockTitle: {
+    fontSize: "18px",
+    fontWeight: 600,
+    marginBottom: "16px",
     color: "rgba(255,255,255,0.9)",
   },
-  content: {
+  paragraph: {
+    fontSize: "15px",
+    lineHeight: 1.9,
+    color: "rgba(255,255,255,0.75)",
+    marginBottom: "16px",
+  },
+  list: {
+    paddingLeft: "18px",
+    lineHeight: 1.9,
     fontSize: "15px",
     color: "rgba(255,255,255,0.75)",
-    lineHeight: 1.8,
+    marginBottom: "12px",
   },
   notice: {
-    marginTop: "12px",
     fontSize: "14px",
-    color: "rgba(255,255,255,0.6)",
+    color: "rgba(255,255,255,0.55)",
+    lineHeight: 1.7,
   },
 };
