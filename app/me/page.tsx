@@ -31,7 +31,8 @@ type CaseUsageVM = {
 
 async function fetchCaseUsage(userId: string): Promise<CaseUsageVM> {
   const { getToken } = await auth();
-  const token = await getToken();
+  const token = await getToken({ template: "backend-api" });
+
 
   if (!token) {
     return {

@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCaseUI, CaseViewMode } from "./CaseUIContext";
+import { useAuth } from "@clerk/nextjs";
 
 const CASE_GREEN = "#065f46";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
@@ -28,6 +29,7 @@ function normalizeCaseId(raw: string): string | null {
 
 
 export default function CaseSidebar() {
+  const { getToken } = useAuth();
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -102,8 +104,18 @@ export default function CaseSidebar() {
       const fd = new FormData();
       fd.append("file", file, file.name);
 
+        // 🔑 ① 여기! 토큰 생성
+      const token = await getToken({ template: "backend-api" });
+      if (!token) {
+        throw new Error("인증 토큰을 가져오지 못했습니다.");
+      }
+
+      // 🔑 ② 그리고 fetch에 헤더로 추가
       const res = await fetch(`${API_BASE}/api/cases/upload-and-run`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: fd,
       });
 
