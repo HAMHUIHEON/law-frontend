@@ -4,6 +4,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/nextjs";
+import { LegalLinks } from "./LegalLinks";
+
 
 export default function HomePage() {
   const router = useRouter();
@@ -11,6 +13,7 @@ export default function HomePage() {
 
   return (
     <main style={styles.container}>
+    <LegalLinks />
     <div style={styles.topUtility}>
       <SignedOut>
         <SignInButton mode="modal">
