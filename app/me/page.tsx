@@ -53,7 +53,7 @@ async function fetchCaseUsage(userId: string): Promise<CaseUsageVM> {
     };
   }
 
-  const res = await fetch(`${API_BASE}/me/case-usage`, {
+  const res = await fetch(`${API_BASE}/api/cases/me/case-usage`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
