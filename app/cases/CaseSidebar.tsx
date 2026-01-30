@@ -119,16 +119,26 @@ export default function CaseSidebar() {
         body: fd,
       });
 
+      // 🔴 1️⃣ 월간 분석 한도 초과
+      if (res.status === 429) {
+        setMainError("CASE_LIMIT_EXCEEDED");
+        setUploading(false);
+        return;
+      }
+
+      // 🔴 2️⃣ 기타 서버 에러
       if (!res.ok) {
         const text = await res.text().catch(() => "");
         throw new Error(text || `Upload failed (${res.status})`);
       }
 
+      // 🔴 3️⃣ 정상 응답만 JSON 파싱
       const json = await res.json();
       const normalized = normalizeCaseId(String(json.case_id ?? ""));
       if (!normalized) throw new Error("서버에서 유효한 사건번호를 받지 못했습니다.");
 
-      // ✅ 캐시 히트인 경우
+
+      // 🔴 4️⃣ 캐시 히트 처리
       if (json.cache_hit) {
         setMainError("CACHE_HIT");
         setCaseId(normalized);   // 🔑 조회칸에 바로 앉힘 (UX 유지)
@@ -136,7 +146,7 @@ export default function CaseSidebar() {
         return;                 // 🔑 startCase 절대 타지 않음
       }
 
-      // 신규 판례만 여기로
+      // 🔴 5️⃣ 신규 분석
       startCase(normalized);
       router.push(`/cases?case_id=${encodeURIComponent(normalized)}`);
 

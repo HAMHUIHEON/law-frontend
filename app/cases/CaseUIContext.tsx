@@ -10,6 +10,7 @@ export type CaseViewMode = "HOME" | "FLOW" | "STRUCTURE" | "PRACTICE";
 type MainErrorType =
   | "PDF_UNREADABLE"
   | "CACHE_HIT"
+  | "CASE_LIMIT_EXCEEDED"
   | null;
 
 
@@ -35,7 +36,6 @@ type CaseUIState = {
   // ✅ 추가
   mainError: MainErrorType;
   setMainError: (v: MainErrorType) => void;
-
   
   // ✅ “세션 제어” 공용 API
   startCase: (nextCaseId: string) => void;

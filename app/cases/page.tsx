@@ -6,8 +6,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useCaseUI } from "./CaseUIContext";
 import { MainUploadError } from "./MainUploadError";
 import { MainUploadCachedNotice } from "./MainUploadCachedNotice";
+import {MainUploadLimitNotice} from "./MainUploadLimitNotice";
 
-type MainErrorType = "PDF_UNREADABLE" | "CACHE_HIT" | null;
+type MainErrorType = "PDF_UNREADABLE" | "CACHE_HIT" | "CASE_LIMIT_EXCEEDED" | null;
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +58,7 @@ export default function CasesRootPage() {
       {/* {!mainError && 기본 안내} */}
       {mainError === "PDF_UNREADABLE" && <MainUploadError />}
       {mainError === "CACHE_HIT" && <MainUploadCachedNotice />}
-
+      {mainError === "CASE_LIMIT_EXCEEDED" && (<MainUploadLimitNotice />)}
       </div>
     </div>
   );
