@@ -45,17 +45,25 @@ export default function AboutPage() {
           <h2 style={styles.subTitle}>What we analyze</h2>
 
           <ul style={styles.featureList}>
-            <li>
-              <strong>판례</strong>
-              <span>법원이 결론에 이르기까지의 판단 구조와 논증 흐름</span>
+            <li style={styles.featureItem}>
+              <strong style={styles.featureTitle}>판례</strong>
+              <span style={styles.featureDesc}>
+                법원이 결론에 이르기까지의 판단 구조와 논증 흐름
+              </span>
             </li>
-            <li>
-              <strong>법령</strong>
-              <span>조문의 요건·효과·예외를 판단 순서에 따라 정리</span>
+
+            <li style={styles.featureItem}>
+              <strong style={styles.featureTitle}>법령</strong>
+              <span style={styles.featureDesc}>
+                조문의 요건·효과·예외를 판단 순서에 따라 정리
+              </span>
             </li>
-            <li>
-              <strong>전략 자료</strong>
-              <span>정책·전략 문헌(OECD 등)을 사고 구조 단위로 재구성</span>
+
+            <li style={styles.featureItem}>
+              <strong style={styles.featureTitle}>전략 자료</strong>
+              <span style={styles.featureDesc}>
+                정책·전략 문헌(OECD 등)을 사고 구조 단위로 재구성
+              </span>
             </li>
           </ul>
         </section>
@@ -131,6 +139,7 @@ const styles: Record<string, React.CSSProperties> = {
     paddingLeft: 20,
     margin: "16px 0",
     lineHeight: 1.8,
+    listStyleType: "disc",  
   },
   featureList: {
     listStyle: "none",
@@ -146,4 +155,24 @@ const styles: Record<string, React.CSSProperties> = {
     color: "rgba(255,255,255,0.55)",
     lineHeight: 1.8,
   },
+  featureItem: {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+  paddingLeft: 12,
+  borderLeft: "2px solid rgba(255,255,255,0.25)",
+  },
+
+  featureTitle: {
+    fontSize: 15,
+    fontWeight: 600,
+    color: "rgba(255,255,255,0.9)",
+  },
+
+  featureDesc: {
+    fontSize: 14,
+    color: "rgba(255,255,255,0.65)",
+    lineHeight: 1.6,
+  },
+
 };

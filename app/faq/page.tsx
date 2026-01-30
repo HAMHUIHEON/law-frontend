@@ -32,9 +32,9 @@ export default function FAQPage() {
               를 위한 서비스입니다.
             </p>
             <ul>
-              <li>법률 실무자</li>
-              <li>법학 연구자</li>
-              <li>로스쿨·공무원·전문자격 시험 수험생</li>
+              <li> · 법률 실무자 </li>
+              <li> · 법학 연구자 </li>
+              <li> · 로스쿨·공무원·전문자격 시험 수험생 </li>
             </ul>
           </div>
         </div>

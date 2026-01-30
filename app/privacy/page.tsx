@@ -126,6 +126,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "15px",
     color: "rgba(255,255,255,0.75)",
     marginBottom: "12px",
+    listStyleType: "disc",
   },
   subText: {
     fontSize: "14px",
