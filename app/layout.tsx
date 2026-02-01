@@ -37,11 +37,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClerkProvider
-          publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-        >
+        <ClerkProvider>
+          <div style={{ minHeight: "100vh" }}>
             {children}
             <GlobalDisclaimerFooter />
+          </div>
         </ClerkProvider>
       </body>
     </html>
