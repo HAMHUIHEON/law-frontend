@@ -119,6 +119,18 @@ export default function CaseSidebar() {
         body: fd,
       });
 
+
+      // 🔴 0️⃣ 구독 필요 (403)
+      if (res.status === 403) {
+        const text = await res.text().catch(() => "");
+        if (text.includes("SUBSCRIPTION_REQUIRED")) {
+          setMainError("SUBSCRIPTION_REQUIRED");
+          setUploading(false);
+          return;
+        }
+      }
+
+
       // 🔴 1️⃣ 월간 분석 한도 초과
       if (res.status === 429) {
         setMainError("CASE_LIMIT_EXCEEDED");

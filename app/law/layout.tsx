@@ -319,7 +319,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   chapterSection: {
-  flex: 1,
+  flex: 2,
   minHeight: 0,
   display: "flex",
   flexDirection: "column",

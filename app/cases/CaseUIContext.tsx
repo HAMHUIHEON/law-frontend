@@ -11,6 +11,7 @@ type MainErrorType =
   | "PDF_UNREADABLE"
   | "CACHE_HIT"
   | "CASE_LIMIT_EXCEEDED"
+  | "SUBSCRIPTION_REQUIRED"
   | null;
 
 

@@ -6,7 +6,7 @@ export default function PublicHome() {
   return (
     <main style={styles.container}>
       <div style={styles.center}>
-        <div style={styles.brand}>LAPIS</div>
+        <div style={styles.brand}>LAPIS NEXUS</div>
         <h1 style={styles.title}>
           Where thought flows, sharpens, and extends.
         </h1>

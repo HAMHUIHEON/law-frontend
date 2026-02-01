@@ -7,8 +7,15 @@ import { useCaseUI } from "./CaseUIContext";
 import { MainUploadError } from "./MainUploadError";
 import { MainUploadCachedNotice } from "./MainUploadCachedNotice";
 import {MainUploadLimitNotice} from "./MainUploadLimitNotice";
+import {MainUploadSubscriptionRequiredNotice} from "./MainUploadSubscriptionRequiredNotice";
 
-type MainErrorType = "PDF_UNREADABLE" | "CACHE_HIT" | "CASE_LIMIT_EXCEEDED" | null;
+
+type MainErrorType =
+  | "PDF_UNREADABLE"
+  | "CACHE_HIT"
+  | "CASE_LIMIT_EXCEEDED"
+  | "SUBSCRIPTION_REQUIRED"
+  | null;
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +66,7 @@ export default function CasesRootPage() {
       {mainError === "PDF_UNREADABLE" && <MainUploadError />}
       {mainError === "CACHE_HIT" && <MainUploadCachedNotice />}
       {mainError === "CASE_LIMIT_EXCEEDED" && (<MainUploadLimitNotice />)}
+      {mainError === "SUBSCRIPTION_REQUIRED" && (<MainUploadSubscriptionRequiredNotice />)}
       </div>
     </div>
   );
