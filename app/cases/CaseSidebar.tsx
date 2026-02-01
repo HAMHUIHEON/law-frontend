@@ -104,10 +104,14 @@ export default function CaseSidebar() {
       const fd = new FormData();
       fd.append("file", file, file.name);
 
-        // 🔑 ① 여기! 토큰 생성
+      // 🔑 ① 토큰 생성
       const token = await getToken({ template: "backend-api" });
+
+      // 🚨 토큰이 없으면: 서버로 가지 않는다
       if (!token) {
-        throw new Error("인증 토큰을 가져오지 못했습니다.");
+        setMainError("SUBSCRIPTION_REQUIRED"); // 로그인/구독 필요 안내
+        setUploading(false);
+        return;
       }
 
       // 🔑 ② 그리고 fetch에 헤더로 추가
@@ -119,17 +123,12 @@ export default function CaseSidebar() {
         body: fd,
       });
 
-
       // 🔴 0️⃣ 구독 필요 (403)
-      if (res.status === 401) {
-        const text = await res.text().catch(() => "");
-        if (text.includes("SUBSCRIPTION_REQUIRED")) {
-          setMainError("SUBSCRIPTION_REQUIRED");
-          setUploading(false);
-          return;
-        }
+      if (res.status === 403) {
+        setMainError("SUBSCRIPTION_REQUIRED");
+        setUploading(false);
+        return;
       }
-
 
       // 🔴 1️⃣ 월간 분석 한도 초과
       if (res.status === 429) {
