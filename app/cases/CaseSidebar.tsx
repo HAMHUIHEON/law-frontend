@@ -121,7 +121,7 @@ export default function CaseSidebar() {
 
 
       // 🔴 0️⃣ 구독 필요 (403)
-      if (res.status === 403) {
+      if (res.status === 401) {
         const text = await res.text().catch(() => "");
         if (text.includes("SUBSCRIPTION_REQUIRED")) {
           setMainError("SUBSCRIPTION_REQUIRED");
