@@ -66,4 +66,8 @@ export type MyPageVM = {
   documents: MyDocument[];
   accessLevel: "GUEST" | "MEMBER" | "SUBSCRIBER"; // ✅ 이 줄만 추가
   caseUsage: CaseUsageVM;
+  subscriptionEndAt: string | null;
+  cancelledAt: string | null;
+
 };
+

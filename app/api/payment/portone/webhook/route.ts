@@ -26,6 +26,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "missing merchant_uid" }, { status: 400 });
   }
 
+  // 2-0️⃣ 이미 paid 처리된 주문인지 확인
+  const { data: paidOrder } = await supabaseAdmin
+    .from("payment_orders")
+    .select("status")
+    .eq("merchant_uid", merchant_uid)
+    .single();
+
+  if (paidOrder?.status === "paid") {
+    // 이미 처리된 웹훅 → 그냥 OK
+    return NextResponse.json({ ok: true });
+  }
+
   // 2️⃣ 주문 조회 (🔥 파싱 없음)
   const { data: order, error: orderErr } = await supabaseAdmin
     .from("payment_orders")

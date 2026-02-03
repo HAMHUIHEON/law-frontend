@@ -176,7 +176,7 @@ function SubscribePageInner() {
         {/* CTA */}
         <section style={ctaSectionStyle}>
           <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>월 구독</p>
-          <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ XX,XXX / 월</p>
+          <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ 9,900 / 월</p>
 
         <button
         onClick={async () => {
@@ -215,7 +215,7 @@ function SubscribePageInner() {
               pay_method: "card",
               merchant_uid,
               name: "월 구독 멤버십",
-              amount: 1000, // 테스트 금액
+              amount: 9900, // 테스트 금액
               buyer_email: "test@test.com",
               buyer_name: "테스트 사용자",
             },

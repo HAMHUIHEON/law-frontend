@@ -20,6 +20,8 @@ const mockData: MyPageVM = {
     remaining: 10,
     cases: [],
   },
+  subscriptionEndAt: null,
+  cancelledAt: null,
 };
 
 type CaseUsageVM = {
@@ -88,9 +90,10 @@ async function getMyPageVM(): Promise<MyPageVM> {
 
   const { data: accessRow } = await supabaseAdmin
     .from("user_access_levels")
-    .select("access_level")
+    .select("access_level, subscription_end_at, cancelled_at")
     .eq("user_id", userId)
     .single();
+
 
   const accessLevel = accessRow?.access_level ?? "MEMBER";
 
@@ -163,6 +166,10 @@ if (traceErr) {
   return {
     ...mockData,
     accessLevel,
+
+    subscriptionEndAt: accessRow?.subscription_end_at ?? null,
+    cancelledAt: accessRow?.cancelled_at ?? null,
+
     recent: (data ?? []).map((row: any) => ({
       id: row.id,
       title: buildRecentTitle(row),
@@ -171,7 +178,8 @@ if (traceErr) {
       lastVisitedAt: row.last_viewed_at ?? "",
     })),
 
-    traces, // ✅ 여기서만 추가
+    traces, 
+
     saved: (savedRows ?? []).map((row: any) => ({
       id: row.id,
       title: buildSavedTitle(row),
@@ -183,7 +191,8 @@ if (traceErr) {
 
       savedAt: row.saved_at ?? "",
     })),
-    caseUsage, // ✅ 추가
+
+    caseUsage, 
   }
 }
 
@@ -260,6 +269,18 @@ function buildSavedTitle(row: {
 
 export default async function MyPage() {
   const vm = await getMyPageVM();
+  const now = new Date();
+
+  const isSubscriber = vm.accessLevel === "SUBSCRIBER";
+
+  const isCancelled = vm.cancelledAt !== null;
+
+  const subscriptionEndsAt = vm.subscriptionEndAt
+    ? new Date(vm.subscriptionEndAt)
+    : null;
+
+  const isActiveUntilEnd =
+    subscriptionEndsAt !== null && subscriptionEndsAt > now;
 
   return (
     <main style={styles.container}>
@@ -366,37 +387,67 @@ export default async function MyPage() {
       </section> */}
       
       <section style={styles.section}>
-      <h2 style={styles.sectionTitle}>멤버십</h2>
-      {vm.accessLevel === "SUBSCRIBER" ? (
-        <>
-          <p style={styles.empty}>
-            현재 <strong>구독 멤버십</strong>을 이용 중입니다.
-          </p>
+        <h2 style={styles.sectionTitle}>멤버십</h2>
 
-          <Link
-            href="/me/unsubscribe"
-            style={{
-              marginTop: 12,
-              display: "inline-block",
-              fontSize: 13,
-              padding: "8px 12px",
-              borderRadius: 8,
-              border: "1px solid rgba(255,255,255,0.35)",
-              color: "rgba(255,255,255,0.8)",
-            }}
-          >
-            멤버십 해지
-          </Link>
-        </>
-      ) : (
-        <>
-          <p style={styles.empty}>현재 무료 멤버십을 이용 중입니다.</p>
-          <Link href="/me/subscribe" style={{ marginTop:13, fontSize: 13, color: "#fff" }}>
-            구독 멤버십 알아보기 →
-          </Link>
-        </>
-      )}
-    </section>
+        {/* A. 비구독 */}
+        {!isSubscriber && (
+          <>
+            <p style={styles.empty}>현재 무료 멤버십을 이용 중입니다.</p>
+            <Link
+              href="/me/subscribe"
+              style={{ marginTop: 13, fontSize: 13, color: "#fff" }}
+            >
+              구독 멤버십 알아보기 →
+            </Link>
+          </>
+        )}
+
+        {/* B. 구독 중 (정상) */}
+        {isSubscriber && !isCancelled && (
+          <>
+            <p style={styles.empty}>
+              현재 <strong>구독 멤버십</strong>을 이용 중입니다.
+            </p>
+
+            <Link
+              href="/me/unsubscribe"
+              style={{
+                marginTop: 12,
+                display: "inline-block",
+                fontSize: 13,
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid rgba(255,255,255,0.35)",
+                color: "rgba(255,255,255,0.8)",
+              }}
+            >
+              멤버십 해지
+            </Link>
+          </>
+        )}
+
+        {/* C. 해지했지만 아직 이용 가능 */}
+        {isSubscriber && isCancelled && isActiveUntilEnd && (
+          <>
+            <p style={styles.empty}>
+              구독은 해지되었지만<br />
+              <strong>
+                {subscriptionEndsAt!.toLocaleDateString("ko-KR", {
+                  timeZone: "Asia/Seoul",
+                })}
+              </strong>{" "}
+              까지 이용 가능합니다.
+            </p>
+
+            <Link
+              href="/me/subscribe"
+              style={{ marginTop: 13, fontSize: 13, color: "#fff" }}
+            >
+              다시 구독하기 →
+            </Link>
+          </>
+        )}
+      </section>
 
     </main>
   );
