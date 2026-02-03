@@ -42,7 +42,7 @@ export function MainLoginRequiredNotice() {
           color: "#166534",
         }}
       >
-        📌 상단의 <b>회원가입 / 로그인</b> 버튼을 이용해 주세요.
+        📌 상단의 홈 화면으로 돌아가서 <b> 회원가입 / 로그인</b> 버튼을 이용해 주세요.
       </p>
     </div>
   );
