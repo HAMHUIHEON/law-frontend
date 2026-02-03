@@ -275,3 +275,57 @@ create policy "service role can write case usage"
 on public.case_analysis_usage
 for insert
 with check (auth.role() = 'service_role');
+
+
+--user_subscription_history 테이블 생성
+create table user_subscription_history (
+  id uuid primary key default gen_random_uuid(),
+
+  user_id text not null,
+
+  -- 이 구독이 언제 시작되었는지
+  started_at timestamptz not null,
+
+  -- 이 구독이 언제 끝났는지 (해지 or 만료)
+  ended_at timestamptz,
+
+  -- ended_at의 이유
+  ended_reason text
+    check (ended_reason in ('expired', 'cancelled', 'admin')),
+
+  -- 어떤 결제로 시작된 구독인지
+  merchant_uid text,
+
+  created_at timestamptz not null default now()
+);
+
+create index idx_subscription_history_user
+on user_subscription_history (user_id, started_at desc);
+
+---크론 SQL 로직 (핵심) 
+---Supabase에 함수(Function) 하나 추가 자동 실행 로직의 본체
+create or replace function expire_subscriptions()
+returns void
+language sql
+as $$
+  update user_subscription_history h
+  set
+    ended_at = u.subscription_end_at,
+    ended_reason = 'expired'
+  from user_access_levels u
+  where
+    h.user_id = u.user_id
+    and h.ended_at is null
+    and u.subscription_end_at is not null
+    and u.subscription_end_at < now();
+
+  update user_access_levels
+  set
+    access_level = 'MEMBER',
+    updated_at = now()
+  where
+    access_level = 'SUBSCRIBER'
+    and subscription_end_at is not null
+    and subscription_end_at < now();
+$$;
+-- 이제 이 함수를 Supabase 크론잡에서 주기적으로 실행하도록 설정하면 된다.
