@@ -2,14 +2,18 @@
 import { useEffect, useState } from "react";
 import { adaptCaseFlow } from "./adapters";
 import { useCaseUI } from "../CaseUIContext";
+import { useAuth } from "@clerk/nextjs";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
 export function useCaseFlow(caseId: string | null) {
+  const { getToken } = useAuth();
+  const { setMainError } = useCaseUI();
+
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const { setMainError } = useCaseUI(); // ✅ 핵심
+
 
   useEffect(() => {
     if (!caseId) {
@@ -19,39 +23,56 @@ export function useCaseFlow(caseId: string | null) {
     }
 
     const controller = new AbortController();
-    setLoading(true);
-    setMainError(null); // 🔑 새 요청 시작 시 초기화
 
-    fetch(`${API_BASE}/api/cases/${caseId}/report-a`, {
-      signal: controller.signal,
-    })
-      .then((res) => {
-        // 🔐 로그인 필요
+    const run = async () => {
+      setLoading(true);
+      setMainError(null);
+
+      // 🔑 1️⃣ 토큰 먼저 받기
+      const token = await getToken({ template: "backend-api" });
+
+      // 🔐 로그인 안 된 상태
+      if (!token) {
+        setMainError("LOGIN_REQUIRED");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/cases/${caseId}/report-a`,
+          {
+            signal: controller.signal,
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        );
+
         if (res.status === 401) {
           setMainError("LOGIN_REQUIRED");
           setLoading(false);
-          return null;
+          return;
         }
 
         if (!res.ok) {
           throw new Error("fetch failed");
         }
 
-        return res.json();
-      })
-      .then((json) => {
-        if (!json) return; // 401 처리된 경우
+        const json = await res.json();
         setData(adaptCaseFlow(json));
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err: any) {
         if (err?.name === "AbortError") return;
         setData(null);
         setLoading(false);
-      });
+      }
+    };
+
+    run();
 
     return () => controller.abort();
-  }, [caseId, setMainError]);
+  }, [caseId, getToken, setMainError]);
 
   return { data, loading };
 }
