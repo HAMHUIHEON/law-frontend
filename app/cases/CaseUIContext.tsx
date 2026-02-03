@@ -12,7 +12,9 @@ type MainErrorType =
   | "CACHE_HIT"
   | "CASE_LIMIT_EXCEEDED"
   | "SUBSCRIPTION_REQUIRED"
+  | "LOGIN_REQUIRED"
   | null;
+
 
 
 type CaseUIState = {

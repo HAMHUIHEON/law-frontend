@@ -46,13 +46,14 @@ export default function CaseSidebar() {
   setMainError,   // ✅ 이거
 } = useCaseUI();
 
-
+  const { isSignedIn } = useAuth(); 
   const initialFromQuery = useMemo(() => {
     const q = sp?.get("case_id");
     return q && q.trim() ? q.trim() : null;
   }, [sp]);
 
   const [draft, setDraft] = useState<string>(caseId ?? initialFromQuery ?? "");
+
 
   // upload state
   const [uploading, setUploading] = useState(false);
@@ -79,7 +80,13 @@ export default function CaseSidebar() {
     setDraft(caseId ?? "");
   }, [caseId]);
 
+
   const commitCaseId = useCallback((value: string) => {
+    if (!isSignedIn) {
+      setMainError("LOGIN_REQUIRED");
+      return;
+    }
+
     const normalized = normalizeCaseId(value);
     if (!normalized) {
       setUploadErr("사건번호 형식을 인식할 수 없습니다.");
@@ -91,7 +98,7 @@ export default function CaseSidebar() {
 
     startCase(normalized);
     router.push(`/cases/flow?case_id=${encodeURIComponent(normalized)}`);
-  }, [router, startCase, setMainError]);
+  }, [isSignedIn,router, startCase, setMainError]);
 
   const onUpload = useCallback(async (file: File) => {
     // ✅ 업로드 시작 시: 공통 초기화
@@ -122,6 +129,13 @@ export default function CaseSidebar() {
         },
         body: fd,
       });
+
+      // 🔴 0️⃣ 로그인 필요 (401)
+      if (res.status === 401) {
+        setMainError("LOGIN_REQUIRED");
+        setUploading(false);
+        return;
+      }
 
       // 🔴 0️⃣ 구독 필요 (403)
       if (res.status === 403) {
