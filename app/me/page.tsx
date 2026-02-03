@@ -269,10 +269,9 @@ function buildSavedTitle(row: {
 
 export default async function MyPage() {
   const vm = await getMyPageVM();
-  const now = new Date();
+  const now = Date.now(); // ✅ number
 
   const isSubscriber = vm.accessLevel === "SUBSCRIBER";
-
   const isCancelled = vm.cancelledAt !== null;
 
   const subscriptionEndsAt = vm.subscriptionEndAt
@@ -280,8 +279,9 @@ export default async function MyPage() {
     : null;
 
   const isActiveUntilEnd =
-    subscriptionEndsAt !== null && subscriptionEndsAt > now;
-
+    subscriptionEndsAt !== null &&
+    subscriptionEndsAt.getTime() > now;
+    
   return (
     <main style={styles.container}>
       <section style={styles.section}>
