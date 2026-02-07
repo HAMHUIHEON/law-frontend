@@ -101,8 +101,8 @@ if (!selectedBookId || !viewMode) {
         >
           <div>• 이 문서를 <strong>왜</strong> 읽어야 하는지, 어떤 관점이 필요한지 정리합니다.</div>
           <div>• 실무에서 <strong>어디서부터</strong> 어떻게 움직일지 흐름과 기준을 제공합니다.</div>
-          <div>• 반복되는 리스크 유형과 주의 지점을 미리 인식할 수 있게 합니다.</div>
-          <div>• 개별 사안을 구조적으로 해석하고 판단에 이르는 틀을 제공합니다.</div>
+          <div>• 반복되는 <strong>리스크 유형과 주의 지점</strong>을 미리 인식할 수 있게 합니다.</div>
+          <div>• 개별 사안을 구조적으로 해석하고 <strong>판단</strong>에 이르는 틀을 제공합니다.</div>
         </div>
 
         <div

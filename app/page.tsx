@@ -37,7 +37,8 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
     padding: "0 24px",
     maxWidth: "840px",
-    marginBottom: "120px",          // 🔑 footer와 거리 확보
+    marginBottom: "120px", 
+    marginTop: "30px",   
   },
 
   brand: {
