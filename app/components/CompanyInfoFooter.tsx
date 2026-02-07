@@ -9,7 +9,11 @@ export function CompanyInfoFooter() {
   const isMain = pathname === "/";
   const isEnter = pathname.startsWith("/enter");
   const isMe = pathname.startsWith("/me");
-  const isPublic = isMain || isEnter|| isMe;
+  const isabout = pathname.startsWith("/about");
+  const isfaq = pathname.startsWith("/faq");
+  const isterms = pathname.startsWith("/terms");
+  const isprivacy = pathname.startsWith("/privacy");
+  const isPublic = isMain || isEnter|| isMe || isabout || isfaq || isterms || isprivacy;
 
   return (
     <footer
@@ -19,18 +23,18 @@ export function CompanyInfoFooter() {
         ...(isPublic ? styles.enterOffset : {}),
       }}
     >
-      <div style={styles.inner}>
-        <p style={{ margin: 0 }}>
-          대표: 윤승미 | 사업자등록번호: 000-00-00000 <br />
-          통신판매업신고번호: 제2026-부산남구-00000호 |
-        </p>
-        <p style={{ margin: "5px 0 0" }}>
-          부산광역시 해운대구 재반로 166 2층 S153
-        </p>
-        <p style={{ margin: "5px 0 0" }}>
-          문의: yoonseul_m@naver.com
-        </p>
-      </div>
+    <div style={styles.inner}>
+    <p style={{ margin: 0 }}>
+        대표: 윤승미 · 사업자등록번호: 000-00-00000
+    </p>
+    <p style={{ margin: "4px 0 0" }}>
+        통신판매업신고번호: 제2026-부산남구-00000호
+    </p>
+    <p style={{ margin: "4px 0 0" }}>
+        부산광역시 해운대구 재반로 166, 2층 S153 ·
+        yoonseul_m@naver.com
+    </p>
+    </div>
     </footer>
   );
 }
