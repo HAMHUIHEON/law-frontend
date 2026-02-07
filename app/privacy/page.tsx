@@ -27,9 +27,13 @@ export default function PrivacyPage() {
 
           <ul style={styles.list}>
             <li>회원 식별을 위한 정보<br />
-             (외부 인증 서비스로부터 제공되는 고유 식별자 등)</li>
+            <span style={styles.subText}>
+             (외부 인증 서비스로부터 제공되는 고유 식별자 등)
+            </span></li>
             <li>서비스 이용 기록 <br />
-            (서비스 개선 및 안정적 운영을 위한 접속·이용 로그)</li>
+            <span style={styles.subText}>
+            (서비스 개선 및 안정적 운영을 위한 접속·이용 로그)
+            </span></li>
             <li>
               결제 관련 정보  
               <br />
