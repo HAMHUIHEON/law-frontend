@@ -8,14 +8,15 @@ export function CompanyInfoFooter() {
 
   const isMain = pathname === "/";
   const isEnter = pathname.startsWith("/enter");
-  const isPublic = isMain || isEnter;
+  const isMe = pathname.startsWith("/me");
+  const isPublic = isMain || isEnter|| isMe;
 
   return (
     <footer
       style={{
         ...styles.base,
         ...(isPublic ? styles.public : styles.internal),
-        ...(isEnter ? styles.enterOffset : {}),
+        ...(isPublic ? styles.enterOffset : {}),
       }}
     >
       <div style={styles.inner}>
