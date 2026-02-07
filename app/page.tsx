@@ -30,6 +30,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    paddingBottom: "160px", // 🔑 footer 영역 확보
   },
   center: {
     textAlign: "center",
