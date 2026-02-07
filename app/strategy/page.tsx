@@ -49,48 +49,74 @@ if (!selectedBookId || !viewMode) {
   return (
     <div
       style={{
-        maxWidth: 880,
+        maxWidth: 920,
         margin: "0 auto",
-        padding: "80px 48px",
-        color: "#374151",
-        lineHeight: 1.7,
+        padding: "96px 32px",
       }}
     >
-      <h2
+      <div
         style={{
-          fontSize: 22,
-          fontWeight: 600,
-          marginBottom: 16,
-          color: "#111827",
+          background: "#f9fafb",
+          border: "1px solid #e5e7eb",
+          borderRadius: 16,
+          padding: "48px 48px 40px",
         }}
       >
-        전략(Strategy)
-      </h2>
+        <h2
+          style={{
+            fontSize: 20,
+            fontWeight: 600,
+            marginBottom: 12,
+            color: "#111827",
+          }}
+        >
+          Strategy
+        </h2>
 
-      <p style={{ marginBottom: 20, color: "#4b5563" }}>
-        이 전략 영역은 OECD 가이드라인·보고서를 단순히 읽는 데서 끝내지 않고,  
-        <br />
-        <strong>이해 → 실행 → 위험 인식 → 판단</strong>으로 이어지는  
-        실무 의사결정 흐름을 구조적으로 지원하는 공간입니다.
-      </p>
+        <p
+          style={{
+            fontSize: 15,
+            lineHeight: 1.7,
+            color: "#4b5563",
+            marginBottom: 28,
+          }}
+        >
+          이 전략 영역은 OECD 가이드라인·보고서를 단순히 읽는 데서 끝내지 않고,  
+          <br />
+          <strong style={{ color: "#111827" }}>
+            이해 → 실행 → 위험 인식 → 판단
+          </strong>
+          으로 이어지는 실무 의사결정 흐름을 지원합니다.
+        </p>
 
-      <ul
-        style={{
-          paddingLeft: 20,
-          marginBottom: 24,
-          color: "#374151",
-        }}
-      >
-        <li>· 이 문서를 왜 봐야 하는지, 어떤 관점으로 읽어야 하는지 정리합니다.</li>
-        <li>· 실무에서 어디서부터 어떻게 움직일지 흐름과 기준을 제공합니다.</li>
-        <li>· 반복되는 리스크 유형과 주의 지점을 미리 인식할 수 있게 합니다.</li>
-        <li>· 개별 사안을 어떻게 해석하고 결론에 이르는지 판단의 틀을 제공합니다.</li>
-      </ul>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            rowGap: 12,
+            marginBottom: 32,
+            fontSize: 14,
+            color: "#374151",
+          }}
+        >
+          <div>• 이 문서를 <strong>왜</strong> 읽어야 하는지, 어떤 관점이 필요한지 정리합니다.</div>
+          <div>• 실무에서 <strong>어디서부터</strong> 어떻게 움직일지 흐름과 기준을 제공합니다.</div>
+          <div>• 반복되는 리스크 유형과 주의 지점을 미리 인식할 수 있게 합니다.</div>
+          <div>• 개별 사안을 구조적으로 해석하고 판단에 이르는 틀을 제공합니다.</div>
+        </div>
 
-      <p style={{ color: "#6b7280", fontSize: 14 }}>
-        ← 왼쪽에서 <strong>간행물</strong>과 <strong>보기 방식</strong>을 선택하면  
-        해당 문서를 전략적으로 해석·활용할 수 있는 화면이 열립니다.
-      </p>
+        <div
+          style={{
+            paddingTop: 16,
+            borderTop: "1px dashed #e5e7eb",
+            fontSize: 13,
+            color: "#6b7280",
+          }}
+        >
+          ← 왼쪽에서 <strong>간행물</strong>과 <strong>보기 방식</strong>을 선택하면  
+          해당 문서를 전략적으로 해석·활용할 수 있는 화면이 열립니다.
+        </div>
+      </div>
     </div>
   );
 }
