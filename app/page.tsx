@@ -26,25 +26,29 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: "100vh",
     width: "100%",
-    backgroundColor: "#111827", // lapis 계열 다크 네이비
+    backgroundColor: "#111827",
     display: "flex",
+    flexDirection: "column",        // 🔑 핵심
+    justifyContent: "center",       // 세로 중앙
     alignItems: "center",
-    justifyContent: "center",
-    paddingBottom: "160px", // 🔑 footer 영역 확보
   },
+
   center: {
     textAlign: "center",
     padding: "0 24px",
     maxWidth: "840px",
+    marginBottom: "120px",          // 🔑 footer와 거리 확보
   },
-brand: {
-  fontSize: "17px",          // ← 12px → 14px
-  letterSpacing: "0.32em",   // ← 살짝만 더 벌림
-  fontWeight: 500,
-  color: "rgba(255,255,255,0.55)", // ← 0.45 → 0.55
-  marginBottom: "36px",      // ← 숨 쉴 공간만 약간 추가
-  textTransform: "uppercase",
-},
+
+  brand: {
+    fontSize: "17px",
+    letterSpacing: "0.32em",
+    fontWeight: 500,
+    color: "rgba(255,255,255,0.55)",
+    marginBottom: "36px",
+    textTransform: "uppercase",
+  },
+
   title: {
     fontSize: "42px",
     fontWeight: 500,
@@ -52,14 +56,16 @@ brand: {
     letterSpacing: "-0.01em",
     color: "rgba(255,255,255,0.92)",
     marginBottom: "20px",
-    whiteSpace: "nowrap",      // 🔑 핵심
+    whiteSpace: "nowrap",
   },
+
   subtitle: {
     fontSize: "16px",
     lineHeight: 1.6,
     color: "rgba(255,255,255,0.6)",
     marginBottom: "64px",
   },
+
   enter: {
     display: "inline-block",
     fontSize: "14px",
@@ -70,6 +76,6 @@ brand: {
     paddingBottom: "2px",
     borderBottom: "1px solid rgba(255,255,255,0.35)",
     transition: "color 160ms ease, border-color 160ms ease",
-    transform: "translateX(-2px)", // ← 여기
+    transform: "translateX(-2px)",
   },
 };
