@@ -45,13 +45,55 @@ export default function StrategyPage() {
   
   
 
-  if (!selectedBookId || !viewMode) {
-    return (
-      <div style={{ padding: "64px", color: "#6b7280" }}>
-        왼쪽에서 간행물과 보기 방식을 선택하세요.
-      </div>
-    );
-  }
+if (!selectedBookId || !viewMode) {
+  return (
+    <div
+      style={{
+        maxWidth: 880,
+        margin: "0 auto",
+        padding: "80px 48px",
+        color: "#374151",
+        lineHeight: 1.7,
+      }}
+    >
+      <h2
+        style={{
+          fontSize: 22,
+          fontWeight: 600,
+          marginBottom: 16,
+          color: "#111827",
+        }}
+      >
+        전략(Strategy)
+      </h2>
+
+      <p style={{ marginBottom: 20, color: "#4b5563" }}>
+        이 전략 영역은 법률·가이드·보고서를 단순히 읽는 데서 끝내지 않고,  
+        <br />
+        <strong>이해 → 실행 → 위험 인식 → 판단</strong>으로 이어지는  
+        실무 의사결정 흐름을 구조적으로 지원하는 공간입니다.
+      </p>
+
+      <ul
+        style={{
+          paddingLeft: 20,
+          marginBottom: 24,
+          color: "#374151",
+        }}
+      >
+        <li>· 이 문서를 왜 봐야 하는지, 어떤 관점으로 읽어야 하는지 정리합니다.</li>
+        <li>· 실무에서 어디서부터 어떻게 움직일지 흐름과 기준을 제공합니다.</li>
+        <li>· 반복되는 리스크 유형과 주의 지점을 미리 인식할 수 있게 합니다.</li>
+        <li>· 개별 사안을 어떻게 해석하고 결론에 이르는지 판단의 틀을 제공합니다.</li>
+      </ul>
+
+      <p style={{ color: "#6b7280", fontSize: 14 }}>
+        ← 왼쪽에서 <strong>간행물</strong>과 <strong>보기 방식</strong>을 선택하면  
+        해당 문서를 전략적으로 해석·활용할 수 있는 화면이 열립니다.
+      </p>
+    </div>
+  );
+}
 
   return (
       <div
