@@ -31,6 +31,7 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",        // 🔑 핵심
     justifyContent: "center",       // 세로 중앙
     alignItems: "center",
+    paddingBottom: "120px", // 🔑 fixed footer 회피용
   },
 
   center: {
