@@ -59,7 +59,7 @@ export default function FAQPage() {
           </div>
         </div>
 
-        {/* Q3 */}
+        {/* Q3 판례 원문을 제공하나요? */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>판례 원문을 제공하나요?</h3>
           <div style={styles.answer}>
@@ -73,7 +73,97 @@ export default function FAQPage() {
           </div>
         </div>
 
-        {/* Q4 */}
+        {/* Q4. 업로드한 판례 원문은 어떻게 관리되나요? */}
+        <div style={styles.faqItem}>
+          <h3 style={styles.question}>
+            업로드한 판례 원문은 어떻게 관리되나요?
+          </h3>
+          <div style={styles.answer}>
+          <p>
+            이용자가 업로드한 판례 원문은
+            <strong> 원문 형태로 데이터베이스에 저장되지 않습니다.</strong>
+          </p>
+          <p>
+            업로드된 자료는
+            <strong> 분석 과정에서만 처리되며,</strong>
+            <br />
+            이후에는
+            <strong> 쟁점, 판단 구조, 논증 흐름 등 가공·정리된 분석 결과만</strong>
+            데이터베이스에 저장됩니다.
+          </p>
+          <p>
+            본 서비스는 판례 원문의 보관이나 열람을 목적으로 하지 않으며,
+            <br />
+            <strong>사고 구조 분석을 위한 처리 과정</strong>에 한정하여
+            자료를 활용합니다.
+          </p>
+          </div>
+        </div>
+
+        {/* Q. 제가 업로드한 판례의 분석 결과를 다른 사람도 볼 수 있나요? */}
+        <div style={styles.faqItem}>
+          <h3 style={styles.question}>
+            제가 업로드한 판례의 분석 결과를 다른 사람도 볼 수 있나요?
+          </h3>
+          <div style={styles.answer}>
+            <p>
+              네. 분석을 통해 생성된 결과는
+              <strong> 서비스 내 콘텐츠로 활용될 수 있습니다.</strong>
+            </p>
+            <p>
+              다만, 이 경우에도
+              <strong>
+                이용자가 업로드한 판례 원문 자체나,
+                해당 자료를 누가 업로드했는지에 대한 정보는
+                다른 이용자에게 제공되지 않습니다.
+              </strong>
+            </p>
+            <p>
+              제공되는 분석 결과는
+              <strong>
+                특정 이용자의 업로드 행위와 분리된 형태의
+                일반적인 분석 자료
+              </strong>
+              로 활용됩니다.
+            </p>
+            <p>
+              판례 원문에 포함된 내용 중
+              공개 범위나 활용에 대해 판단이 필요한 정보가 있는 경우에는,
+              <br />
+              <strong>
+                이용자가 사전에 비식별 처리 등을 거친 자료를
+                업로드하는 것을 권장합니다.
+              </strong>
+            </p>
+          </div>
+        </div>
+        
+        {/* Q5. 왜 국제조세조정법만 다루고 있나요? */}
+        <div style={styles.faqItem}>
+          <h3 style={styles.question}>
+            왜 국제조세조정법만 다루고 있나요? 다른 법률은 제공되지 않나요?
+          </h3>
+          <div style={styles.answer}>
+            <p>
+              현재 법률 영역에서는
+              <strong> 국제조세조정법을 중심으로 한 콘텐츠</strong>를 제공하고 있습니다.
+            </p>
+            <p>
+              이는 특정 법률 분야를 얕게 확장하기보다,
+              <br />
+              <strong>하나의 영역을 깊이 있게 구조화하고 분석하는 데 집중하기 위한
+              단계적 운영 전략</strong>에 따른 것입니다.
+            </p>
+            <p>
+              다른 조세 법률이나 법률 분야에 대한 콘텐츠는
+              <br />
+              향후 서비스 고도화 및 데이터 축적 상황에 따라
+              <strong>순차적으로 확장될 예정</strong>입니다.
+            </p>
+          </div>
+        </div>
+
+        {/* Q6 */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>법률 자문 서비스인가요?</h3>
           <div style={styles.answer}>
@@ -88,7 +178,7 @@ export default function FAQPage() {
           </div>
         </div>
 
-          {/* Q. 분석 결과를 그대로 사용해도 되나요? */}
+          {/* Q7. 분석 결과를 그대로 사용해도 되나요? */}
           <div style={styles.faqItem}>
             <h3 style={styles.question}>
               분석 결과를 그대로 사용해도 되나요?
@@ -106,7 +196,27 @@ export default function FAQPage() {
             </div>
           </div>
 
-        {/* Q5 */}
+          {/* Q8. 콘텐츠는 얼마나 자주 업데이트되나요? */}
+          <div style={styles.faqItem}>
+            <h3 style={styles.question}>
+              콘텐츠는 얼마나 자주 업데이트되나요?
+            </h3>
+            <div style={styles.answer}>
+              <p>
+                콘텐츠 업데이트 주기는
+                <strong> 법령 개정, 판례 축적, 분석 필요성</strong>을 종합적으로 고려해
+                결정됩니다.
+              </p>
+              <p>
+                모든 변경 사항을 실시간으로 반영하기보다는,
+                <br />
+                <strong>분석 가치가 충분한 시점에 선별적으로 업데이트</strong>하는
+                방식을 취하고 있습니다.
+              </p>
+            </div>
+          </div>
+
+        {/* Q9 */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>해지하면 바로 이용이 중단되나요?</h3>
           <div style={styles.answer}>
@@ -118,7 +228,7 @@ export default function FAQPage() {
           </div>
         </div>
 
-        {/* Q6 */}
+        {/* Q10 */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>환불은 언제 가능한가요?</h3>
           <div style={styles.answer}>

@@ -47,7 +47,6 @@ export default function CasesRootPage() {
               왼쪽 사이드바에서 사건번호를 입력하거나,
               판례 파일을 업로드해 분석을 시작하세요.
             </p>
-
             <ul
               style={{
                 marginTop: 12,
@@ -59,7 +58,14 @@ export default function CasesRootPage() {
             >
               <li>📎 업로드 가능한 파일은 <strong>PDF 형식</strong>만 지원합니다.</li>
               <li>📑 파일명은 <strong>법원명_사건번호.pdf</strong> 형식이어야 합니다.</li>
-              <li>⏳ 분석에는 약 <strong>15-20분</strong> 정도 소요될 수 있습니다.</li>
+              <li>⏳ 분석에는 약 <strong>15–20분</strong> 정도 소요될 수 있습니다.</li>
+              <li>
+                🔍 업로드된 판례를 바탕으로 생성된 분석 결과는
+                <strong> 서비스 내 콘텐츠로 활용될 수 있습니다.</strong>
+                <br />
+                공개 범위에 대해 판단이 필요한 내용이 포함된 경우에는,
+                <strong> 비식별 처리 후 업로드하는 것을 권장합니다.</strong>
+              </li>
             </ul>
           </>
         )}
