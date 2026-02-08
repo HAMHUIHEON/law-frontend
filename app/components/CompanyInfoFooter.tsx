@@ -23,20 +23,16 @@ export function CompanyInfoFooter() {
         ...(isPublic ? styles.enterOffset : {}),
       }}
     >
-    <div style={styles.inner}>
-    <p style={{ margin: 0 }}>
-      윤슬 · 사업자등록번호: 000-00-00000
-    </p>
-    <p style={{ margin: "4px 0 0" }}>
-      통신판매업신고번호: 제2026-부산남구-00000호
-    </p>
-    <p style={{ margin: "4px 0 0" }}>
-      부산광역시 해운대구 재반로 166, 2층 S153호
-    </p>
-    <p style={{ margin: "4px 0 0" }}>
-      대표자 윤승미 · 문의: yoonseul_m@naver.com
-    </p>
-    </div>
+      <div style={styles.inner}>
+        <p style={{ margin: 0 }}>
+          윤슬 · 사업자등록번호 000-00-00000 · 통신판매업신고번호
+          제2026-부산남구-00000호
+        </p>
+        <p style={{ margin: "4px 0 0" }}>
+          부산광역시 해운대구 재반로 166, 2층 S153호 · 대표자 윤승미 ·
+          문의 yoonseul_m@naver.com
+        </p>
+      </div>
     </footer>
   );
 }
