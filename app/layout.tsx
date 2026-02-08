@@ -19,7 +19,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "LAPIS NEXUS",
-  description: "Where thought flows, sharpens, and extends.",
+  description:
+    "Where thought flows, sharpens, and extends — LAPIS NEXUS는 생각의 흐름 속에서 사고를 정제하고 확장하는 전략적 사고 도구입니다.",
   icons: {
     icon: "/favicon.ico",
   },
