@@ -6,14 +6,31 @@ import { usePathname } from "next/navigation";
 export function CompanyInfoFooter() {
   const pathname = usePathname();
 
+  // ❌ footer 숨길 페이지들
+  const hideOnFlow = pathname.startsWith("/cases/flow");
+  const hideOnStructure = pathname.startsWith("/cases/structure");
+  const hideOnPractice = pathname.startsWith("/cases/practice");
+
+  if (hideOnFlow || hideOnStructure || hideOnPractice) {
+    return null;
+  }
+
   const isMain = pathname === "/";
   const isEnter = pathname.startsWith("/enter");
   const isMe = pathname.startsWith("/me");
-  const isabout = pathname.startsWith("/about");
-  const isfaq = pathname.startsWith("/faq");
-  const isterms = pathname.startsWith("/terms");
-  const isprivacy = pathname.startsWith("/privacy");
-  const isPublic = isMain || isEnter|| isMe || isabout || isfaq || isterms || isprivacy;
+  const isAbout = pathname.startsWith("/about");
+  const isFaq = pathname.startsWith("/faq");
+  const isTerms = pathname.startsWith("/terms");
+  const isPrivacy = pathname.startsWith("/privacy");
+
+  const isPublic =
+    isMain ||
+    isEnter ||
+    isMe ||
+    isAbout ||
+    isFaq ||
+    isTerms ||
+    isPrivacy;
 
   return (
     <footer
@@ -38,7 +55,6 @@ export function CompanyInfoFooter() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  // 문서 하단(스크롤 끝)에 자연스럽게 붙는 기본 footer
   base: {
     width: "100%",
     borderTop: "1px solid #e5e7eb",
@@ -52,7 +68,6 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.7,
   },
 
-  // 메인/엔터는 다크 배경에 어울리게
   public: {
     padding: "24px 16px 32px",
     backgroundColor: "#111827",
@@ -62,7 +77,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderTop: "1px solid rgba(255,255,255,0.12)",
   },
 
-  // enter 페이지는 아래 fixed disclaimer가 살짝 겹치므로 여백 보정
   enterOffset: {
     paddingBottom: "72px",
   },
