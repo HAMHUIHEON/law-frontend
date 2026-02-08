@@ -22,7 +22,7 @@ export default function FAQPage() {
         {/* Q1 */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>
-            이 서비스는 어떤 사람을 위한 건가요?
+            Q. 이 서비스는 어떤 사람을 위한 건가요?
           </h3>
           <div style={styles.answer}>
             <p>
@@ -42,7 +42,7 @@ export default function FAQPage() {
         {/* Q2 */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>
-            무료 이용과 유료 이용의 차이는 무엇인가요?
+            Q. 무료 이용과 유료 이용의 차이는 무엇인가요?
           </h3>
           <div style={styles.answer}>
             <p>
@@ -61,7 +61,7 @@ export default function FAQPage() {
 
         {/* Q3 판례 원문을 제공하나요? */}
         <div style={styles.faqItem}>
-          <h3 style={styles.question}>판례 원문을 제공하나요?</h3>
+          <h3 style={styles.question}>Q. 판례 원문을 제공하나요?</h3>
           <div style={styles.answer}>
             <p>
               아니요. 본 서비스는 판례 원문을 제공하지 않습니다.
@@ -76,7 +76,7 @@ export default function FAQPage() {
         {/* Q4. 업로드한 판례 원문은 어떻게 관리되나요? */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>
-            업로드한 판례 원문은 어떻게 관리되나요?
+            Q. 업로드한 판례 원문은 어떻게 관리되나요?
           </h3>
           <div style={styles.answer}>
           <p>
@@ -88,7 +88,7 @@ export default function FAQPage() {
             <strong> 분석 과정에서만 처리되며,</strong>
             <br />
             이후에는
-            <strong> 쟁점, 판단 구조, 논증 흐름 등 가공·정리된 분석 결과만</strong>
+            <strong> 쟁점, 판단 구조, 논증 흐름 등 가공·정리된 분석 결과만 </strong>
             데이터베이스에 저장됩니다.
           </p>
           <p>
@@ -103,7 +103,7 @@ export default function FAQPage() {
         {/* Q. 제가 업로드한 판례의 분석 결과를 다른 사람도 볼 수 있나요? */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>
-            제가 업로드한 판례의 분석 결과를 다른 사람도 볼 수 있나요?
+            Q. 제가 업로드한 판례의 분석 결과를 다른 사람도 볼 수 있나요?
           </h3>
           <div style={styles.answer}>
             <p>
@@ -111,7 +111,7 @@ export default function FAQPage() {
               <strong> 서비스 내 콘텐츠로 활용될 수 있습니다.</strong>
             </p>
             <p>
-              다만, 이 경우에도
+              다만, 이 경우에도 
               <strong>
                 이용자가 업로드한 판례 원문 자체나,
                 해당 자료를 누가 업로드했는지에 대한 정보는
@@ -119,7 +119,7 @@ export default function FAQPage() {
               </strong>
             </p>
             <p>
-              제공되는 분석 결과는
+              제공되는 분석 결과는 
               <strong>
                 특정 이용자의 업로드 행위와 분리된 형태의
                 일반적인 분석 자료
@@ -137,11 +137,11 @@ export default function FAQPage() {
             </p>
           </div>
         </div>
-        
+
         {/* Q5. 왜 국제조세조정법만 다루고 있나요? */}
         <div style={styles.faqItem}>
           <h3 style={styles.question}>
-            왜 국제조세조정법만 다루고 있나요? 다른 법률은 제공되지 않나요?
+            Q. 왜 국제조세조정법만 다루고 있나요? 다른 법률은 제공되지 않나요?
           </h3>
           <div style={styles.answer}>
             <p>
@@ -157,7 +157,7 @@ export default function FAQPage() {
             <p>
               다른 조세 법률이나 법률 분야에 대한 콘텐츠는
               <br />
-              향후 서비스 고도화 및 데이터 축적 상황에 따라
+              향후 서비스 고도화 및 데이터 축적 상황에 따라 
               <strong>순차적으로 확장될 예정</strong>입니다.
             </p>
           </div>
@@ -165,7 +165,7 @@ export default function FAQPage() {
 
         {/* Q6 */}
         <div style={styles.faqItem}>
-          <h3 style={styles.question}>법률 자문 서비스인가요?</h3>
+          <h3 style={styles.question}>Q. 법률 자문 서비스인가요?</h3>
           <div style={styles.answer}>
             <p>
               아니요. 본 서비스는 법률 자문, 법적 판단,
@@ -181,7 +181,7 @@ export default function FAQPage() {
           {/* Q7. 분석 결과를 그대로 사용해도 되나요? */}
           <div style={styles.faqItem}>
             <h3 style={styles.question}>
-              분석 결과를 그대로 사용해도 되나요?
+              Q. 분석 결과를 그대로 사용해도 되나요?
             </h3>
             <div style={styles.answer}>
               <p>
@@ -199,7 +199,7 @@ export default function FAQPage() {
           {/* Q8. 콘텐츠는 얼마나 자주 업데이트되나요? */}
           <div style={styles.faqItem}>
             <h3 style={styles.question}>
-              콘텐츠는 얼마나 자주 업데이트되나요?
+              Q. 콘텐츠는 얼마나 자주 업데이트되나요?
             </h3>
             <div style={styles.answer}>
               <p>
@@ -218,7 +218,7 @@ export default function FAQPage() {
 
         {/* Q9 */}
         <div style={styles.faqItem}>
-          <h3 style={styles.question}>해지하면 바로 이용이 중단되나요?</h3>
+          <h3 style={styles.question}>Q. 해지하면 바로 이용이 중단되나요?</h3>
           <div style={styles.answer}>
             <p>
               아니요. 구독을 해지하더라도
@@ -230,7 +230,7 @@ export default function FAQPage() {
 
         {/* Q10 */}
         <div style={styles.faqItem}>
-          <h3 style={styles.question}>환불은 언제 가능한가요?</h3>
+          <h3 style={styles.question}>Q. 환불은 언제 가능한가요?</h3>
           <div style={styles.answer}>
             <ul>
               <li>결제 후 <strong>7일 이내</strong></li>
