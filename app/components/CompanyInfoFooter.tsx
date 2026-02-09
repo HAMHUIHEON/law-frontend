@@ -42,7 +42,7 @@ export function CompanyInfoFooter() {
     >
       <div style={styles.inner}>
         <p style={{ margin: 0 }}>
-          윤슬 · 사업자등록번호 000-00-00000 · 통신판매업신고번호
+          윤슬 · 사업자등록번호 348-10-03174 · 통신판매업신고번호
           제2026-부산남구-00000호
         </p>
         <p style={{ margin: "4px 0 0" }}>
