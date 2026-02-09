@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "LAPIS NEXUS",
   description:
-    "Where thought flows, sharpens, and extends — LAPIS NEXUS는 생각의 흐름 속에서 사고를 정제하고 확장하는 전략적 사고 도구입니다.",
+    "Where thought flows, sharpens, and extends. LAPIS NEXUS는 조세법과 제도의 구조를 해석하고 판단의 좌표계를 제공하는 전략적 사고 도구입니다. 국제조세조정법, 조세범처벌법, 조세범칙 세무조사 등 고난도 영역에서 리스크의 발생 지점과 판단 구조를 체계적으로 탐색할 수 있도록 설계되었습니다.",
   icons: {
     icon: "/favicon.ico",
   },
