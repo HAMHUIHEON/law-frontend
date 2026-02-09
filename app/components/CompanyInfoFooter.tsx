@@ -3,6 +3,12 @@
 
 import { usePathname } from "next/navigation";
 
+/**
+ * 🔧 고객센터 정보 (나중에 여기만 바꾸면 됨)
+ */
+const CUSTOMER_PHONE = "070-0000-0000"; // TODO: 카카오 채널 전화 발급 후 교체
+const KAKAO_CHAT_URL = "http://pf.kakao.com/_txgIzX/chat";
+
 export function CompanyInfoFooter() {
   const pathname = usePathname();
 
@@ -45,9 +51,18 @@ export function CompanyInfoFooter() {
           윤슬 · 사업자등록번호 348-10-03174 · 통신판매업신고번호
           제2026-부산남구-00000호
         </p>
+
         <p style={{ margin: "4px 0 0" }}>
-          부산광역시 해운대구 재반로 166, 2층 S153호 · 대표자 윤승미 ·
-          문의 yoonseul_m@naver.com
+          부산광역시 해운대구 재반로 166, 2층 S153호 · 대표자 윤승미 ·{" "}
+          <span style={styles.nowrap}>전화 {CUSTOMER_PHONE}</span> ·{" "}
+          <a
+            href={KAKAO_CHAT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.kakaoLink}
+          >
+            고객 문의 
+          </a>
         </p>
       </div>
     </footer>
@@ -85,5 +100,16 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 960,
     margin: "0 auto",
     textAlign: "center",
+  },
+
+  kakaoLink: {
+    color: "inherit",
+    textDecoration: "underline",
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+  },
+
+  nowrap: {
+    whiteSpace: "nowrap",
   },
 };
