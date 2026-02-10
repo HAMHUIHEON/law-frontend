@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 /**
  * 🔧 고객센터 정보 (나중에 여기만 바꾸면 됨)
  */
-const CUSTOMER_PHONE = "070-0000-0000"; // TODO: 카카오 채널 전화 발급 후 교체
+const CUSTOMER_PHONE = "070-8065-2732"; // TODO: 카카오 채널 전화 발급 후 교체
 const KAKAO_CHAT_URL = "http://pf.kakao.com/_txgIzX/chat";
 
 export function CompanyInfoFooter() {
