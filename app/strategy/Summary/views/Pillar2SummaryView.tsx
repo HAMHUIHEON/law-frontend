@@ -270,6 +270,7 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
 
       {(p.structuralRole || p.coreMessage) && (
         <Section title="GloBE 규칙 체계 내 해당 섹션의 역할">
+          <div style={{ position: "relative" }}>
           <div style={blurStyle(isLocked)}>
           {p.structuralRole && (
             <p style={{ marginTop: 0 }}>{p.structuralRole}</p>
@@ -288,6 +289,23 @@ export function Pillar2SummaryView({ bookId }: { bookId: string }) {
             </p>
           )}
         </Section>
+        </div>
+          {/* 🔒 잠금 오버레이 + CTA */}
+          {isLocked && (
+            <div style={lockOverlayStyle}>
+              <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                이 내용은
+                <br />
+                <strong>유료 멤버쉽 가입 후 전체 확인할 수 있습니다</strong>
+              </p>
+              <button
+                style={ctaButtonStyle}
+                onClick={() => router.push("/me/subscribe?from=strategy")}
+              >
+                유료 멤버쉽 가입하기
+              </button>
+            </div>
+          )}
         </div>
         </Section>
       )}
