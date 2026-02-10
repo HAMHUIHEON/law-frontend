@@ -337,13 +337,13 @@ return (
               <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
                 이 법령 검토 단계는
                 <br />
-                <strong>구독 후 전체 확인할 수 있습니다</strong>
+                <strong>유료 멤버쉽 가입 후 전체 확인할 수 있습니다</strong>
               </p>
               <button
                 style={ctaButtonStyle}
                 onClick={() => router.push("/me/subscribe?from=law")}
               >
-                구독하고 전체 보기
+                유료 멤버쉽 가입하기
               </button>
             </div>
           )}

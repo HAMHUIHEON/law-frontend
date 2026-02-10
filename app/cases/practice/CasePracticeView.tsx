@@ -198,14 +198,14 @@ const handleSaveCurrent = () => {
               <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6 }}>
                 이 판례의 <strong>핵심 쟁점 · 판단 흐름 · 실무 메시지</strong>는  
                 <br />
-                <strong>구독 후 전체 확인</strong>할 수 있습니다.
+                <strong>유료 멤버쉽 가입 후 전체 확인</strong>할 수 있습니다.
               </p>
 
               <button
                 style={ctaButtonStyle}
                 onClick={() => router.push("/me/subscribe?from=case")}
               >
-                구독하기
+                유료 멤버쉽 가입하기
               </button>
             </div>
           )}

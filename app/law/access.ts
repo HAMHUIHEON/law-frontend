@@ -22,6 +22,6 @@ export function getLawAccess(
   // 로그인만 하면 기본 구조는 보이게
   if (user === "SUBSCRIBER") return "FULL";
 
-  // 비구독자는 전부 잠금 (오늘은 여기까지)
+  // 비구독자는 전부 잠금 
   return "LOCKED";
 }

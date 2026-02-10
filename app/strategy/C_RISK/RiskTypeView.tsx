@@ -277,13 +277,13 @@ export function RiskTypesView({ bookId }: { bookId: string }) {
               <p style={{ fontSize: 14, fontWeight: 600, textAlign: "center" }}>
                 이 리스크 분석은
                 <br />
-                <strong>구독 후 전체 내용을 확인할 수 있습니다</strong>
+                <strong>유료 멤버쉽 가입 후 전체 내용을 확인할 수 있습니다</strong>
               </p>
               <button
                 style={ctaButtonStyle}
                 onClick={() => router.push("/me/subscribe?from=strategy")}
               >
-                구독하고 전체 보기
+                유료 멤버쉽 가입하기
               </button>
             </div>
           )}
