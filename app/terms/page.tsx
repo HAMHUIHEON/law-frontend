@@ -55,7 +55,7 @@ export default function TermsPage() {
           <h3 style={styles.blockTitle}>환불 정책</h3>
 
           <p style={styles.paragraph}>
-            구독 결제에 대한 환불은 아래 기준에 따라 처리됩니다.
+            유료 멤버쉽 결제에 대한 환불은 아래 기준에 따라 처리됩니다.
           </p>
 
           <ul style={styles.list}>
@@ -69,14 +69,14 @@ export default function TermsPage() {
               서비스 이용 이력이 있는 경우 환불 불가
             </li>
             <li>
-              구독 해지 시에도
+              유료 멤버쉽 해지 시에도
               결제된 이용 기간 종료일까지는 서비스 이용 가능
             </li>
           </ul>
 
           <p style={styles.notice}>
-            환불 요청은 고객센터 또는
-            운영자가 안내한 방법을 통해 접수할 수 있습니다.
+            환불 요청은 사이트 하단 문의하기를 클릭하시거나,
+            카카오톡 채널을 통해 1:1 문의로 접수할 수 있습니다.
           </p>
         </div>
       </section>

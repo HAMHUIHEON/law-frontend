@@ -35,7 +35,7 @@ export default function UnsubscribePage() {
               marginBottom: 24,
             }}
           >
-            구독 해지가 완료되었습니다
+            멤버쉽 해지가 완료되었습니다
           </h1>
 
           <p
@@ -48,7 +48,7 @@ export default function UnsubscribePage() {
           >
             현재 결제 주기가 끝날 때까지는
             <br />
-            구독 기능을 계속 이용하실 수 있습니다.
+            멤버쉽 기능을 계속 이용하실 수 있습니다.
           </p>
 
           <button
@@ -91,7 +91,7 @@ export default function UnsubscribePage() {
             marginBottom: 24,
           }}
         >
-          구독 멤버십을 해지하시겠어요?
+          멤버십을 해지하시겠어요?
         </h1>
 
         <p
@@ -106,7 +106,7 @@ export default function UnsubscribePage() {
           <br />
           <strong>현재 결제 주기가 끝날 때까지</strong>는
           <br />
-          구독 기능을 그대로 이용하실 수 있습니다.
+          유료 서비스 기능을 그대로 이용하실 수 있습니다.
         </p>
 
         <p
@@ -117,9 +117,9 @@ export default function UnsubscribePage() {
             marginBottom: 40,
           }}
         >
-          · 이미 이용한 구독 서비스에 대해서는 환불이 어렵습니다.
+          · 이미 이용한 유료 서비스에 대해서는 환불이 어렵습니다.
           <br />
-          · 결제 후 7일 이내이며 구독 서비스를 이용하지 않은 경우에 한해
+          · 결제 후 7일 이내이며 멤버쉽 서비스를 이용하지 않은 경우에 한해
           환불이 가능합니다.
         </p>
 
@@ -160,7 +160,7 @@ export default function UnsubscribePage() {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? "처리 중…" : "구독 해지하기"}
+            {loading ? "처리 중…" : "멤버쉽 해지하기"}
           </button>
         </div>
       </div>

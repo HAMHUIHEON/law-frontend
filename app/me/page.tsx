@@ -397,7 +397,7 @@ export default async function MyPage() {
               href="/me/subscribe"
               style={{ marginTop: 13, fontSize: 13, color: "#fff" }}
             >
-              구독 멤버십 알아보기 →
+              유료 멤버쉽 알아보기 →
             </Link>
           </>
         )}
@@ -406,7 +406,7 @@ export default async function MyPage() {
         {isSubscriber && !isCancelled && (
           <>
             <p style={styles.empty}>
-              현재 <strong>구독 멤버십</strong>을 이용 중입니다.
+              현재 <strong>유료 멤버십</strong>을 이용 중입니다.
             </p>
 
             <Link
@@ -421,7 +421,7 @@ export default async function MyPage() {
                 color: "rgba(255,255,255,0.8)",
               }}
             >
-              멤버십 해지
+              유료 멤버쉽 해지
             </Link>
           </>
         )}
@@ -430,7 +430,7 @@ export default async function MyPage() {
         {isSubscriber && isCancelled && isActiveUntilEnd && (
           <>
             <p style={styles.empty}>
-              구독은 해지되었지만<br />
+              유료 멤버쉽은 해지되었지만<br />
               <strong>
                 {subscriptionEndsAt!.toLocaleDateString("ko-KR", {
                   timeZone: "Asia/Seoul",
@@ -443,7 +443,7 @@ export default async function MyPage() {
               href="/me/subscribe"
               style={{ marginTop: 13, fontSize: 13, color: "#fff" }}
             >
-              다시 구독하기 →
+              유료 멤버쉽 연장 하기 →
             </Link>
           </>
         )}

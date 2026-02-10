@@ -48,7 +48,7 @@ export default function FAQPage() {
             <p>
               무료 이용자는 일부 기능만 제한적으로 이용할 수 있으며,
               <br />
-              유료 구독자는 판례·법령·전략 분석 기능을
+              유료 멤버쉽은 판례·법령·전략 분석 기능을
               <strong> 월간 이용 한도 내에서 </strong>
               이용할 수 있습니다.
             </p>
@@ -221,7 +221,7 @@ export default function FAQPage() {
           <h3 style={styles.question}>Q. 해지하면 바로 이용이 중단되나요?</h3>
           <div style={styles.answer}>
             <p>
-              아니요. 구독을 해지하더라도
+              아니요. 유료 멤버쉽을 해지하더라도
               이미 결제된 이용 기간이 종료될 때까지는
               정상적으로 서비스를 이용할 수 있습니다.
             </p>
@@ -235,7 +235,7 @@ export default function FAQPage() {
             <ul>
               <li>결제 후 <strong>7일 이내</strong></li>
               <li>
-                <strong>서비스 이용 이력이 없는 경우에 한해</strong> 환불 가능
+                <strong>유료 서비스 이용 이력이 없는 경우에 한해</strong> 환불 가능
               </li>
               <li>서비스 이용 이력이 있는 경우 환불 불가</li>
               <li>이용 기간 경과 후 환불 불가</li>
