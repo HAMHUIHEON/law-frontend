@@ -39,7 +39,7 @@ const COPY_BY_FROM = {
         판단의 기준을
         <br />
         자신의 사고 자산으로 만드는 영역이기 때문에
-        <strong> 구독자 전용</strong>으로 제공됩니다.
+        <strong> 멤버쉽 전용</strong>으로 제공됩니다.
       </>
     ),
     benefits: [
@@ -49,7 +49,7 @@ const COPY_BY_FROM = {
       "판례 업로드 및 분석 실행",
     ],
     afterPath: "/cases",
-    cta: "구독하여 전체 판례 분석 보기",
+    cta: "멤버십 가입하여 전체 판례 분석 보기",
   },
 
   law: {
@@ -78,7 +78,7 @@ const COPY_BY_FROM = {
         판단의 흐름을 이해하기 위한
         <br />
         분석 자료 성격의 콘텐츠이기 때문에
-        <strong> 구독자 전용</strong>으로 제공됩니다.
+        <strong> 멤버쉽 전용</strong>으로 제공됩니다.
       </>
     ),
     benefits: [
@@ -88,7 +88,7 @@ const COPY_BY_FROM = {
       "조문 ↔ 판단 단계 간 연계 탐색",
     ],
     afterPath: "/law",
-    cta: "구독하여 전체 법령 분석 보기",
+    cta: "멤버십 가입하여 전체 법령 분석 보기",
   },
 
   strategy: {
@@ -118,7 +118,7 @@ const COPY_BY_FROM = {
         <br />
         사고 과정을 자산화하는 영역이기 때문에
         <br />
-        <strong> 구독자 전용</strong>으로 제공됩니다.
+        <strong> 멤버쉽 전용</strong>으로 제공됩니다.
       </>
     ),
     benefits: [
@@ -127,7 +127,7 @@ const COPY_BY_FROM = {
       "사고 단계별 구조화된 전략 정리",
     ],
     afterPath: "/strategy",
-    cta: "구독하여 전체 전략 보기",
+    cta: "멤버십 가입하여 전체 전략 보기",
   },
 } as const;
 
@@ -165,7 +165,7 @@ function SubscribePageInner() {
 
         {/* BENEFITS */}
         <section style={{ marginBottom: 72 }}>
-          <h2 style={sectionTitle}>구독 시 이용할 수 있는 내용</h2>
+          <h2 style={sectionTitle}>유료 결제시 이용할 수 있는 내용</h2>
           <ul style={{ paddingLeft: 18, lineHeight: 1.9 }}>
             {copy.benefits.map((b, i) => (
               <li key={i}>✅ {b}</li>
@@ -175,7 +175,7 @@ function SubscribePageInner() {
 
         {/* CTA */}
         <section style={ctaSectionStyle}>
-          <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>월 구독</p>
+          <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>월 결제 이용권</p>
           <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ 9,900 / 월</p>
 
         <button
@@ -214,9 +214,9 @@ function SubscribePageInner() {
               pg: "html5_inicis",
               pay_method: "card",
               merchant_uid,
-              name: "월 구독 멤버십",
+              name: "월 이용 멤버십",
               amount: 9900, // 테스트 금액
-              buyer_email: "test@test.com",
+              buyer_email: "yoonsuel_m@naver.com",
               buyer_name: "테스트 사용자",
             },
             (rsp: any) => {
@@ -245,9 +245,9 @@ function SubscribePageInner() {
                 marginRight: "auto",
               }}
             >
-              구독 멤버십은 결제일로부터 7일 이내에 서비스를 이용하지 않은 경우에 한해 환불이 가능합니다.
+              월간 결제 멤버십은 결제일로부터 7일 이내에 서비스를 이용하지 않은 경우에 한해 환불이 가능합니다.
               <br />
-              이미 구독 서비스를 이용했거나, 결제일로부터 7일이 지난 경우에는 환불이 제공되지 않습니다.
+              이미 유료 서비스를 이용했거나, 결제일로부터 7일이 지난 경우에는 환불이 제공되지 않습니다.
               <br /><br />
               멤버십 해지는 언제든 ‘계정’ 페이지에서 가능하며 해지하더라도,
               <br />
@@ -264,7 +264,7 @@ function SubscribePageInner() {
                   marginRight: "auto",
                 }}
               >
-                본 구독은 1개월 이용권 결제 방식으로 제공됩니다.
+                본 서비스는 1개월 이용권 결제 방식으로 제공되며 자동 갱신 되지 않습니다.
                 <br />
                 이용 기간 종료 전에 안내를 드리며,
                 원하시는 경우 언제든 다시 구독하실 수 있습니다.
