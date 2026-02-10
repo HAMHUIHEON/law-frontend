@@ -75,7 +75,7 @@ export default function TermsPage() {
           </ul>
 
           <p style={styles.notice}>
-            환불 요청은 사이트 하단 문의하기를 클릭하시거나,
+            환불 요청은 사이트 하단 고객 문의를 클릭하시거나,
             카카오톡 채널을 통해 1:1 문의로 접수할 수 있습니다.
           </p>
         </div>
