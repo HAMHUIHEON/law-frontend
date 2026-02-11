@@ -243,6 +243,10 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             style={{
                 writingMode: "vertical-rl",
                 textOrientation: "upright",
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
                 fontWeight: 600,
                 letterSpacing: "2px",
             }}
@@ -501,10 +505,9 @@ td: {
 
 categoryCell: {
   background: "#fafafa",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+  position: "relative",
   padding: 0,
+  width: "70px",
 },
 
 authorityBlock: {
