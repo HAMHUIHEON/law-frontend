@@ -180,12 +180,14 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* PRINCIPLES */}
       <CollapsibleSection title="⚖ 기본 원칙 축">
         {data.principles.map((p, idx) => (
-          <Card key={idx}>
+          <AuthorityBlock key={idx}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <CardTitle>{p.title}</CardTitle>
+            <EvidenceBadge status={p.evidenceStatus} />
+            </div>
             <ArticleList articles={p.articles} />
             <BodyText>{p.meaning}</BodyText>
-            <EvidenceBadge status={p.evidenceStatus} />
-          </Card>
+          </AuthorityBlock>
         ))}
       </CollapsibleSection>
 
@@ -193,16 +195,13 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* AUTHORITY */}
       <CollapsibleSection title="🏛 권한·통제 구조">
         {data.authorities.map((a, idx) => (
-          <AuthorityBlock  key={idx}>
+        <AuthorityBlock  key={idx}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <CardTitle>{a.topic}</CardTitle>
         <EvidenceBadge status={a.evidenceStatus} />
         </div>
-
         <ArticleList articles={a.articles} />
         <BodyText>{a.controlFunction}</BodyText>
-
-
           </AuthorityBlock >
         ))}
       </CollapsibleSection>
@@ -212,12 +211,12 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* PROCEDURE */}
       <CollapsibleSection title="🔁 세무조사 절차">
         {data.procedureStages.map((s, idx) => (
-          <Card key={idx}>
+          <ProcedureCard  key={idx}>
             <CardTitle>{s.stage}</CardTitle>
             <ArticleList articles={s.articles} />
             <BodyText>{s.keyControls}</BodyText>
             <EvidenceBadge status={s.evidenceStatus} />
-          </Card>
+          </ProcedureCard >
         ))}
       </CollapsibleSection>
 
@@ -268,8 +267,11 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
                 <div style={{ marginTop: 6 }}>
                     <EvidenceBadge status={row.evidenceStatus} />
                 </div>
+                
                 </td>
+
             </tr>
+
             ))}
         </tbody>
         </table>
@@ -404,6 +406,10 @@ function EvidenceBadge({ status }: { status: "근거 있음" | "근거 부족" }
   );
 }
 
+function ProcedureCard({ children }: { children: React.ReactNode }) {
+  return <div style={styles.procedureCard}>{children}</div>;
+}
+
 /* ============================== */
 /* Styles */
 /* ============================== */
@@ -482,7 +488,7 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     borderCollapse: "collapse",
     fontSize: 13,
-    tableLayout: "fixed",
+    tableLayout: "auto",
     },
 
 
@@ -507,12 +513,21 @@ categoryCell: {
   padding: 0,
   verticalAlign: "middle",
 },
+
 authorityBlock: {
   background: "#f8fafc",
   borderLeft: "4px solid #94a3b8",
   padding: "20px 22px",
   marginBottom: 28,
   position: "relative",
+},
+procedureCard: {
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
+  padding: "20px 22px",
+  marginBottom: 22,
+  background: "#ffffff",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
 },
 
 };
