@@ -210,7 +210,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
 
 
       {/* PROCEDURE */}
-      <CollapsibleSection title="🔁 절차 단계 구조">
+      <CollapsibleSection title="🔁 세무조사 절차">
         {data.procedureStages.map((s, idx) => (
           <Card key={idx}>
             <CardTitle>{s.stage}</CardTitle>
