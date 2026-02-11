@@ -173,7 +173,7 @@ function SubscribePageInner() {
           </ul>
           <p
           style={{
-            marginTop: 18,
+            marginTop: 24,
             fontSize: 14,
             color: "rgba(255,255,255,0.7)",
             lineHeight: 1.8,
