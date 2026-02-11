@@ -250,8 +250,6 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             {row.category}
             </div>
             </td>
-
-
                 <td style={styles.td}>{row.definition}</td>
                 <td style={styles.td}>{row.authority}</td>
                 <td style={styles.td}>{row.noticeRequirement}</td>
@@ -416,18 +414,18 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.ink,
   },
 
-    summaryBox: {
-    padding: "22px 24px",
-    background: "#ffffff",
-    },
-
+  summaryBox: {
+    border: `1px solid ${colors.line}`,
+    borderRadius: 10,
+    padding: 20,
+    background: colors.bgSoft,
+  },
 
     summary: {
     fontSize: 16,
     lineHeight: 1.9,
     color: "#1f2937",
-    letterSpacing: "-0.1px",
-    },
+  },
 
     sectionTitle: {
     fontSize: 18,
