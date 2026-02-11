@@ -240,7 +240,7 @@ useEffect(() => {
 
   const run = async () => {
     const res = await fetch(
-      `${API_BASE}/api/publications/${selectedBookId}/E/${selectedEChapter}/step2/sections`
+    `${API_BASE}/api/publications/e/${selectedBookId}/E/${selectedEChapter}/step2/sections`
     );
     const json = await res.json();
 
