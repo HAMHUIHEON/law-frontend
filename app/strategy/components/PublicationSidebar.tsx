@@ -706,7 +706,7 @@ useEffect(() => {
         {/* =========================
             E: 조사사무처리규정 엔진
           ========================= */}
-        {selectedBookId && (
+        {artifacts?.E  && (
           <SidebarSection>
             <div>
 
