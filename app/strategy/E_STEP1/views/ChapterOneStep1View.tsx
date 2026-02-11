@@ -240,20 +240,15 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             <tr key={idx}>
             <td style={{ ...styles.td, ...styles.categoryCell }}>
             <div
-                style={{
+            style={{
                 writingMode: "vertical-rl",
                 textOrientation: "upright",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                height: "100%",
                 fontWeight: 600,
                 letterSpacing: "2px",
                 verticalAlign: "middle",
-
-                }}
+            }}
             >
+
                 {row.category}
             </div>
             </td>
@@ -504,14 +499,16 @@ th: {
 td: {
   borderTop: "1px dotted #e5e7eb",
   padding: "12px",
-  verticalAlign: "top",
   lineHeight: 1.6,
   wordBreak: "keep-all",
 },
+
 categoryCell: {
   background: "#fafafa",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
   padding: 0,
-  verticalAlign: "middle",
 },
 
 authorityBlock: {
