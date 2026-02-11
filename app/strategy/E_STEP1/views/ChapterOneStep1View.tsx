@@ -193,12 +193,17 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* AUTHORITY */}
       <CollapsibleSection title="🏛 권한·통제 구조">
         {data.authorities.map((a, idx) => (
-          <Card key={idx}>
-            <CardTitle>{a.topic}</CardTitle>
-            <ArticleList articles={a.articles} />
-            <BodyText>{a.controlFunction}</BodyText>
-            <EvidenceBadge status={a.evidenceStatus} />
-          </Card>
+          <AuthorityBlock  key={idx}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <CardTitle>{a.topic}</CardTitle>
+        <EvidenceBadge status={a.evidenceStatus} />
+        </div>
+
+        <ArticleList articles={a.articles} />
+        <BodyText>{a.controlFunction}</BodyText>
+
+
+          </AuthorityBlock >
         ))}
       </CollapsibleSection>
 
@@ -234,9 +239,26 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         <tbody>
             {data.definitionTable.rows.map((row, idx) => (
             <tr key={idx}>
-                <td style={{ ...styles.td, ...styles.categoryCell }}>
+            <td style={{ ...styles.td, ...styles.categoryCell }}>
+            <div
+                style={{
+                writingMode: "vertical-rl",
+                textOrientation: "upright",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                height: "100%",
+                fontWeight: 600,
+                letterSpacing: "2px",
+                verticalAlign: "middle",
+
+                }}
+            >
                 {row.category}
-                </td>
+            </div>
+            </td>
+
 
                 <td style={styles.td}>{row.definition}</td>
                 <td style={styles.td}>{row.authority}</td>
@@ -338,6 +360,10 @@ function Section({
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div style={styles.block}>{children}</div>;
+}
+
+function AuthorityBlock({ children }: { children: React.ReactNode }) {
+  return <div style={styles.authorityBlock}>{children}</div>;
 }
 
 
@@ -477,12 +503,16 @@ td: {
   wordBreak: "keep-all",
 },
 categoryCell: {
-  writingMode: "vertical-rl",
-  textOrientation: "upright",
-  textAlign: "center",
-  fontWeight: 600,
-  letterSpacing: "2px",
   background: "#fafafa",
+  padding: 0,
+  verticalAlign: "middle",
+},
+authorityBlock: {
+  background: "#f8fafc",
+  borderLeft: "4px solid #94a3b8",
+  padding: "20px 22px",
+  marginBottom: 28,
+  position: "relative",
 },
 
 };
