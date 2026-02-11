@@ -7,6 +7,8 @@ type Props = {
   data: ChapterOneStep1ViewModel;
 };
 
+
+
 export function ChapterOneStep1View({ data }: Props) {
   return (
     <div style={styles.container}>

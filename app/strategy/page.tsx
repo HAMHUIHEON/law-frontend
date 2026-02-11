@@ -16,11 +16,17 @@ import { MjuRoadmapView } from "./D_TPG2022/MjuRoadmapView";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRecordRecentThought } from "@/app/hooks/useRecordRecentThought";
-
+import { ChapterOneStep1Container } from "./E_STEP1/containers/ChapterOneStep1Container";
 
 export default function StrategyPage() {
   
-  const { selectedBookId, viewMode } = useStrategyUI();
+  const {
+    selectedBookId,
+    viewMode,
+    selectedEChapter,
+    selectedESectionSlug,
+  } = useStrategyUI();
+
   const [showFloatingTop, setShowFloatingTop] = useState(false);
   
   const { userId } = useAuth();
@@ -163,6 +169,10 @@ if (!selectedBookId || !viewMode) {
       )}
       {viewMode === "JU" && (
         <MjuRoadmapView bookId={selectedBookId} />
+      )}
+
+      {viewMode === "E_STEP1" && selectedEChapter === "chapter1" && (
+        <ChapterOneStep1Container bookId={selectedBookId} />
       )}
 
     <button
