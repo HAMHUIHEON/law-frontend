@@ -234,7 +234,10 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         <tbody>
             {data.definitionTable.rows.map((row, idx) => (
             <tr key={idx}>
-                <td style={styles.td}>{row.category}</td>
+                <td style={{ ...styles.td, ...styles.categoryCell }}>
+                {row.category}
+                </td>
+
                 <td style={styles.td}>{row.definition}</td>
                 <td style={styles.td}>{row.authority}</td>
                 <td style={styles.td}>{row.noticeRequirement}</td>
@@ -389,7 +392,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
     summaryBox: {
-    borderLeft: "4px solid #d1d5db",
     padding: "22px 24px",
     background: "#ffffff",
     },
@@ -460,8 +462,9 @@ const styles: Record<string, React.CSSProperties> = {
 
 th: {
   borderBottom: "1px solid #d1d5db",
-  padding: "10px 12px",
-  textAlign: "left",
+  padding: "12px 12px",
+  textAlign: "center",
+  verticalAlign: "middle",
   background: "#f9fafb",
   fontWeight: 600,
 },
@@ -473,4 +476,13 @@ td: {
   lineHeight: 1.6,
   wordBreak: "keep-all",
 },
+categoryCell: {
+  writingMode: "vertical-rl",
+  textOrientation: "upright",
+  textAlign: "center",
+  fontWeight: 600,
+  letterSpacing: "2px",
+  background: "#fafafa",
+},
+
 };
