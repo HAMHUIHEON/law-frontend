@@ -27,7 +27,7 @@ const colors = {
 function CollapsibleSection({
   title,
   children,
-  defaultOpen = true,
+  defaultOpen = false,
 }: {
   title: string;
   children: React.ReactNode;
@@ -139,6 +139,30 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             cursor: "pointer",
             transition: "all 120ms ease",
             }}
+
+            
+            onMouseEnter={(e) => {
+              setShowHint(true);
+              e.currentTarget.style.background = "#fffbeb";
+              e.currentTarget.style.borderColor = "#f59e0b";
+              e.currentTarget.style.transform = "scale(1.06)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 14px rgba(245,158,11,0.25)";
+            }}
+            onMouseLeave={(e) => {
+              setShowHint(false);
+              e.currentTarget.style.background = "#ffffff";
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 10px rgba(0,0,0,0.08)";
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = "scale(0.96)";
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = "scale(1.06)";
+            }}
         >
             🔖
         </button>
@@ -197,27 +221,27 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       <Section title="📊 조사 유형 비교">
         <div style={styles.tableWrapper}>
           <table style={styles.table}>
-            <thead>
-              <tr>
-                {data.definitionTable.columns.map((col, idx) => (
-                  <th key={idx}>{col}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.definitionTable.rows.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{row.category}</td>
-                  <td>{row.definition}</td>
-                  <td>{row.authority}</td>
-                  <td>{row.noticeRequirement}</td>
-                  <td>
-                    {row.notes}
-                    <EvidenceBadge status={row.evidenceStatus} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+        <thead>
+        <tr>
+            {data.definitionTable.columns.map((col, idx) => (
+            <th key={idx} style={styles.th}>{col}</th>
+            ))}
+        </tr>
+        </thead>
+        <tbody>
+        {data.definitionTable.rows.map((row, idx) => (
+            <tr key={idx}>
+            <td style={styles.td}>{row.category}</td>
+            <td style={styles.td}>{row.definition}</td>
+            <td style={styles.td}>{row.authority}</td>
+            <td style={styles.td}>{row.noticeRequirement}</td>
+            <td style={styles.td}>
+                {row.notes}
+                <EvidenceBadge status={row.evidenceStatus} />
+            </td>
+            </tr>
+        ))}
+        </tbody>
           </table>
         </div>
       </Section>
@@ -307,8 +331,9 @@ function Section({
 }
 
 function Card({ children }: { children: React.ReactNode }) {
-  return <div style={styles.card}>{children}</div>;
+  return <div style={styles.block}>{children}</div>;
 }
+
 
 function CardTitle({ children }: { children: React.ReactNode }) {
   return <h3 style={styles.cardTitle}>{children}</h3>;
@@ -373,37 +398,39 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.deep,
   },
 
-  sectionTitle: {
+    sectionTitle: {
     fontSize: 18,
     fontWeight: 600,
     marginBottom: 18,
     color: colors.ink,
-  },
+    borderBottom: "1px solid #f1f5f9",
+    paddingBottom: 6,
+    },
 
-  card: {
-    border: `1px solid ${colors.line}`,
-    borderRadius: 10,
-    padding: 18,
-    marginBottom: 14,
-    background: "#ffffff",
-  },
+    block: {
+    borderLeft: "3px solid #e5e7eb",
+    paddingLeft: 16,
+    marginBottom: 22,
+    },
 
-  cardTitle: {
+    cardTitle: {
     fontSize: 15,
     fontWeight: 600,
-    marginBottom: 8,
-  },
+    marginBottom: 6,
+    color: "#1f2937",
+    },
 
   bodyText: {
     fontSize: 14,
     marginBottom: 8,
   },
 
-  articleList: {
+    articleList: {
     fontSize: 12,
-    color: colors.muted,
-    marginBottom: 8,
-  },
+    color: "#9ca3af",
+    marginBottom: 6,
+    letterSpacing: "0.2px",
+    },
 
   badge: {
     display: "inline-block",
@@ -419,9 +446,22 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: "hidden",
   },
 
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    fontSize: 13,
-  },
+table: {
+  width: "100%",
+  borderCollapse: "collapse",
+  fontSize: 13,
+},
+
+th: {
+  borderBottom: "1px solid #d1d5db",
+  padding: "8px 10px",
+  textAlign: "left",
+  background: "#f9fafb",
+},
+
+td: {
+  borderTop: "1px dotted #e5e7eb",
+  padding: "8px 10px",
+  verticalAlign: "top",
+},
 };
