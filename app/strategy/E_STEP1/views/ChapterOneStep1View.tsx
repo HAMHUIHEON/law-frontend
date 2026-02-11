@@ -189,7 +189,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         ))}
       </CollapsibleSection>
 
-      <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
+
       {/* AUTHORITY */}
       <CollapsibleSection title="🏛 권한·통제 구조">
         {data.authorities.map((a, idx) => (
@@ -202,7 +202,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         ))}
       </CollapsibleSection>
 
-      <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
+
 
       {/* PROCEDURE */}
       <CollapsibleSection title="🔁 절차 단계 구조">
@@ -216,33 +216,39 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         ))}
       </CollapsibleSection>
 
-      <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
+
       {/* TABLE */}
       <Section title="📊 조사 유형 비교">
         <div style={styles.tableWrapper}>
-          <table style={styles.table}>
+        <table style={styles.table}>
         <thead>
-        <tr>
-            {data.definitionTable.columns.map((col, idx) => (
-            <th key={idx} style={styles.th}>{col}</th>
-            ))}
-        </tr>
-        </thead>
-        <tbody>
-        {data.definitionTable.rows.map((row, idx) => (
-            <tr key={idx}>
-            <td style={styles.td}>{row.category}</td>
-            <td style={styles.td}>{row.definition}</td>
-            <td style={styles.td}>{row.authority}</td>
-            <td style={styles.td}>{row.noticeRequirement}</td>
-            <td style={styles.td}>
-                {row.notes}
-                <EvidenceBadge status={row.evidenceStatus} />
-            </td>
+            <tr>
+            <th style={{ ...styles.th, width: "10%" }}>구분</th>
+            <th style={{ ...styles.th, width: "30%" }}>정의(요지)</th>
+            <th style={{ ...styles.th, width: "18%" }}>근거권한(문언)</th>
+            <th style={{ ...styles.th, width: "18%" }}>계획/통지 요건</th>
+            <th style={{ ...styles.th, width: "24%" }}>비고</th>
             </tr>
-        ))}
+        </thead>
+
+        <tbody>
+            {data.definitionTable.rows.map((row, idx) => (
+            <tr key={idx}>
+                <td style={styles.td}>{row.category}</td>
+                <td style={styles.td}>{row.definition}</td>
+                <td style={styles.td}>{row.authority}</td>
+                <td style={styles.td}>{row.noticeRequirement}</td>
+                <td style={styles.td}>
+                {row.notes}
+                <div style={{ marginTop: 6 }}>
+                    <EvidenceBadge status={row.evidenceStatus} />
+                </div>
+                </td>
+            </tr>
+            ))}
         </tbody>
-          </table>
+        </table>
+
         </div>
       </Section>
 
@@ -263,7 +269,6 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         ))}
       </CollapsibleSection>
 
-      <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
       {/* INTERNAL */}
       <CollapsibleSection title="⚙ 내부 운영 포인트">
@@ -277,7 +282,6 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         ))}
       </CollapsibleSection>
 
-      <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
       {/* BRIDGE */}
       <CollapsibleSection title="🔎 다음 장으로 이어지는 질문">
@@ -292,7 +296,6 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         ))}
       </CollapsibleSection>
 
-      <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
       {/* EXTRA */}
       {data.extraExplanations.length > 0 && (
@@ -385,18 +388,19 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.ink,
   },
 
-  summaryBox: {
-    border: `1px solid ${colors.line}`,
-    borderRadius: 10,
-    padding: 20,
-    background: colors.bgSoft,
-  },
+    summaryBox: {
+    borderLeft: "4px solid #d1d5db",
+    padding: "22px 24px",
+    background: "#ffffff",
+    },
 
-  summary: {
-    fontSize: 15,
-    lineHeight: 1.8,
-    color: colors.deep,
-  },
+
+    summary: {
+    fontSize: 16,
+    lineHeight: 1.9,
+    color: "#1f2937",
+    letterSpacing: "-0.1px",
+    },
 
     sectionTitle: {
     fontSize: 18,
@@ -446,22 +450,27 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: "hidden",
   },
 
-table: {
-  width: "100%",
-  borderCollapse: "collapse",
-  fontSize: 13,
-},
+    table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 13,
+    tableLayout: "fixed",
+    },
+
 
 th: {
   borderBottom: "1px solid #d1d5db",
-  padding: "8px 10px",
+  padding: "10px 12px",
   textAlign: "left",
   background: "#f9fafb",
+  fontWeight: 600,
 },
 
 td: {
   borderTop: "1px dotted #e5e7eb",
-  padding: "8px 10px",
+  padding: "12px",
   verticalAlign: "top",
+  lineHeight: 1.6,
+  wordBreak: "keep-all",
 },
 };
