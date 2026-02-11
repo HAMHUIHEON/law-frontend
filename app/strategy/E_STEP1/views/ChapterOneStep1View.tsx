@@ -242,7 +242,6 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             <div
             style={{
                 writingMode: "vertical-rl",
-                textOrientation: "upright",
                 fontWeight: 600,
                 letterSpacing: "2px",
                 verticalAlign: "middle",
