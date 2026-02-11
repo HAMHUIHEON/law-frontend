@@ -165,31 +165,27 @@ function SubscribePageInner() {
 
         {/* BENEFITS */}
         <section style={{ marginBottom: 72 }}>
-          <h2 style={sectionTitle}>유료 결제시 이용할 수 있는 내용</h2>
+          <h2 style={sectionTitle}>월 멤버십으로 이용할 수 있는 전체 기능</h2>
           <ul style={{ paddingLeft: 18, lineHeight: 1.9 }}>
             {copy.benefits.map((b, i) => (
               <li key={i}>✅ {b}</li>
             ))}
           </ul>
-        </section>
-
-        <p
+          <p
           style={{
-            marginTop: 32,
+            marginTop: 18,
             fontSize: 14,
-            lineHeight: 1.8,
             color: "rgba(255,255,255,0.7)",
-            maxWidth: 680,
-            marginLeft: "auto",
-            marginRight: "auto",
+            lineHeight: 1.8,
           }}
         >
           본 멤버십은 단일 기능 이용권이 아닌,
           <br />
            <strong>판례 · 법령 · 전략 전 영역의 분석 기능을 하나로 통합한 월 이용권</strong>입니다.
           <br />
-          <strong>하나의 멤버십으로 전 영역 무제한 이용</strong>이 가능합니다.
+          <strong>하나의 멤버십으로 전 영역 이용</strong>이 가능합니다.
         </p>
+        </section>
 
         {/* CTA */}
         <section style={ctaSectionStyle}>
@@ -268,7 +264,7 @@ function SubscribePageInner() {
               <br />
               이미 유료 기능을 이용했거나, 7일이 경과한 경우에는 환불이 제공되지 않습니다.
               <br /><br />
-              멤버십 해지는 언제든 ‘계정’ 페이지에서 가능합니다.
+              멤버십 해지는 언제든 ‘계정’ 페이지에서 가능합니다.<br />
               해지하더라도 현재 결제 주기가 종료될 때까지는
               멤버십 기능을 계속 이용하실 수 있습니다.
             </p> 
