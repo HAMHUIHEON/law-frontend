@@ -81,7 +81,7 @@ if (!selectedBookId || !viewMode) {
             marginBottom: 28,
           }}
         >
-          이 전략 영역은 OECD 가이드라인·보고서를 단순히 읽는 데서 끝내지 않고,  
+          이 전략 영역은 OECD 가이드라인·국세청 행정규칙를 단순히 읽는 데서 끝내지 않고,  
           <br />
           <strong style={{ color: "#111827" }}>
             이해 → 실행 → 위험 인식 → 판단

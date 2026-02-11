@@ -15,7 +15,10 @@ export type StrategyViewMode =
   | "BLUEPRINTS"
   | "RISK_TYPES"
   | "JU"
-  | "MJU";
+  | "MJU"
+  | "E_STEP1"      // 🔥 추가
+  | "E_STEP2";     // 🔥 추가
+  
   
 
 type StrategyUIState = {
@@ -50,6 +53,11 @@ type StrategyUIState = {
   briefPage: number | null;
   setBriefPage: (v: number | null) => void;
   
+  selectedEChapter: "chapter1" | "chapter2" | "chapter3" | null;
+  setSelectedEChapter: (v: "chapter1" | "chapter2" | "chapter3" | null) => void;
+
+  selectedESectionSlug: string | null;
+  setSelectedESectionSlug: (v: string | null) => void;
 
 };
 
@@ -73,6 +81,12 @@ export function StrategyUIProvider({ children }: { children: React.ReactNode }) 
   const [selectedJudgeId, setSelectedJudgeId] =
     useState<string | null>(null);
 
+  const [selectedEChapter, setSelectedEChapter] =
+    useState<"chapter1" | "chapter2" | "chapter3" | null>(null);
+
+  const [selectedESectionSlug, setSelectedESectionSlug] =
+    useState<string | null>(null);
+
   const value = useMemo(
     () => ({
       sidebarOpen,
@@ -92,11 +106,17 @@ export function StrategyUIProvider({ children }: { children: React.ReactNode }) 
       selectedBlueprintBlockId, 
       setSelectedBlueprintBlockId,
       selectedJudgeId, 
-      setSelectedJudgeId
-      
+      setSelectedJudgeId,
+
+      selectedEChapter,
+      setSelectedEChapter,
+
+      selectedESectionSlug,
+      setSelectedESectionSlug,
     }),
     [sidebarOpen,selectedBookId, viewMode, briefPage,selectedSummaryBlockId, 
-    selectedRiskTypologyId, selectedBlueprintBlockId, selectedJudgeId]
+    selectedRiskTypologyId, selectedBlueprintBlockId, selectedJudgeId,selectedEChapter,
+    selectedESectionSlug]
   );
 
   return (

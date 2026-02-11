@@ -33,6 +33,7 @@ type ArtifactState = {
   };
   C: boolean;
   D: boolean;
+  E: boolean;
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
@@ -54,7 +55,11 @@ export function PublicationSidebar() {
     setSelectedRiskTypologyId,
     setBriefPage,
     selectedJudgeId,
-    setSelectedJudgeId
+    setSelectedJudgeId,
+    selectedEChapter,
+    setSelectedEChapter,
+    selectedESectionSlug,
+    setSelectedESectionSlug,
 
   } = useStrategyUI();
 
@@ -64,7 +69,10 @@ export function PublicationSidebar() {
   const [blueprintBlocks, setBlueprintBlocks] = useState<BlueprintBlockItem[]>([]);
   const [artifacts, setArtifacts] = useState<ArtifactState | null>(null);
   const [mjuBlocks, setMjuBlocks] = useState<MjuBlockItem[]>([]);
-  
+  const [eSections, setESections] = useState<
+  { slug: string; title: string }[]
+>([]);
+
   
   useEffect(() => {
     if (!selectedBookId) return;
@@ -220,6 +228,28 @@ useEffect(() => {
     run();
   }, [viewMode, selectedBookId, selectedJudgeId, setSelectedJudgeId]);
   
+  useEffect(() => {
+  if (
+    viewMode !== "E_STEP2" ||
+    !selectedBookId ||
+    !selectedEChapter
+  ) {
+    setESections([]);
+    return;
+  }
+
+  const run = async () => {
+    const res = await fetch(
+      `${API_BASE}/api/publications/${selectedBookId}/E/${selectedEChapter}/step2/sections`
+    );
+    const json = await res.json();
+
+    setESections(json.sections ?? []);
+  };
+
+  run();
+}, [viewMode, selectedBookId, selectedEChapter]);
+
   
   // 간행물 리스트 로딩 
   const selectedItem = items.find(
@@ -670,6 +700,146 @@ useEffect(() => {
                   })}
                 </div>
               )}
+            </div>
+          </SidebarSection>
+        )}
+        {/* =========================
+            E: 조사사무처리규정 엔진
+          ========================= */}
+        {selectedBookId && (
+          <SidebarSection>
+            <div>
+
+              {/* STEP1 */}
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 13,
+                  color: "#111827",
+                  cursor: "pointer",
+                  marginBottom: 6,
+                }}
+              >
+                <input
+                  type="radio"
+                  name="viewMode"
+                  value="E_STEP1"
+                  checked={viewMode === "E_STEP1"}
+                  onChange={() => {
+                    setViewMode("E_STEP1");
+                    setSelectedESectionSlug(null);
+                  }}
+                />
+                규정 구조 분석 (Step1)
+              </label>
+
+              {/* STEP1 - Chapter 선택 */}
+              {viewMode === "E_STEP1" && (
+                <div style={inlineListStyle}>
+                  {["chapter1", "chapter2", "chapter3"].map((ch) => {
+                    const active = selectedEChapter === ch;
+                    return (
+                      <div
+                        key={ch}
+                        onClick={() => setSelectedEChapter(ch as any)}
+                        style={{
+                          fontSize: 13,
+                          padding: "4px 6px",
+                          borderRadius: 4,
+                          cursor: "pointer",
+                          color: active ? "#111827" : "#6b7280",
+                          background: active ? "#f3f4f6" : "transparent",
+                        }}
+                      >
+                        {ch.replace("chapter", "제") + "장"}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* STEP2 */}
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 13,
+                  color: "#111827",
+                  cursor: "pointer",
+                  marginTop: 12,
+                  marginBottom: 6,
+                }}
+              >
+                <input
+                  type="radio"
+                  name="viewMode"
+                  value="E_STEP2"
+                  checked={viewMode === "E_STEP2"}
+                  onChange={() => {
+                    setViewMode("E_STEP2");
+                  }}
+                />
+                규정 절차 해부 (Step2)
+              </label>
+
+              {/* STEP2 - Chapter 선택 */}
+              {viewMode === "E_STEP2" && (
+                <>
+                  <div style={inlineListStyle}>
+                    {["chapter1", "chapter2", "chapter3"].map((ch) => {
+                      const active = selectedEChapter === ch;
+                      return (
+                        <div
+                          key={ch}
+                          onClick={() => {
+                            setSelectedEChapter(ch as any);
+                            setSelectedESectionSlug(null);
+                          }}
+                          style={{
+                            fontSize: 13,
+                            padding: "4px 6px",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            color: active ? "#111827" : "#6b7280",
+                            background: active ? "#f3f4f6" : "transparent",
+                          }}
+                        >
+                          {ch.replace("chapter", "제") + "장"}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* 절 목록 */}
+                  {eSections.length > 0 && (
+                    <div style={{ ...inlineListStyle, marginTop: 8 }}>
+                      {eSections.map((s) => {
+                        const active = selectedESectionSlug === s.slug;
+                        return (
+                          <div
+                            key={s.slug}
+                            onClick={() => setSelectedESectionSlug(s.slug)}
+                            style={{
+                              fontSize: 13,
+                              padding: "4px 6px",
+                              borderRadius: 4,
+                              cursor: "pointer",
+                              color: active ? "#111827" : "#6b7280",
+                              background: active ? "#f3f4f6" : "transparent",
+                            }}
+                          >
+                            {s.title}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
+
             </div>
           </SidebarSection>
         )}
