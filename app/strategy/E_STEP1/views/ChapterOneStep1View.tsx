@@ -242,13 +242,12 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             <div
             style={{
                 writingMode: "vertical-rl",
+                textOrientation: "upright",
                 fontWeight: 600,
                 letterSpacing: "2px",
-                verticalAlign: "middle",
             }}
             >
-
-                {row.category}
+            {row.category}
             </div>
             </td>
 
@@ -319,8 +318,8 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
 
 
       {/* EXTRA */}
-      {data.extraExplanations.length > 0 && (
-        <CollapsibleSection title="📌 추가 설명">
+      {/* {data.extraExplanations.length > 0 && ( */}
+        {/* <CollapsibleSection title="📌 추가 설명">
           {data.extraExplanations.map((e, idx) => (
             <Card key={idx}>
               <CardTitle>{e.topic}</CardTitle>
@@ -329,7 +328,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             </Card>
           ))}
         </CollapsibleSection>
-      )}
+      )} */}
 
     </article>
   );
