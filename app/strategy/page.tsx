@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRecordRecentThought } from "@/app/hooks/useRecordRecentThought";
 import { ChapterOneStep1Container } from "./E_STEP1/containers/ChapterOneStep1Container";
+import { MainLoginRequiredNotice } from "@/app/components/MainLoginRequiredNotice";
 
 export default function StrategyPage() {
   
@@ -55,7 +56,6 @@ export default function StrategyPage() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  
   
 
 if (!selectedBookId || !viewMode) {
@@ -133,6 +133,21 @@ if (!selectedBookId || !viewMode) {
     </div>
   );
 }
+
+if (!userId) {
+  return (
+    <div
+      style={{
+        maxWidth: 920,
+        margin: "0 auto",
+        padding: "96px 32px",
+      }}
+    >
+      <MainLoginRequiredNotice />
+    </div>
+  );
+}
+  
 
   return (
       <div

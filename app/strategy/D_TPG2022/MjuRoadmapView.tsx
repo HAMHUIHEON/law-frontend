@@ -35,7 +35,6 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 export function MjuRoadmapView({ bookId }: MjuRoadmapViewProps) {
   const { userId } = useAuth();
   const { setViewMode, setSelectedJudgeId } = useStrategyUI();
-  console.log("DEBUG API_BASE =", API_BASE); // 👈 이 줄 추가
   const [vm, setVm] = useState<MjuTypesVM | null>(null);
   const [error, setError] = useState<string | null>(null);
 
