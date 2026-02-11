@@ -250,7 +250,7 @@ function SubscribePageInner() {
         </button>
          <p
               style={{
-                marginTop: 14,
+                marginTop: 18,
                 fontSize: 12,
                 color: "rgba(255,255,255,0.55)",
                 lineHeight: 1.6,
