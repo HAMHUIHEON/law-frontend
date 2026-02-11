@@ -31,15 +31,22 @@ export default function StrategyPage() {
   
   const { userId } = useAuth();
   const [showHint, setShowHint] = useState(false);
+  
+  const strategyTargetId =
+    selectedBookId && viewMode
+      ? viewMode === "E_STEP1" && selectedEChapter
+        ? `${selectedBookId}:E_STEP1:${selectedEChapter}`
+        : viewMode === "E_STEP2" && selectedEChapter && selectedESectionSlug
+        ? `${selectedBookId}:E_STEP2:${selectedEChapter}:${selectedESectionSlug}`
+        : `${selectedBookId}:${viewMode}`
+      : null;
 
   useRecordRecentThought({
     userId,
     targetType: "strategy",
-    targetId:
-      selectedBookId && viewMode
-        ? `${selectedBookId}:${viewMode}`
-        : null,
+    targetId: strategyTargetId,
   });
+
 
   useEffect(() => {
     const onScroll = () => {

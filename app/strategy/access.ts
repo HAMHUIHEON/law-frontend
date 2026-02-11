@@ -16,7 +16,9 @@ export type StrategyViewMode =
   | "BLUEPRINTS"
   | "RISK_TYPES"
   | "JU"
-  | "MJU";
+  | "MJU"
+  | "E_STEP1"
+  | "E_STEP2";
 
 /**
  * 전략 접근 결과
@@ -41,6 +43,7 @@ export function getStrategyAccess(
     "APP_MAP",
     "FLOW",
     "JU",
+    "E_STEP1",   // 🔥 추가
   ];
 
   // 🔒 구독자 전용
@@ -49,6 +52,7 @@ export function getStrategyAccess(
     "BLUEPRINTS",
     "RISK_TYPES",
     "MJU",
+    "E_STEP2",   // 🔥 추가
   ];
 
   if (FREE.includes(viewMode)) return "FULL";

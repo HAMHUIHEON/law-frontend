@@ -48,5 +48,5 @@ export function ChapterOneStep1Container({ bookId }: Props) {
     return <div style={{ padding: 40 }}>데이터 없음</div>;
   }
 
-  return <ChapterOneStep1View data={data} />;
+  return <ChapterOneStep1View bookId={bookId} data={data} />;
 }
