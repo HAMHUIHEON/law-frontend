@@ -32,7 +32,7 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
   const userAccess = useUserAccessLevel();
   const access = getStrategyAccess(userAccess, "E_STEP1");
   const isLocked = access !== "FULL";
-
+  const [showHint, setShowHint] = useState(false);
   const saveThought = useSaveThought();
   const [saving, setSaving] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
@@ -66,6 +66,29 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
             }
           }}
           style={styles.floatingButton}
+                      onMouseEnter={(e) => {
+              setShowHint(true);
+              e.currentTarget.style.background = "#fffbeb";
+              e.currentTarget.style.borderColor = "#f59e0b";
+              e.currentTarget.style.transform = "scale(1.06)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 14px rgba(245,158,11,0.25)";
+            }}
+            onMouseLeave={(e) => {
+              setShowHint(false);
+              e.currentTarget.style.background = "#ffffff";
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 10px rgba(0,0,0,0.08)";
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = "scale(0.96)";
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = "scale(1.06)";
+            }}
+
         >
           🔖
         </button>
