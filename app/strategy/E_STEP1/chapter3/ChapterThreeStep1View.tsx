@@ -468,6 +468,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     marginBottom: 18,
   },
+  
   card: {
     border: "1px solid #e5e7eb",
     borderRadius: 12,
@@ -475,11 +476,13 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 24,
     background: "#ffffff",
   },
+
   cardTitleWrapper: {
     display: "flex",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 18,
   },
+
   cardTitleBar: {
     width: 4,
     height: 22,
@@ -487,13 +490,14 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 2,
     marginRight: 10,
   },
+
   cardTitle: {
     fontSize: 15,
     fontWeight: 600,
     margin: 0,
     lineHeight: 1.4,
   },
-  
+
   label: {
     display: "inline-block",
     fontSize: 12,
@@ -578,5 +582,11 @@ labelResult: {
 labelNext: {
   color: "#374151", // 딥그레이
 },
+
+articleList: {
+    fontSize: 12,
+    color: "#9ca3af",
+    marginBottom: 6,
+  },
 
 };
