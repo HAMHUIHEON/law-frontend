@@ -228,12 +228,17 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
           <Card key={idx}>
             <CardTitle>{p.principle}</CardTitle>
             <ArticleList articles={p.evidence_articles} />
-            <BodyText>{p.how_it_operates}</BodyText>
-            {p.when_it_breaks && (
-              <BodyText>
-                <strong>예외:</strong> {p.when_it_breaks}
+            {splitSentences(p.how_it_operates).map((s, i) => (
+              <BodyText key={i}>{s}</BodyText>
+            ))}
+          {p.when_it_breaks &&
+            splitSentences(p.when_it_breaks).map((s, i) => (
+              <BodyText key={i}>
+                {i === 0 && <strong>예외: </strong>}
+                {s}
               </BodyText>
-            )}
+            ))}
+
             <EvidenceBadge status={p.evidence_status} />
           </Card>
         ))}
@@ -257,10 +262,9 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
               </span>
               {c.timing_in_flow}
             </BodyText>
-            {splitIntoParagraphs(c.how_control_is_described_in_text).map((para, i) => (
-              <BodyText key={i}>{para}</BodyText>
+            {splitSentences(c.how_control_is_described_in_text).map((s, i) => (
+              <BodyText key={i}>{s}</BodyText>
             ))}
-
             <ArticleList articles={c.evidence_articles} />
             <EvidenceBadge status={c.evidence_status} />
           </Card>
@@ -272,27 +276,36 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
         {data.branchPoints.map((b, idx) => (
           <Card key={idx}>
             <CardTitle>Q. {b.decision_question}</CardTitle>
-            <BodyText>
-              <span style={{ ...styles.labelBase, ...styles.labelTrigger }}>
-                Trigger
-              </span>
-              {b.trigger_defined_in_text}
-            </BodyText>
-
-            <BodyText>
-              <span style={{ ...styles.labelBase, ...styles.labelResult }}>
-                구조적 결과
-              </span>
-              {b.structural_consequence}
-            </BodyText>
-
-            <BodyText>
-              <span style={{ ...styles.labelBase, ...styles.labelNext }}>
-                다음 전환
-              </span>
-              {b.next_structural_change_defined_in_text}
-            </BodyText>
-
+            {splitSentences(b.trigger_defined_in_text).map((s, i) => (
+              <BodyText key={i}>
+                {i === 0 && (
+                  <span style={{ ...styles.labelBase, ...styles.labelTrigger }}>
+                    Trigger
+                  </span>
+                )}
+                {s}
+              </BodyText>
+            ))}
+            {splitSentences(b.structural_consequence).map((s, i) => (
+              <BodyText key={i}>
+                {i === 0 && (
+                  <span style={{ ...styles.labelBase, ...styles.labelResult }}>
+                    구조적 결과
+                  </span>
+                )}
+                {s}
+              </BodyText>
+            ))}
+            {splitSentences(b.next_structural_change_defined_in_text).map((s, i) => (
+              <BodyText key={i}>
+                {i === 0 && (
+                  <span style={{ ...styles.labelBase, ...styles.labelNext }}>
+                    다음 전환
+                  </span>
+                )}
+                {s}
+              </BodyText>
+            ))}
             <ArticleList articles={b.evidence_articles} />
             <EvidenceBadge status={b.evidence_status} />
           </Card>
