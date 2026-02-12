@@ -365,14 +365,18 @@ function Card({
   children: React.ReactNode;
   variant?: "defense" | "internal" | "bridge";
 }) {
-  const style =
+  const variantStyle =
     variant === "defense"
-      ? styles.defenseBlock
+      ? styles.cardDefense
       : variant === "internal"
-      ? styles.internalBlock
-      : styles.bridgeBlock;
+      ? styles.cardInternal
+      : styles.cardBridge;
 
-  return <div style={style}>{children}</div>;
+  return (
+    <div style={{ ...styles.cardBase, ...variantStyle }}>
+      {children}
+    </div>
+  );
 }
 
 function AuthorityBlock({
@@ -382,12 +386,16 @@ function AuthorityBlock({
   children: React.ReactNode;
   variant?: "primary" | "secondary";
 }) {
-  const style =
+  const variantStyle =
     variant === "secondary"
-      ? styles.authorityBlock2
-      : styles.authorityBlock;
+      ? styles.cardSecondary
+      : styles.cardPrimary;
 
-  return <div style={style}>{children}</div>;
+  return (
+    <div style={{ ...styles.cardBase, ...variantStyle }}>
+      {children}
+    </div>
+  );
 }
 
 
@@ -451,176 +459,163 @@ function ProcedureCard({ children }: { children: React.ReactNode }) {
   return <div style={styles.procedureCard}>{children}</div>;
 }
 
-/* ============================== */
-/* Styles */
-/* ============================== */
+const design = {
+  radius: 14,
+  shadow: "0 4px 16px rgba(0,0,0,0.04)",
+  border: "1px solid #e5e7eb",
+  spacing: 24,
+};
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: 960,
     margin: "0 auto",
-    paddingTop: 18,
-    lineHeight: 1.7,
-    color: colors.ink,
-  },
-
-  summaryBox: {
-    border: `1px solid ${colors.line}`,
-    borderRadius: 10,
-    padding: 20,
-    background: colors.bgSoft,
-  },
-
-  summary: {
-    fontSize: 16,
-    lineHeight: 1.9,
-    color: "#1f2937",
+    paddingTop: 24,
+    paddingBottom: 80,
+    lineHeight: 1.75,
+    color: "#111827",
   },
 
   sectionTitle: {
     fontSize: 18,
     fontWeight: 600,
-    marginBottom: 18,
-    color: colors.ink,
+    marginBottom: 20,
+    paddingBottom: 8,
     borderBottom: "1px solid #f1f5f9",
-    paddingBottom: 6,
-    },
+  },
 
-  block: {
-    borderLeft: "3px solid #e5e7eb",
-    paddingLeft: 16,
-    marginBottom: 22,
-    },
+  summaryBox: {
+    border: design.border,
+    borderRadius: design.radius,
+    padding: 24,
+    background: "#fafafa",
+  },
 
-   cardTitle: {
+  summary: {
+    fontSize: 15,
+    lineHeight: 1.8,
+    color: "#1f2937",
+  },
+
+  /* ============================= */
+  /* 카드 공통 베이스 */
+  /* ============================= */
+
+  cardBase: {
+    border: design.border,
+    borderRadius: design.radius,
+    padding: 24,
+    marginBottom: 24,
+    background: "#ffffff",
+    boxShadow: design.shadow,
+  },
+
+  cardPrimary: {
+    borderLeft: "4px solid #334155",
+  },
+
+  cardSecondary: {
+    borderLeft: "4px solid #94a3b8",
+    background: "#f8fafc",
+  },
+
+  cardDefense: {
+    borderLeft: "4px solid #7c3aed",
+  },
+
+  cardInternal: {
+    borderLeft: "4px solid #0ea5e9",
+  },
+
+  cardBridge: {
+    borderLeft: "4px solid #f59e0b",
+    background: "#fffbeb",
+  },
+
+  procedureCard: {
+    border: design.border,
+    borderRadius: design.radius,
+    padding: 24,
+    marginBottom: 24,
+    background: "#ffffff",
+    boxShadow: design.shadow,
+  },
+
+  cardTitle: {
     fontSize: 15,
     fontWeight: 600,
-    marginBottom: 6,
-    color: "#1f2937",
-    },
+    marginBottom: 8,
+    color: "#111827",
+  },
+
+  bridgeTitle: {
+    fontSize: 15,
+    fontWeight: 600,
+    marginBottom: 16,
+    color: "#92400e",
+  },
 
   bodyText: {
     fontSize: 14,
-    marginBottom: 8,
+    marginBottom: 10,
+    color: "#374151",
   },
 
   articleList: {
     fontSize: 12,
-    color: "#9ca3af",
-    marginBottom: 6,
-    letterSpacing: "0.2px",
-    },
+    color: "#6b7280",
+    marginBottom: 8,
+    letterSpacing: "0.3px",
+  },
 
   badge: {
     display: "inline-block",
-    padding: "2px 6px",
-    borderRadius: 6,
+    padding: "4px 8px",
+    borderRadius: 999,
     fontSize: 11,
-    marginTop: 6,
+    fontWeight: 500,
+    marginTop: 8,
   },
 
+  /* ============================= */
+  /* 테이블 */
+  /* ============================= */
+
   tableWrapper: {
-    border: `1px solid ${colors.line}`,
-    borderRadius: 10,
+    border: design.border,
+    borderRadius: design.radius,
     overflow: "hidden",
   },
 
-    table: {
+  table: {
     width: "100%",
     borderCollapse: "collapse",
     fontSize: 13,
-    tableLayout: "auto",
-    },
+  },
 
+  th: {
+    padding: "14px",
+    textAlign: "center",
+    background: "#f9fafb",
+    fontWeight: 600,
+    borderBottom: "1px solid #e5e7eb",
+  },
 
-th: {
-  borderBottom: "1px solid #d1d5db",
-  padding: "12px 12px",
-  textAlign: "center",
-  verticalAlign: "middle",
-  background: "#f9fafb",
-  fontWeight: 600,
-},
+  td: {
+    padding: "14px",
+    borderTop: "1px solid #f1f5f9",
+    verticalAlign: "top",
+  },
 
-td: {
-  borderTop: "1px dotted #e5e7eb",
-  padding: "12px",
-  lineHeight: 1.6,
-  wordBreak: "keep-all",
-},
+  categoryCell: {
+    background: "#fafafa",
+    position: "relative",
+    padding: 0,
+    width: 70,
+  },
 
-categoryCell: {
-  background: "#fafafa",
-  position: "relative",
-  padding: 0,
-  width: "70px",
-},
-
-authorityBlock: {
-  background: "#f8fafc",
-  borderLeft: "4px solid #94a3b8",
-  padding: "20px 22px",
-  marginBottom: 28,
-  position: "relative",
-},
-
-authorityBlock2: {
-  background: "#ffffff",
-  border: "1px solid #e5e7eb",
-  borderTop: "3px solid #d1d5db",
-  borderRadius: 14,
-  padding: "24px 26px",
-  marginBottom: 32,
-},
-
-procedureCard: {
-  border: "1px solid #e5e7eb",
-  borderRadius: 12,
-  padding: "20px 22px",
-  marginBottom: 22,
-  background: "#ffffff",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-},
-
-defenseBlock: {
-  border: "1px solid #e5e7eb",
-  borderRadius: 12,
-  padding: "22px 24px",
-  marginBottom: 26,
-  background: "#ffffff",
-  boxShadow: "0 6px 18px rgba(0,0,0,0.04)",
-},
-
-internalBlock: {
-  background: "#f9fafb",
-  borderRadius: 14,
-  padding: "22px 24px",
-  marginBottom: 24,
-  border: "1px solid #f1f5f9",
-},
-
-bridgeBlock: {
-  border: "1px dashed #d1d5db",
-  borderRadius: 18,
-  padding: "32px 36px",
-  marginBottom: 36,
-  background: "#fafafa",
-},
-
-bridgeTitle: {
-  fontSize: 15,
-  fontWeight: 600,
-  marginBottom: 16,
-  color: "#111827",
-  lineHeight: 1.6,
-},
-
-qMark: {
-  marginRight: 8,
-  fontWeight: 700,
-  color: "#111827",
-  display: "inline-block",
-  transform: "translateY(-1px)",
-},
-
+  qMark: {
+    marginRight: 8,
+    fontWeight: 700,
+  },
 };
