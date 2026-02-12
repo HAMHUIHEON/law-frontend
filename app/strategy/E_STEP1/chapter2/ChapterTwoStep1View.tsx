@@ -70,9 +70,14 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
       </div>
 
       {/* SUMMARY */}
-      <Section title="📘 제2장 개관">
+      <Section title="📘 제2장 일반세무조사">
         <div style={styles.summaryBox}>
-          <p style={styles.summary}>{data.summaryText}</p>
+        {splitIntoParagraphs(data.summaryText).map((para, idx) => (
+          <p key={idx} style={styles.summary}>
+            {para}
+          </p>
+        ))}
+
         </div>
       </Section>
 
@@ -84,7 +89,10 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
           <Card key={idx}>
             <CardTitle>{unit.structural_unit}</CardTitle>
             <ArticleList articles={unit.evidence_articles} />
-            <BodyText>{unit.description}</BodyText>
+            {splitIntoParagraphs(unit.description).map((para, i) => (
+              <BodyText key={i}>{para}</BodyText>
+            ))}
+
             <BodyText>
               <strong>구조 효과:</strong> {unit.structural_effect}
             </BodyText>
@@ -121,7 +129,10 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
             <BodyText>
               <strong>개입 시점:</strong> {c.timing_in_flow}
             </BodyText>
-            <BodyText>{c.how_control_is_described_in_text}</BodyText>
+            {splitIntoParagraphs(c.how_control_is_described_in_text).map((para, i) => (
+              <BodyText key={i}>{para}</BodyText>
+            ))}
+
             <ArticleList articles={c.evidence_articles} />
             <EvidenceBadge status={c.evidence_status} />
           </Card>
@@ -155,12 +166,31 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
           <div key={idx} style={{ marginBottom: 48 }}>
             <h3 style={styles.tableTitle}>{table.table_title}</h3>
             <p style={styles.tablePurpose}>{table.table_purpose}</p>
-            <div
-              style={styles.tableMarkdown}
-              dangerouslySetInnerHTML={{
-                __html: table.table_markdown.replace(/\n/g, "<br/>"),
-              }}
-            />
+            <div style={styles.tableWrapper}>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    {Object.keys(table.rows[0] ?? {}).map((col) => (
+                      <th key={col} style={styles.th}>
+                        {col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.rows.map((row, rowIdx) => (
+                    <tr key={rowIdx}>
+                      {Object.entries(row).map(([col, value]) => (
+                        <td key={col} style={styles.td}>
+                          {value}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
           </div>
         ))}
       </Section>
@@ -179,6 +209,26 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
     </article>
   );
 }
+
+function splitIntoParagraphs(text: string): string[] {
+  if (!text) return [];
+
+  // 마침표 기준 분리 (괄호 안 조문은 그대로 유지)
+  const sentences = text
+    .split(/(?<=\.)\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const paragraphs: string[] = [];
+
+  for (let i = 0; i < sentences.length; i += 2) {
+    const chunk = sentences.slice(i, i + 2).join(" ");
+    paragraphs.push(chunk);
+  }
+
+  return paragraphs;
+}
+
 function Section({ title, children }: any) {
   return (
     <section style={{ marginBottom: 56 }}>
@@ -245,10 +295,15 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 20,
     background: colors.bgSoft,
   },
+
   summary: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 1.9,
+    color: "#1f2937",
+    marginBottom: 18,
+    wordBreak: "keep-all",
   },
+
   sectionTitle: {
     fontSize: 18,
     fontWeight: 600,
@@ -309,4 +364,34 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     background: "#fafafa",
   },
+
+  tableWrapper: {
+  overflowX: "auto",
+  border: "1px solid #e5e7eb",
+  borderRadius: 10,
+},
+
+table: {
+  width: "100%",
+  borderCollapse: "collapse",
+  fontSize: 13,
+  lineHeight: 1.6,
+  minWidth: 720,
+},
+
+th: {
+  textAlign: "left",
+  padding: "10px 12px",
+  background: "#f9fafb",
+  borderBottom: "1px solid #e5e7eb",
+  fontWeight: 600,
+  whiteSpace: "nowrap",
+},
+
+td: {
+  padding: "10px 12px",
+  borderBottom: "1px solid #f1f5f9",
+  verticalAlign: "top",
+},
+
 };

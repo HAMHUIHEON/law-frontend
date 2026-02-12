@@ -169,7 +169,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
         </div>
 
       {/* SUMMARY */}
-      <Section title="📘 제1장 개관">
+      <Section title="📘 제1장 총칙">
         <div style={styles.summaryBox}>
           <p style={styles.summary}>{data.summary}</p>
         </div>
