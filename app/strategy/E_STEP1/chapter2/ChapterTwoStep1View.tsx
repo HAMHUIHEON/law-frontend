@@ -72,12 +72,17 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
       {/* SUMMARY */}
       <Section title="📘 제2장 일반세무조사">
         <div style={styles.summaryBox}>
-        {splitIntoParagraphs(data.summaryText).map((para, idx) => (
-          <p key={idx} style={styles.summary}>
-            {para}
+        {splitSentences(data.summaryText).map((sentence, idx) => (
+          <p
+            key={idx}
+            style={{
+              ...styles.summary,
+              fontWeight: idx === 0 ? 600 : 400,
+            }}
+          >
+            {sentence}
           </p>
         ))}
-
         </div>
       </Section>
 
@@ -89,13 +94,31 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
           <Card key={idx}>
             <CardTitle>{unit.structural_unit}</CardTitle>
             <ArticleList articles={unit.evidence_articles} />
-            {splitIntoParagraphs(unit.description).map((para, i) => (
-              <BodyText key={i}>{para}</BodyText>
+            {splitSentences(unit.description).map((sentence, i) => (
+              <BodyText
+                key={i}
+                style={{
+                  marginBottom: 12,
+                  lineHeight: 1.85,
+                  fontWeight: i === 0 ? 500 : 400,
+                  color: i === 0 ? "#111827" : "#374151",
+                }}
+              >
+                {sentence}
+              </BodyText>
             ))}
+            <div style={{ marginTop: 16 }}>
+              <BodyText style={{ fontWeight: 600, marginBottom: 8 }}>
+                구조 효과
+              </BodyText>
 
-            <BodyText>
-              <strong>구조 효과:</strong> {unit.structural_effect}
-            </BodyText>
+              {splitSentences(unit.structural_effect).map((sentence, i) => (
+                <BodyText key={i} style={{ lineHeight: 1.85 }}>
+                  {sentence}
+                </BodyText>
+              ))}
+            </div>
+
             <EvidenceBadge status={unit.evidence_status} />
           </Card>
         ))}
@@ -195,19 +218,16 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
         ))}
       </Section>
 
-      {/* BRIDGE */}
-      <Section title="🔎 STEP2로 이어지는 관문">
-        <Card>
-          <BodyText>
-            <strong>STEP1 한계:</strong> {data.bridge.limit}
-          </BodyText>
-          <BodyText>
-            <strong>STEP2 초점:</strong> {data.bridge.focus}
-          </BodyText>
-        </Card>
-      </Section>
     </article>
   );
+}
+
+function splitSentences(text: string): string[] {
+  if (!text) return [];
+  return text
+    .split(/(?<=\.)\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 function splitIntoParagraphs(text: string): string[] {
