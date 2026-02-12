@@ -19,6 +19,7 @@ import { useRecordRecentThought } from "@/app/hooks/useRecordRecentThought";
 import { ChapterOneStep1Container } from "./E_STEP1/chapter1/containers/ChapterOneStep1Container";
 import { MainLoginRequiredNotice } from "@/app/components/MainLoginRequiredNotice";
 import { ChapterTwoStep1Container } from "./E_STEP1/chapter2/ChapterTwoStep1Container";
+import { ChapterThreeStep1Container } from "./E_STEP1/chapter3/containers/ChapterThreeStep1Container";
 
 export default function StrategyPage() {
   
@@ -202,9 +203,9 @@ if (!userId) {
         {selectedEChapter === "chapter2" && (
           <ChapterTwoStep1Container bookId={selectedBookId} />
         )}
-        {/* {selectedEChapter === "chapter3" && (
+        {selectedEChapter === "chapter3" && (
           <ChapterThreeStep1Container bookId={selectedBookId} />
-        )} */}
+        )}
       </>
     )}
 
