@@ -537,22 +537,25 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 22,
     },
 
-   cardTitle: {
-    fontSize: 15,
-    fontWeight: 600,
-    marginBottom: 6,
-    color: "#1f2937",
-    },
+cardTitle: {
+  fontSize: 15,
+  fontWeight: 600,
+  margin: 0,              // ⭐ 중요
+  lineHeight: 1.4,        // ⭐ 살짝 줄여
+  color: "#1f2937",
+},
+
 
 cardTitleWrapper: {
   display: "flex",
   alignItems: "center",
   marginBottom: 12,
+  transform: "translateY(1px)",  // ⭐ 아주 미세하게
 },
 
 cardTitleBar: {
   width: 4,
-  height: 18,
+  height: 22,
   background: "#1e3a8a",
   borderRadius: 2,
   marginRight: 10,
