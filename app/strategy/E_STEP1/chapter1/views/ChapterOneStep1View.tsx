@@ -325,15 +325,20 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* BRIDGE */}
       <CollapsibleSection title="🔎 다음 장으로 이어지는 질문">
         {data.bridgeQuestions.map((b, idx) => (
-          <Card key={idx} variant="bridge">
-            <CardTitle variant="bridge">
-              {b.question}
-            </CardTitle>
-            <BodyText style={{ color: colors.muted, marginBottom: 12 }}>
-              → {b.nextChapter}
-            </BodyText>
-            <BodyText>{b.why}</BodyText>
-          </Card>
+        <QuestionCard key={idx}>
+          <QuestionTitle>
+            {b.question}
+          </QuestionTitle>
+
+          <div style={styles.questionMeta}>
+            → {b.nextChapter}
+          </div>
+
+          <BodyText style={{ marginTop: 14 }}>
+            {b.why}
+          </BodyText>
+        </QuestionCard>
+
         ))}
       </CollapsibleSection>
 
@@ -475,6 +480,20 @@ function splitSentences(text: string): string[] {
     .split(/(?<=\.)\s+/)
     .map((s) => s.trim())
     .filter(Boolean);
+}
+function QuestionCard({ children }: { children: React.ReactNode }) {
+  return <div style={styles.questionCard}>{children}</div>;
+}
+function QuestionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={styles.questionTitleWrapper}>
+      <div style={styles.questionBar} />
+      <h3 style={styles.questionTitle}>
+        <span style={styles.qMark}>Q.</span>
+        {children}
+      </h3>
+    </div>
+  );
 }
 
 /* ============================== */
@@ -670,6 +689,40 @@ labelBase: {
   marginRight: 6,
   letterSpacing: "0.2px",
   color: "#1e3a8a",
+},
+questionCard: {
+  border: "1px dashed #cbd5e1",
+  borderRadius: 18,
+  padding: "28px 32px",
+  marginBottom: 36,
+  background: "#f8fafc",
+},
+
+questionTitleWrapper: {
+  display: "flex",
+  alignItems: "center",
+  marginBottom: 18,
+},
+
+questionBar: {
+  width: 4,
+  height: 22,
+  background: "#0f766e", // 청록
+  borderRadius: 2,
+  marginRight: 12,
+},
+
+questionTitle: {
+  fontSize: 16,
+  fontWeight: 600,
+  color: "#0f172a",
+  lineHeight: 1.6,
+},
+
+qMark2: {
+  marginRight: 8,
+  color: "#0f766e",
+  fontWeight: 700,
 },
 
 };
