@@ -35,6 +35,8 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
 
   const saveThought = useSaveThought();
   const [saving, setSaving] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [openUnits, setOpenUnits] = useState<Record<number, boolean>>({});
 
   useRecordStrategyTrace({
     userId,
@@ -72,17 +74,50 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
       {/* SUMMARY */}
       <Section title="📘 제2장 일반세무조사">
         <div style={styles.summaryBox}>
-        {splitSentences(data.summaryText).map((sentence, idx) => (
-          <p
-            key={idx}
-            style={{
-              ...styles.summary,
-              fontWeight: idx === 0 ? 600 : 400,
-            }}
-          >
-            {sentence}
-          </p>
-        ))}
+        {(() => {
+          const sentences = splitSentences(data.summaryText);
+          const previewCount = 3;
+          const visible = summaryOpen
+            ? sentences
+            : sentences.slice(0, previewCount);
+
+          return (
+            <>
+              {visible.map((sentence, idx) => (
+                <p
+                  key={idx}
+                  style={{
+                    ...styles.summary,
+                    fontWeight: idx === 0 ? 600 : 400,
+                  }}
+                >
+                  {sentence}
+                </p>
+              ))}
+
+              {sentences.length > previewCount && (
+                <div style={{ marginTop: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => setSummaryOpen((prev) => !prev)}
+                    style={{
+                      fontSize: 13,
+                      color: "#6b7280",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                  >
+                    {summaryOpen
+                      ? "접기 ▲"
+                      : `더 보기 (${sentences.length - previewCount}) ▼`}
+                  </button>
+                </div>
+              )}
+            </>
+          );
+        })()}
         </div>
       </Section>
 
@@ -94,19 +129,60 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
           <Card key={idx}>
             <CardTitle>{unit.structural_unit}</CardTitle>
             <ArticleList articles={unit.evidence_articles} />
-          {splitSentences(unit.description).map((sentence, i) => (
-            <BodyText
-              key={i}
-              style={{
-                marginBottom: 12,
-                lineHeight: 1.85,
-                fontWeight: i === 0 ? 500 : 400,
-                color: i === 0 ? "#111827" : "#374151",
-              }}
-            >
-              {sentence}
-            </BodyText>
-          ))}
+            {(() => {
+              const sentences = splitSentences(unit.description);
+              const previewCount = 2;
+              const isOpen = openUnits[idx] ?? false;
+
+              const visible = isOpen
+                ? sentences
+                : sentences.slice(0, previewCount);
+
+              return (
+                <>
+                  {visible.map((sentence, i) => (
+                    <BodyText
+                      key={i}
+                      style={{
+                        marginBottom: 12,
+                        lineHeight: 1.85,
+                        fontWeight: i === 0 ? 500 : 400,
+                        color: i === 0 ? "#111827" : "#374151",
+                      }}
+                    >
+                      {sentence}
+                    </BodyText>
+                  ))}
+
+                  {sentences.length > previewCount && (
+                    <div style={{ marginTop: 6 }}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenUnits((prev) => ({
+                            ...prev,
+                            [idx]: !isOpen,
+                          }))
+                        }
+                        style={{
+                          fontSize: 12,
+                          color: "#6b7280",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          padding: 0,
+                        }}
+                      >
+                        {isOpen
+                          ? "접기 ▲"
+                          : `더 보기 (${sentences.length - previewCount}) ▼`}
+                      </button>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
           <div style={{ marginTop: 16 }}>
             <BodyText style={{ fontWeight: 600, marginBottom: 8 }}>
               <strong>구조 효과:</strong>
@@ -146,10 +222,17 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
           <Card key={idx}>
             <CardTitle>{c.control_point}</CardTitle>
             <BodyText>
-              <strong>통제 주체:</strong> {c.who_controls}
+              <span style={{ ...styles.labelBase, ...styles.labelAuthority }}>
+                통제 주체
+              </span>
+              {c.who_controls}
             </BodyText>
+
             <BodyText>
-              <strong>개입 시점:</strong> {c.timing_in_flow}
+              <span style={{ ...styles.labelBase, ...styles.labelTiming }}>
+                개입 시점
+              </span>
+              {c.timing_in_flow}
             </BodyText>
             {splitIntoParagraphs(c.how_control_is_described_in_text).map((para, i) => (
               <BodyText key={i}>{para}</BodyText>
@@ -167,15 +250,26 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
           <Card key={idx}>
             <CardTitle>Q. {b.decision_question}</CardTitle>
             <BodyText>
-              <strong>Trigger:</strong> {b.trigger_defined_in_text}
+              <span style={{ ...styles.labelBase, ...styles.labelTrigger }}>
+                Trigger
+              </span>
+              {b.trigger_defined_in_text}
             </BodyText>
+
             <BodyText>
-              <strong>구조적 결과:</strong> {b.structural_consequence}
+              <span style={{ ...styles.labelBase, ...styles.labelResult }}>
+                구조적 결과
+              </span>
+              {b.structural_consequence}
             </BodyText>
+
             <BodyText>
-              <strong>다음 전환:</strong>{" "}
+              <span style={{ ...styles.labelBase, ...styles.labelNext }}>
+                다음 전환
+              </span>
               {b.next_structural_change_defined_in_text}
             </BodyText>
+
             <ArticleList articles={b.evidence_articles} />
             <EvidenceBadge status={b.evidence_status} />
           </Card>
@@ -261,21 +355,81 @@ function Divider() {
   return <hr style={{ borderColor: colors.line, marginBottom: 24 }} />;
 }
 
-function CollapsibleSection({ title, children }: any) {
+function CollapsibleSection({
+  title,
+  children,
+  defaultOpen = false,
+  previewCount = 3,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  previewCount?: number;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  const childArray = React.Children.toArray(children);
+  const hasMore = childArray.length > previewCount;
+
+  const visibleChildren = open ? childArray : childArray.slice(0, previewCount);
+
   return (
-    <section style={{ marginBottom: 56 }}>
-      <h2 style={styles.sectionTitle}>{title}</h2>
-      {children}
+    <section
+      style={{
+        marginBottom: 56,
+        borderBottom: "1px solid #e5e7eb",
+        paddingBottom: 32,
+      }}
+    >
+      <h2
+        style={{
+          fontSize: 18,
+          fontWeight: 600,
+          marginBottom: 18,
+          color: "#111827",
+        }}
+      >
+        {title}
+      </h2>
+
+      <div>
+        {visibleChildren}
+
+        {hasMore && (
+          <div style={{ marginTop: 12 }}>
+            <button
+              type="button"
+              onClick={() => setOpen((prev) => !prev)}
+              style={{
+                fontSize: 13,
+                color: "#6b7280",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
+              {open ? "접기 ▲" : `더 보기 (${childArray.length - previewCount}) ▼`}
+            </button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
+
 
 function Card({ children }: any) {
   return <div style={styles.card}>{children}</div>;
 }
 
 function CardTitle({ children }: any) {
-  return <h3 style={styles.cardTitle}>{children}</h3>;
+  return (
+    <div style={styles.cardTitleWrapper}>
+      <div style={styles.cardTitleBar} />
+      <h3 style={styles.cardTitle}>{children}</h3>
+    </div>
+  );
 }
 
 function BodyText({ children }: any) {
@@ -335,11 +489,27 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 24,
     background: "#ffffff",
   },
+
+  cardTitleWrapper: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  cardTitleBar: {
+    width: 4,
+    height: 18,
+    background: "#1e3a8a", // 남색
+    borderRadius: 2,
+    marginRight: 10,
+  },
+
   cardTitle: {
     fontSize: 15,
     fontWeight: 600,
-    marginBottom: 8,
+    margin: 0,
   },
+
   bodyText: {
     fontSize: 14,
     marginBottom: 8,
@@ -412,5 +582,33 @@ td: {
   borderBottom: "1px solid #f1f5f9",
   verticalAlign: "top",
 },
+labelBase: {
+  display: "inline-block",
+  fontSize: 12,
+  fontWeight: 600,
+  marginRight: 6,
+  letterSpacing: "0.2px",
+},
+
+labelAuthority: {
+  color: "#1e3a8a", // 남색
+},
+
+labelTiming: {
+  color: "#0f766e", // 청록
+},
+
+labelTrigger: {
+  color: "#7c3aed", // 보라
+},
+
+labelResult: {
+  color: "#b45309", // 브라운 오렌지
+},
+
+labelNext: {
+  color: "#374151", // 딥그레이
+},
+
 
 };
