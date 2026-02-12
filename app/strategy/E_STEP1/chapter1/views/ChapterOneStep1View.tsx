@@ -712,7 +712,7 @@ qMark: {
 },
 labelBase: {
   display: "inline-block",
-  fontSize: 12,
+  fontSize: 13,
   fontWeight: 600,
   marginRight: 6,
   letterSpacing: "0.2px",
@@ -733,7 +733,7 @@ questionTitleWrapper: {
 },
 
 questionBar: {
-  width: 4,
+  width: 6,
   height: 22,
   background: "#0f766e", // 청록
   borderRadius: 2,
