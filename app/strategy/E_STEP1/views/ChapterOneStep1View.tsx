@@ -72,17 +72,16 @@ function CollapsibleSection({
 
         {hasMore && (
           <div style={{ marginTop: 12 }}>
-          <button
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-              color: theme.accent,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-            }}
-          >
+            <button
+              onClick={() => setOpen((prev) => !prev)}
+              style={{
+                fontSize: 13,
+                color: "#6b7280",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
               {open
                 ? "접기 ▲"
                 : `더 보기 (${childArray.length - previewCount}) ▼`}
@@ -192,6 +191,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
           </AuthorityBlock>
         ))}
       </CollapsibleSection>
+
 
 
       {/* AUTHORITY */}
@@ -366,18 +366,14 @@ function Card({
   children: React.ReactNode;
   variant?: "defense" | "internal" | "bridge";
 }) {
-  const variantStyle =
+  const style =
     variant === "defense"
-      ? styles.cardDefense
+      ? styles.defenseBlock
       : variant === "internal"
-      ? styles.cardInternal
-      : styles.cardBridge;
+      ? styles.internalBlock
+      : styles.bridgeBlock;
 
-  return (
-    <div style={{ ...styles.cardBase, ...variantStyle }}>
-      {children}
-    </div>
-  );
+  return <div style={style}>{children}</div>;
 }
 
 function AuthorityBlock({
@@ -387,16 +383,12 @@ function AuthorityBlock({
   children: React.ReactNode;
   variant?: "primary" | "secondary";
 }) {
-  const variantStyle =
+  const style =
     variant === "secondary"
-      ? styles.cardSecondary
-      : styles.cardPrimary;
+      ? styles.authorityBlock2
+      : styles.authorityBlock;
 
-  return (
-    <div style={{ ...styles.cardBase, ...variantStyle }}>
-      {children}
-    </div>
-  );
+  return <div style={style}>{children}</div>;
 }
 
 
@@ -442,18 +434,13 @@ function ArticleList({ articles }: { articles: string[] }) {
 }
 
 function EvidenceBadge({ status }: { status: "근거 있음" | "근거 부족" }) {
-  const isValid = status === "근거 있음";
-
+  const good = status === "근거 있음";
   return (
     <span
       style={{
-        padding: "4px 10px",
-        borderRadius: 999,
-        fontSize: 12,
-        fontWeight: 500,
-        border: `1px solid ${isValid ? theme.success : theme.danger}`,
-        color: isValid ? theme.success : theme.danger,
-        background: "transparent",
+        ...styles.badge,
+        background: good ? "#f0fdf4" : "#fef2f2",
+        color: good ? "#065f46" : "#991b1b",
       }}
     >
       {status}
@@ -461,188 +448,179 @@ function EvidenceBadge({ status }: { status: "근거 있음" | "근거 부족" }
   );
 }
 
-
 function ProcedureCard({ children }: { children: React.ReactNode }) {
   return <div style={styles.procedureCard}>{children}</div>;
 }
 
-const design = {
-  radius: 14,
-  shadow: "0 4px 16px rgba(0,0,0,0.04)",
-  border: "1px solid #e5e7eb",
-  spacing: 24,
-};
-
-const theme = {
-  bg: "#ffffff",
-  bgSubtle: "#f8fafc",
-  border: "#e2e8f0",
-  textPrimary: "#0f172a",
-  textSecondary: "#475569",
-  textMuted: "#94a3b8",
-  accent: "#2563eb",       // 핵심 강조 색 하나만
-  accentSoft: "#eff6ff",
-  success: "#16a34a",
-  danger: "#dc2626",
-  radius: 12,
-  shadow: "0 1px 3px rgba(0,0,0,0.06)",
-};
+/* ============================== */
+/* Styles */
+/* ============================== */
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: 960,
     margin: "0 auto",
-    padding: "40px 24px 120px",
-    lineHeight: 1.8,
-    color: theme.textPrimary,
-  },
-
-
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 700,
-    marginBottom: 24,
-    color: theme.textPrimary,
-    letterSpacing: "-0.3px",
+    paddingTop: 18,
+    lineHeight: 1.7,
+    color: colors.ink,
   },
 
   summaryBox: {
-    border: design.border,
-    borderRadius: design.radius,
-    padding: 24,
-    background: "#fafafa",
+    border: `1px solid ${colors.line}`,
+    borderRadius: 10,
+    padding: 20,
+    background: colors.bgSoft,
   },
 
   summary: {
-    fontSize: 15,
-    lineHeight: 1.8,
+    fontSize: 16,
+    lineHeight: 1.9,
     color: "#1f2937",
   },
 
-  /* ============================= */
-  /* 카드 공통 베이스 */
-  /* ============================= */
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 600,
+    marginBottom: 18,
+    color: colors.ink,
+    borderBottom: "1px solid #f1f5f9",
+    paddingBottom: 6,
+    },
 
-  cardBase: {
-    background: theme.bg,
-    border: `1px solid ${theme.border}`,
-    borderRadius: theme.radius,
-    padding: 28,
-    marginBottom: 28,
-    boxShadow: theme.shadow,
-    transition: "all 0.15s ease",
-  },
+  block: {
+    borderLeft: "3px solid #e5e7eb",
+    paddingLeft: 16,
+    marginBottom: 22,
+    },
 
-  cardPrimary: {
-    background: theme.bg,
-  },
-
-  cardSecondary: {
-    background: theme.bgSubtle,
-  },
-
-  cardDefense: {
-    background: "#faf5ff",
-  },
-
-  cardInternal: {
-    background: "#f0f9ff",
-  },
-
-  cardBridge: {
-    background: theme.accentSoft,
-  },
-
-  procedureCard: {
-    border: design.border,
-    borderRadius: design.radius,
-    padding: 24,
-    marginBottom: 24,
-    background: "#ffffff",
-    boxShadow: design.shadow,
-  },
-
-
-
-cardTitle: {
-  fontSize: 16,
-  fontWeight: 600,
-  marginBottom: 12,
-  color: theme.textPrimary,
-},
+   cardTitle: {
+    fontSize: 15,
+    fontWeight: 600,
+    marginBottom: 6,
+    color: "#1f2937",
+    },
 
   bodyText: {
     fontSize: 14,
-    marginBottom: 10,
-    color: "#374151",
-  },
-
-":hover": {
-  boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
-},
-
-  bridgeTitle: {
-    fontSize: 15,
-    fontWeight: 600,
-    marginBottom: 16,
-    color: "#92400e",
+    marginBottom: 8,
   },
 
   articleList: {
     fontSize: 12,
-    color: "#6b7280",
-    marginBottom: 8,
-    letterSpacing: "0.3px",
-  },
+    color: "#9ca3af",
+    marginBottom: 6,
+    letterSpacing: "0.2px",
+    },
 
   badge: {
     display: "inline-block",
-    padding: "4px 8px",
-    borderRadius: 999,
+    padding: "2px 6px",
+    borderRadius: 6,
     fontSize: 11,
-    fontWeight: 500,
-    marginTop: 8,
+    marginTop: 6,
   },
 
-  /* ============================= */
-  /* 테이블 */
-  /* ============================= */
-
   tableWrapper: {
-    border: design.border,
-    borderRadius: design.radius,
+    border: `1px solid ${colors.line}`,
+    borderRadius: 10,
     overflow: "hidden",
   },
 
-  table: {
+    table: {
     width: "100%",
     borderCollapse: "collapse",
     fontSize: 13,
-  },
+    tableLayout: "auto",
+    },
 
-  th: {
-    padding: "14px",
-    textAlign: "center",
-    background: "#f9fafb",
-    fontWeight: 600,
-    borderBottom: "1px solid #e5e7eb",
-  },
 
-  td: {
-    padding: "14px",
-    borderTop: "1px solid #f1f5f9",
-    verticalAlign: "top",
-  },
+th: {
+  borderBottom: "1px solid #d1d5db",
+  padding: "12px 12px",
+  textAlign: "center",
+  verticalAlign: "middle",
+  background: "#f9fafb",
+  fontWeight: 600,
+},
 
-  categoryCell: {
-    background: "#fafafa",
-    position: "relative",
-    padding: 0,
-    width: 70,
-  },
+td: {
+  borderTop: "1px dotted #e5e7eb",
+  padding: "12px",
+  lineHeight: 1.6,
+  wordBreak: "keep-all",
+},
 
-  qMark: {
-    marginRight: 8,
-    fontWeight: 700,
-  },
+categoryCell: {
+  background: "#fafafa",
+  position: "relative",
+  padding: 0,
+  width: "70px",
+},
+
+authorityBlock: {
+  background: "#f8fafc",
+  borderLeft: "4px solid #94a3b8",
+  padding: "20px 22px",
+  marginBottom: 28,
+  position: "relative",
+},
+
+authorityBlock2: {
+  background: "#f8fafc",
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
+  padding: "20px 22px",
+  marginBottom: 28,
+},
+
+procedureCard: {
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
+  padding: "20px 22px",
+  marginBottom: 22,
+  background: "#ffffff",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+},
+
+defenseBlock: {
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
+  padding: "22px 24px",
+  marginBottom: 26,
+  background: "#ffffff",
+  boxShadow: "0 6px 18px rgba(0,0,0,0.04)",
+},
+
+internalBlock: {
+  background: "#f9fafb",
+  borderRadius: 14,
+  padding: "22px 24px",
+  marginBottom: 24,
+  border: "1px solid #f1f5f9",
+},
+
+bridgeBlock: {
+  border: "1px dashed #d1d5db",
+  borderRadius: 18,
+  padding: "32px 36px",
+  marginBottom: 36,
+  background: "#fafafa",
+},
+
+bridgeTitle: {
+  fontSize: 15,
+  fontWeight: 600,
+  marginBottom: 16,
+  color: "#111827",
+  lineHeight: 1.6,
+},
+
+qMark: {
+  marginRight: 8,
+  fontWeight: 700,
+  color: "#111827",
+  display: "inline-block",
+  transform: "translateY(-1px)",
+},
+
 };
