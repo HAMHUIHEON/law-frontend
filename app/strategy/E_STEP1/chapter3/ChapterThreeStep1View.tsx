@@ -277,28 +277,44 @@ export function ChapterThreeStep1View({ bookId, data }: Props) {
                     <table style={styles.table}>
                         <thead>
                         <tr>
-                            {Object.keys(table.rows[0] || {}).map((key) => (
-                            <th key={key} style={styles.th}>
-                                {key}
+                        {Object.keys(table.rows[0] || {}).map((key, colIdx) => {
+                          let width = "20%";
+
+                          if (colIdx === 0) width = "18%";   // 단계
+                          if (colIdx === 1) width = "28%";   // 주요 행위·결정
+                          if (colIdx === 2) width = "16%";   // 관련 주체
+                          if (colIdx === 3) width = "22%";   // 통제 장치
+                          if (colIdx === 4) width = "16%";   // 관련 조문
+
+                          return (
+                            <th key={key} style={{ ...styles.th, width }}>
+                              {key}
                             </th>
-                            ))}
+                          );
+                        })}
                         </tr>
                         </thead>
 
                         <tbody>
                         {table.rows.map((row, rIdx) => (
-                            <tr key={rIdx}>
+                          <tr key={rIdx}>
                             {Object.values(row).map((value, cIdx) => (
-                                <td key={cIdx} style={styles.td}>
+                              <td
+                                key={cIdx}
+                                style={{
+                                  ...styles.td,
+                                  textAlign: cIdx === 0 ? "left" : "left",
+                                  fontWeight: cIdx === 0 ? 600 : 400,
+                                }}
+                              >
                                 {String(value)}
-                                </td>
+                              </td>
                             ))}
-                            </tr>
+                          </tr>
                         ))}
                         </tbody>
                     </table>
                     </div>
-
                     <div style={{ marginTop: 12 }}>
                     <EvidenceBadge status={table.evidence_status} />
                     </div>
@@ -476,6 +492,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     margin: 0,
     lineHeight: 1.4,
+    marginBottom: 6,
   },
   label: {
     display: "inline-block",
@@ -521,7 +538,7 @@ table: {
 },
 
 th: {
-  textAlign: "left",
+  textAlign: "center",
   padding: "10px 12px",
   background: "#f9fafb",
   borderBottom: "1px solid #e5e7eb",
