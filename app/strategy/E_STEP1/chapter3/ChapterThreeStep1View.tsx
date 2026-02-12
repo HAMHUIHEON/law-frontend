@@ -492,8 +492,8 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     margin: 0,
     lineHeight: 1.4,
-    marginBottom: 6,
   },
+  
   label: {
     display: "inline-block",
     fontSize: 12,
