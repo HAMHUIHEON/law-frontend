@@ -72,16 +72,17 @@ function CollapsibleSection({
 
         {hasMore && (
           <div style={{ marginTop: 12 }}>
-            <button
-              onClick={() => setOpen((prev) => !prev)}
-              style={{
-                fontSize: 13,
-                color: "#6b7280",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
+          <button
+            style={{
+              fontSize: 13,
+              fontWeight: 500,
+              color: theme.accent,
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
               {open
                 ? "접기 ▲"
                 : `더 보기 (${childArray.length - previewCount}) ▼`}
@@ -441,19 +442,25 @@ function ArticleList({ articles }: { articles: string[] }) {
 }
 
 function EvidenceBadge({ status }: { status: "근거 있음" | "근거 부족" }) {
-  const good = status === "근거 있음";
+  const isValid = status === "근거 있음";
+
   return (
     <span
       style={{
-        ...styles.badge,
-        background: good ? "#f0fdf4" : "#fef2f2",
-        color: good ? "#065f46" : "#991b1b",
+        padding: "4px 10px",
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 500,
+        border: `1px solid ${isValid ? theme.success : theme.danger}`,
+        color: isValid ? theme.success : theme.danger,
+        background: "transparent",
       }}
     >
       {status}
     </span>
   );
 }
+
 
 function ProcedureCard({ children }: { children: React.ReactNode }) {
   return <div style={styles.procedureCard}>{children}</div>;
@@ -466,22 +473,37 @@ const design = {
   spacing: 24,
 };
 
+const theme = {
+  bg: "#ffffff",
+  bgSubtle: "#f8fafc",
+  border: "#e2e8f0",
+  textPrimary: "#0f172a",
+  textSecondary: "#475569",
+  textMuted: "#94a3b8",
+  accent: "#2563eb",       // 핵심 강조 색 하나만
+  accentSoft: "#eff6ff",
+  success: "#16a34a",
+  danger: "#dc2626",
+  radius: 12,
+  shadow: "0 1px 3px rgba(0,0,0,0.06)",
+};
+
 const styles: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: 960,
     margin: "0 auto",
-    paddingTop: 24,
-    paddingBottom: 80,
-    lineHeight: 1.75,
-    color: "#111827",
+    padding: "40px 24px 120px",
+    lineHeight: 1.8,
+    color: theme.textPrimary,
   },
 
+
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 600,
-    marginBottom: 20,
-    paddingBottom: 8,
-    borderBottom: "1px solid #f1f5f9",
+    fontSize: 20,
+    fontWeight: 700,
+    marginBottom: 24,
+    color: theme.textPrimary,
+    letterSpacing: "-0.3px",
   },
 
   summaryBox: {
@@ -502,34 +524,33 @@ const styles: Record<string, React.CSSProperties> = {
   /* ============================= */
 
   cardBase: {
-    border: design.border,
-    borderRadius: design.radius,
-    padding: 24,
-    marginBottom: 24,
-    background: "#ffffff",
-    boxShadow: design.shadow,
+    background: theme.bg,
+    border: `1px solid ${theme.border}`,
+    borderRadius: theme.radius,
+    padding: 28,
+    marginBottom: 28,
+    boxShadow: theme.shadow,
+    transition: "all 0.15s ease",
   },
 
   cardPrimary: {
-    borderLeft: "4px solid #334155",
+    background: theme.bg,
   },
 
   cardSecondary: {
-    borderLeft: "4px solid #94a3b8",
-    background: "#f8fafc",
+    background: theme.bgSubtle,
   },
 
   cardDefense: {
-    borderLeft: "4px solid #7c3aed",
+    background: "#faf5ff",
   },
 
   cardInternal: {
-    borderLeft: "4px solid #0ea5e9",
+    background: "#f0f9ff",
   },
 
   cardBridge: {
-    borderLeft: "4px solid #f59e0b",
-    background: "#fffbeb",
+    background: theme.accentSoft,
   },
 
   procedureCard: {
@@ -541,24 +562,30 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: design.shadow,
   },
 
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: 600,
-    marginBottom: 8,
-    color: "#111827",
+
+
+cardTitle: {
+  fontSize: 16,
+  fontWeight: 600,
+  marginBottom: 12,
+  color: theme.textPrimary,
+},
+
+  bodyText: {
+    fontSize: 14,
+    marginBottom: 10,
+    color: "#374151",
   },
+
+":hover": {
+  boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+},
 
   bridgeTitle: {
     fontSize: 15,
     fontWeight: 600,
     marginBottom: 16,
     color: "#92400e",
-  },
-
-  bodyText: {
-    fontSize: 14,
-    marginBottom: 10,
-    color: "#374151",
   },
 
   articleList: {
