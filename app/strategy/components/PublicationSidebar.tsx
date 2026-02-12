@@ -738,25 +738,30 @@ useEffect(() => {
               {/* STEP1 - Chapter 선택 */}
               {viewMode === "E_STEP1" && (
                 <div style={inlineListStyle}>
-                  {["chapter1", "chapter2", "chapter3"].map((ch) => {
-                    const active = selectedEChapter === ch;
-                    return (
-                      <div
-                        key={ch}
-                        onClick={() => setSelectedEChapter(ch as any)}
-                        style={{
-                          fontSize: 13,
-                          padding: "4px 6px",
-                          borderRadius: 4,
-                          cursor: "pointer",
-                          color: active ? "#111827" : "#6b7280",
-                          background: active ? "#f3f4f6" : "transparent",
-                        }}
-                      >
-                        {ch.replace("chapter", "제") + "장"}
-                      </div>
-                    );
-                  })}
+                {[
+                  { key: "chapter1", label: "제1장 총칙" },
+                  { key: "chapter2", label: "제2장 일반세무조사" },
+                  { key: "chapter3", label: "제3장 조세범칙조사" },
+                ].map(({ key, label }) => {
+                  const active = selectedEChapter === key;
+
+                  return (
+                    <div
+                      key={key}
+                      onClick={() => setSelectedEChapter(key as any)}
+                      style={{
+                        fontSize: 13,
+                        padding: "4px 6px",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        color: active ? "#111827" : "#6b7280",
+                        background: active ? "#f3f4f6" : "transparent",
+                      }}
+                    >
+                      {label}
+                    </div>
+                  );
+                })}
                 </div>
               )}
 
@@ -789,28 +794,30 @@ useEffect(() => {
               {viewMode === "E_STEP2" && (
                 <>
                   <div style={inlineListStyle}>
-                    {["chapter1", "chapter2", "chapter3"].map((ch) => {
-                      const active = selectedEChapter === ch;
-                      return (
-                        <div
-                          key={ch}
-                          onClick={() => {
-                            setSelectedEChapter(ch as any);
-                            setSelectedESectionSlug(null);
-                          }}
-                          style={{
-                            fontSize: 13,
-                            padding: "4px 6px",
-                            borderRadius: 4,
-                            cursor: "pointer",
-                            color: active ? "#111827" : "#6b7280",
-                            background: active ? "#f3f4f6" : "transparent",
-                          }}
-                        >
-                          {ch.replace("chapter", "제") + "장"}
-                        </div>
-                      );
-                    })}
+                  {[
+                    { key: "chapter1", label: "제1장 총칙" },
+                    { key: "chapter2", label: "제2장 일반세무조사" },
+                    { key: "chapter3", label: "제3장 조세범칙조사" },
+                  ].map(({ key, label }) => {
+                    const active = selectedEChapter === key;
+
+                    return (
+                      <div
+                        key={key}
+                        onClick={() => setSelectedEChapter(key as any)}
+                        style={{
+                          fontSize: 13,
+                          padding: "4px 6px",
+                          borderRadius: 4,
+                          cursor: "pointer",
+                          color: active ? "#111827" : "#6b7280",
+                          background: active ? "#f3f4f6" : "transparent",
+                        }}
+                      >
+                        {label}
+                      </div>
+                    );
+                  })}
                   </div>
 
                   {/* 절 목록 */}
