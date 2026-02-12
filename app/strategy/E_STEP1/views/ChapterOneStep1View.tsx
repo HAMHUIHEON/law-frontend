@@ -565,11 +565,12 @@ authorityBlock: {
 },
 
 authorityBlock2: {
-  background: "#f8fafc",
+  background: "#ffffff",
   border: "1px solid #e5e7eb",
-  borderRadius: 12,
-  padding: "20px 22px",
-  marginBottom: 28,
+  borderTop: "3px solid #d1d5db",
+  borderRadius: 14,
+  padding: "24px 26px",
+  marginBottom: 32,
 },
 
 procedureCard: {
