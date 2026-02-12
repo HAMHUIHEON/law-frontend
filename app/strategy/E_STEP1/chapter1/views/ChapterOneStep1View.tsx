@@ -171,18 +171,32 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* SUMMARY */}
       <Section title="📘 제1장 총칙">
         <div style={styles.summaryBox}>
-        {splitSentences(data.summary).map((sentence, idx) => (
-          <p
-            key={idx}
-            style={{
-              ...styles.summary,
-              fontWeight: idx === 0 ? 600 : 400,
-            }}
-          >
-            {sentence}
-          </p>
-        ))}
+        {(() => {
+          const sentences = splitSentences(data.summary);
 
+          if (sentences.length <= 2) {
+            // 2문장 이하 → 한 문단으로
+            return (
+              <p style={styles.summary}>
+                <strong>{sentences[0]}</strong>{" "}
+                {sentences.slice(1).join(" ")}
+              </p>
+            );
+          }
+
+          // 3문장 이상 → 분리
+          return sentences.map((sentence, idx) => (
+            <p
+              key={idx}
+              style={{
+                ...styles.summary,
+                fontWeight: idx === 0 ? 600 : 400,
+              }}
+            >
+              {sentence}
+            </p>
+          ));
+        })()}
         </div>
       </Section>
 
@@ -214,7 +228,10 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
               <EvidenceBadge status={a.evidenceStatus} />
             </div>
             <ArticleList articles={a.articles} />
-            <BodyText>{a.controlFunction}</BodyText>
+            {splitSentences(a.controlFunction).map((sentence, idx) => (
+              <BodyText key={idx}>{sentence}</BodyText>
+            ))}
+
           </AuthorityBlock>
         ))}
       </CollapsibleSection>
@@ -227,7 +244,10 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
           <ProcedureCard  key={idx}>
             <CardTitle>{s.stage}</CardTitle>
             <ArticleList articles={s.articles} />
-            <BodyText>{s.keyControls}</BodyText>
+            {splitSentences(s.keyControls).map((sentence, idx) => (
+              <BodyText key={idx}>{sentence}</BodyText>
+            ))}
+
             <EvidenceBadge status={s.evidenceStatus} />
           </ProcedureCard >
         ))}
@@ -296,10 +316,12 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             <CardTitle>{d.scenario}</CardTitle>
             <ArticleList articles={d.articles} />
             <BodyText>
-            <BodyText>
-              <span style={styles.labelBase}>요건</span>
-              {d.legalRequirement}
+          {splitSentences(d.legalRequirement).map((sentence, idx) => (
+            <BodyText key={idx}>
+              {idx === 0 && <span style={styles.labelBase}>요건 </span>}
+              {sentence}
             </BodyText>
+          ))}
 
             </BodyText>
             <BodyText>{d.commentary}</BodyText>
@@ -315,7 +337,10 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             <Card key={idx} variant="internal">
             <CardTitle>{i.area}</CardTitle>
             <ArticleList articles={i.articles} />
-            <BodyText>{i.implication}</BodyText>
+            {splitSentences(i.implication).map((sentence, idx) => (
+              <BodyText key={idx}>{sentence}</BodyText>
+            ))}
+
             <EvidenceBadge status={i.evidenceStatus} />
           </Card>
         ))}
