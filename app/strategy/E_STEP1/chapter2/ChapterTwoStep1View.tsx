@@ -94,30 +94,29 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
           <Card key={idx}>
             <CardTitle>{unit.structural_unit}</CardTitle>
             <ArticleList articles={unit.evidence_articles} />
-            {splitSentences(unit.description).map((sentence, i) => (
-              <BodyText
-                key={i}
-                style={{
-                  marginBottom: 12,
-                  lineHeight: 1.85,
-                  fontWeight: i === 0 ? 500 : 400,
-                  color: i === 0 ? "#111827" : "#374151",
-                }}
-              >
+          {splitSentences(unit.description).map((sentence, i) => (
+            <BodyText
+              key={i}
+              style={{
+                marginBottom: 12,
+                lineHeight: 1.85,
+                fontWeight: i === 0 ? 500 : 400,
+                color: i === 0 ? "#111827" : "#374151",
+              }}
+            >
+              {sentence}
+            </BodyText>
+          ))}
+          <div style={{ marginTop: 16 }}>
+            <BodyText style={{ fontWeight: 600, marginBottom: 8 }}>
+              <strong>구조 효과:</strong>
+            </BodyText>
+            {splitSentences(unit.structural_effect).map((sentence, i) => (
+              <BodyText key={i} style={{ lineHeight: 1.85 }}>
                 {sentence}
               </BodyText>
             ))}
-            <div style={{ marginTop: 16 }}>
-              <BodyText style={{ fontWeight: 600, marginBottom: 8 }}>
-                구조 효과
-              </BodyText>
-
-              {splitSentences(unit.structural_effect).map((sentence, i) => (
-                <BodyText key={i} style={{ lineHeight: 1.85 }}>
-                  {sentence}
-                </BodyText>
-              ))}
-            </div>
+          </div>
 
             <EvidenceBadge status={unit.evidence_status} />
           </Card>
