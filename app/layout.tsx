@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { GlobalDisclaimerFooter } from "./components/GlobalDisclaimerFooter";
 import Script from "next/script";
 import { CompanyInfoFooter } from "./components/CompanyInfoFooter";
+import { UserSync } from "./components/UserSync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClerkProvider>
+          <UserSync />
           <div style={{ minHeight: "100vh" }}>
             {children}
             <CompanyInfoFooter />

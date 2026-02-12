@@ -1,5 +1,7 @@
 -- Supabase SQL Editor: run all
 
+
+
 create extension if not exists "pgcrypto";
 
 create table if not exists recent_thoughts (
@@ -329,3 +331,23 @@ as $$
     and subscription_end_at < now();
 $$;
 -- 이제 이 함수를 Supabase 크론잡에서 주기적으로 실행하도록 설정하면 된다.
+
+--1️⃣ users (마스터)
+create table if not exists public.users (
+  id text primary key,              -- Clerk userId
+  email text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_users_email
+on public.users (email);
+
+alter table public.users enable row level security;
+
+-- 서버 전용
+create policy "service role full access users"
+on public.users
+for all
+using (auth.role() = 'service_role')
+with check (auth.role() = 'service_role');
