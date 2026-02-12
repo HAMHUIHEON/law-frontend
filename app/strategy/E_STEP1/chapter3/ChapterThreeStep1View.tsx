@@ -156,6 +156,8 @@ export function ChapterThreeStep1View({ bookId, data }: Props) {
         </Card>
       </Section>
 
+      <Divider />
+
       {/* INVESTIGATION STRUCTURE */}
       <CollapsibleSection title="🏗 범칙조사 구조 단위">
         {data.investigationUnits.map((unit, idx) => (
@@ -375,30 +377,65 @@ function CollapsibleSection({
   title,
   children,
   defaultOpen = false,
-}: any) {
+  previewCount = 3,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  previewCount?: number;
+}) {
   const [open, setOpen] = useState(defaultOpen);
-  const childArray = React.Children.toArray(children);
-  const previewCount = 3;
 
-  const visible = open
-    ? childArray
-    : childArray.slice(0, previewCount);
+  const childArray = React.Children.toArray(children);
+  const hasMore = childArray.length > previewCount;
+
+  const visibleChildren = open ? childArray : childArray.slice(0, previewCount);
 
   return (
-    <section style={{ marginBottom: 56 }}>
-      <h2 style={styles.sectionTitle}>{title}</h2>
-      {visible}
-      {childArray.length > previewCount && (
-        <button
-          onClick={() => setOpen(!open)}
-          style={styles.moreBtn}
-        >
-          {open ? "접기 ▲" : "더 보기 ▼"}
-        </button>
-      )}
+    <section
+      style={{
+        marginBottom: 56,
+        borderBottom: "1px solid #e5e7eb",
+        paddingBottom: 32,
+      }}
+    >
+      <h2
+        style={{
+          fontSize: 18,
+          fontWeight: 600,
+          marginBottom: 18,
+          color: "#111827",
+        }}
+      >
+        {title}
+      </h2>
+
+      <div>
+        {visibleChildren}
+
+        {hasMore && (
+          <div style={{ marginTop: 12 }}>
+            <button
+              type="button"
+              onClick={() => setOpen((prev) => !prev)}
+              style={{
+                fontSize: 13,
+                color: "#6b7280",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
+              {open ? "접기 ▲" : `더 보기 (${childArray.length - previewCount}) ▼`}
+            </button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
+
 
 function Card({ children }: any) {
   return <div style={styles.card}>{children}</div>;
