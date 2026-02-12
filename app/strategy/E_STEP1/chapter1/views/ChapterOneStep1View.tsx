@@ -171,7 +171,18 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* SUMMARY */}
       <Section title="📘 제1장 총칙">
         <div style={styles.summaryBox}>
-          <p style={styles.summary}>{data.summary}</p>
+        {splitSentences(data.summary).map((sentence, idx) => (
+          <p
+            key={idx}
+            style={{
+              ...styles.summary,
+              fontWeight: idx === 0 ? 600 : 400,
+            }}
+          >
+            {sentence}
+          </p>
+        ))}
+
         </div>
       </Section>
 
@@ -285,7 +296,11 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
             <CardTitle>{d.scenario}</CardTitle>
             <ArticleList articles={d.articles} />
             <BodyText>
-              <strong>요건:</strong> {d.legalRequirement}
+            <BodyText>
+              <span style={styles.labelBase}>요건</span>
+              {d.legalRequirement}
+            </BodyText>
+
             </BodyText>
             <BodyText>{d.commentary}</BodyText>
             <EvidenceBadge status={d.evidenceStatus} />
@@ -400,18 +415,21 @@ function CardTitle({
   variant?: "bridge";
 }) {
   return (
-    <h3
-      style={
-        variant === "bridge"
-          ? styles.bridgeTitle
-          : styles.cardTitle
-      }
-    >
-      {variant === "bridge" && (
-        <span style={styles.qMark}>Q.</span>
-      )}
-      {children}
-    </h3>
+    <div style={styles.cardTitleWrapper}>
+      <div style={styles.cardTitleBar} />
+      <h3
+        style={
+          variant === "bridge"
+            ? styles.bridgeTitle
+            : styles.cardTitle
+        }
+      >
+        {variant === "bridge" && (
+          <span style={styles.qMark}>Q.</span>
+        )}
+        {children}
+      </h3>
+    </div>
   );
 }
 
@@ -450,6 +468,13 @@ function EvidenceBadge({ status }: { status: "근거 있음" | "근거 부족" }
 
 function ProcedureCard({ children }: { children: React.ReactNode }) {
   return <div style={styles.procedureCard}>{children}</div>;
+}
+function splitSentences(text: string): string[] {
+  if (!text) return [];
+  return text
+    .split(/(?<=\.)\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 /* ============================== */
@@ -500,10 +525,26 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#1f2937",
     },
 
-  bodyText: {
-    fontSize: 14,
-    marginBottom: 8,
-  },
+cardTitleWrapper: {
+  display: "flex",
+  alignItems: "center",
+  marginBottom: 12,
+},
+
+cardTitleBar: {
+  width: 4,
+  height: 18,
+  background: "#1e3a8a",
+  borderRadius: 2,
+  marginRight: 10,
+},
+
+bodyText: {
+  fontSize: 14,
+  marginBottom: 10,
+  lineHeight: 1.85,
+  color: "#374151",
+},
 
   articleList: {
     fontSize: 12,
@@ -560,23 +601,23 @@ categoryCell: {
 authorityBlock: {
   background: "#f8fafc",
   borderLeft: "4px solid #94a3b8",
-  padding: "20px 22px",
-  marginBottom: 28,
-  position: "relative",
+  padding: "18px 20px",
+  marginBottom: 24,
 },
+
 
 authorityBlock2: {
   background: "#f8fafc",
   border: "1px solid #e5e7eb",
   borderRadius: 12,
-  padding: "20px 22px",
+  padding: "18px 20px",
   marginBottom: 28,
 },
 
 procedureCard: {
   border: "1px solid #e5e7eb",
   borderRadius: 12,
-  padding: "20px 22px",
+  padding: "18px 20px",
   marginBottom: 22,
   background: "#ffffff",
   boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
@@ -621,6 +662,14 @@ qMark: {
   color: "#111827",
   display: "inline-block",
   transform: "translateY(-1px)",
+},
+labelBase: {
+  display: "inline-block",
+  fontSize: 12,
+  fontWeight: 600,
+  marginRight: 6,
+  letterSpacing: "0.2px",
+  color: "#1e3a8a",
 },
 
 };
