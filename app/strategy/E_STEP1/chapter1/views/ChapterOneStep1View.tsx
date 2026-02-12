@@ -6,7 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useSaveThought } from "@/app/hooks/useSaveThought";
 import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
-import { getStrategyAccess } from "../../access";
+import { getStrategyAccess } from "../../../access";
 import React from "react";
 
 

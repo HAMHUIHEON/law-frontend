@@ -1,3 +1,4 @@
+//E_STEP1/types.ts
 /* ========= RAW ========= */
 
 export type EvidenceStatus = "근거 있음" | "근거 부족";

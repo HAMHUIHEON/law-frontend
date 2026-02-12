@@ -16,7 +16,7 @@ import { MjuRoadmapView } from "./D_TPG2022/MjuRoadmapView";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRecordRecentThought } from "@/app/hooks/useRecordRecentThought";
-import { ChapterOneStep1Container } from "./E_STEP1/containers/ChapterOneStep1Container";
+import { ChapterOneStep1Container } from "./E_STEP1/chapter1/containers/ChapterOneStep1Container";
 import { MainLoginRequiredNotice } from "@/app/components/MainLoginRequiredNotice";
 
 export default function StrategyPage() {
