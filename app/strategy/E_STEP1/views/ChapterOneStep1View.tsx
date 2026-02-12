@@ -308,9 +308,11 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* BRIDGE */}
       <CollapsibleSection title="🔎 다음 장으로 이어지는 질문">
         {data.bridgeQuestions.map((b, idx) => (
-            <Card key={idx} variant="bridge">
-            <CardTitle>{b.question}</CardTitle>
-            <BodyText style={{ color: colors.muted }}>
+          <Card key={idx} variant="bridge">
+            <CardTitle variant="bridge">
+              {b.question}
+            </CardTitle>
+            <BodyText style={{ color: colors.muted, marginBottom: 12 }}>
               → {b.nextChapter}
             </BodyText>
             <BodyText>{b.why}</BodyText>
@@ -377,8 +379,27 @@ function AuthorityBlock({ children }: { children: React.ReactNode }) {
 }
 
 
-function CardTitle({ children }: { children: React.ReactNode }) {
-  return <h3 style={styles.cardTitle}>{children}</h3>;
+function CardTitle({
+  children,
+  variant,
+}: {
+  children: React.ReactNode;
+  variant?: "bridge";
+}) {
+  return (
+    <h3
+      style={
+        variant === "bridge"
+          ? styles.bridgeTitle
+          : styles.cardTitle
+      }
+    >
+      {variant === "bridge" && (
+        <span style={styles.qMark}>Q.</span>
+      )}
+      {children}
+    </h3>
+  );
 }
 
 function BodyText({
@@ -525,11 +546,13 @@ categoryCell: {
 
 authorityBlock: {
   background: "#f8fafc",
-  borderLeft: "4px solid #94a3b8",
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
   padding: "20px 22px",
   marginBottom: 28,
-  position: "relative",
 },
+
+
 procedureCard: {
   border: "1px solid #e5e7eb",
   borderRadius: 12,
@@ -538,6 +561,7 @@ procedureCard: {
   background: "#ffffff",
   boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
 },
+
 defenseBlock: {
   border: "1px solid #e5e7eb",
   borderRadius: 12,
@@ -556,12 +580,27 @@ internalBlock: {
 },
 
 bridgeBlock: {
-  border: "1px dashed #e5e7eb",
-  borderRadius: 16,
-  padding: "24px 28px",
-  marginBottom: 28,
-  background: "#ffffff",
-  textAlign: "center",
+  border: "1px dashed #d1d5db",
+  borderRadius: 18,
+  padding: "32px 36px",
+  marginBottom: 36,
+  background: "#fafafa",
+},
+
+bridgeTitle: {
+  fontSize: 17,
+  fontWeight: 600,
+  marginBottom: 16,
+  color: "#111827",
+  lineHeight: 1.6,
+},
+
+qMark: {
+  marginRight: 8,
+  fontWeight: 700,
+  color: "#2563eb",
+  display: "inline-block",
+  transform: "translateY(-1px)",
 },
 
 };
