@@ -279,7 +279,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* DEFENSE */}
       <CollapsibleSection title="🛡 방어 포인트">
         {data.defensePoints.map((d, idx) => (
-          <Card key={idx}>
+            <Card key={idx} variant="defense">
             <CardTitle>{d.scenario}</CardTitle>
             <ArticleList articles={d.articles} />
             <BodyText>
@@ -295,7 +295,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* INTERNAL */}
       <CollapsibleSection title="⚙ 내부 운영 포인트">
         {data.internalOperations.map((i, idx) => (
-          <Card key={idx}>
+            <Card key={idx} variant="internal">
             <CardTitle>{i.area}</CardTitle>
             <ArticleList articles={i.articles} />
             <BodyText>{i.implication}</BodyText>
@@ -308,7 +308,7 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* BRIDGE */}
       <CollapsibleSection title="🔎 다음 장으로 이어지는 질문">
         {data.bridgeQuestions.map((b, idx) => (
-          <Card key={idx}>
+            <Card key={idx} variant="bridge">
             <CardTitle>{b.question}</CardTitle>
             <BodyText style={{ color: colors.muted }}>
               → {b.nextChapter}
@@ -355,8 +355,21 @@ function Section({
   );
 }
 
-function Card({ children }: { children: React.ReactNode }) {
-  return <div style={styles.block}>{children}</div>;
+function Card({
+  children,
+  variant = "defense",
+}: {
+  children: React.ReactNode;
+  variant?: "defense" | "internal" | "bridge";
+}) {
+  const style =
+    variant === "defense"
+      ? styles.defenseBlock
+      : variant === "internal"
+      ? styles.internalBlock
+      : styles.bridgeBlock;
+
+  return <div style={style}>{children}</div>;
 }
 
 function AuthorityBlock({ children }: { children: React.ReactNode }) {
@@ -524,6 +537,31 @@ procedureCard: {
   marginBottom: 22,
   background: "#ffffff",
   boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+},
+defenseBlock: {
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
+  padding: "22px 24px",
+  marginBottom: 26,
+  background: "#ffffff",
+  boxShadow: "0 6px 18px rgba(0,0,0,0.04)",
+},
+
+internalBlock: {
+  background: "#f9fafb",
+  borderRadius: 14,
+  padding: "22px 24px",
+  marginBottom: 24,
+  border: "1px solid #f1f5f9",
+},
+
+bridgeBlock: {
+  border: "1px dashed #e5e7eb",
+  borderRadius: 16,
+  padding: "24px 28px",
+  marginBottom: 28,
+  background: "#ffffff",
+  textAlign: "center",
 },
 
 };
