@@ -18,6 +18,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useRecordRecentThought } from "@/app/hooks/useRecordRecentThought";
 import { ChapterOneStep1Container } from "./E_STEP1/chapter1/containers/ChapterOneStep1Container";
 import { MainLoginRequiredNotice } from "@/app/components/MainLoginRequiredNotice";
+import { ChapterTwoStep1Container } from "./E_STEP1/chapter2/ChapterTwoStep1Container";
 
 export default function StrategyPage() {
   
@@ -193,14 +194,23 @@ if (!userId) {
         <MjuRoadmapView bookId={selectedBookId} />
       )}
 
-      {viewMode === "E_STEP1" && selectedEChapter === "chapter1" && (
-        <ChapterOneStep1Container bookId={selectedBookId} />
-      )}
+    {viewMode === "E_STEP1" && (
+      <>
+        {selectedEChapter === "chapter1" && (
+          <ChapterOneStep1Container bookId={selectedBookId} />
+        )}
+        {selectedEChapter === "chapter2" && (
+          <ChapterTwoStep1Container bookId={selectedBookId} />
+        )}
+        {/* {selectedEChapter === "chapter3" && (
+          <ChapterThreeStep1Container bookId={selectedBookId} />
+        )} */}
+      </>
+    )}
+
 
     <button
     onClick={() => {
-      document
-        .querySelector("aside")
         window.scrollTo({ top: 0, behavior: "smooth" });
     }}
       style={{
