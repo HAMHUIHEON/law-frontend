@@ -177,13 +177,14 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
 
       <hr style={{ borderColor: colors.line, marginBottom: 24 }} />
 
+
       {/* PRINCIPLES */}
       <CollapsibleSection title="⚖ 기본 원칙 축">
         {data.principles.map((p, idx) => (
-          <AuthorityBlock key={idx}>
+          <AuthorityBlock key={idx} variant="secondary">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <CardTitle>{p.title}</CardTitle>
-            <EvidenceBadge status={p.evidenceStatus} />
+              <CardTitle>{p.title}</CardTitle>
+              <EvidenceBadge status={p.evidenceStatus} />
             </div>
             <ArticleList articles={p.articles} />
             <BodyText>{p.meaning}</BodyText>
@@ -195,14 +196,14 @@ export function ChapterOneStep1View({ bookId, data }: Props) {
       {/* AUTHORITY */}
       <CollapsibleSection title="🏛 권한·통제 구조">
         {data.authorities.map((a, idx) => (
-        <AuthorityBlock  key={idx}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <CardTitle>{a.topic}</CardTitle>
-        <EvidenceBadge status={a.evidenceStatus} />
-        </div>
-        <ArticleList articles={a.articles} />
-        <BodyText>{a.controlFunction}</BodyText>
-          </AuthorityBlock >
+          <AuthorityBlock key={idx} variant="primary">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <CardTitle>{a.topic}</CardTitle>
+              <EvidenceBadge status={a.evidenceStatus} />
+            </div>
+            <ArticleList articles={a.articles} />
+            <BodyText>{a.controlFunction}</BodyText>
+          </AuthorityBlock>
         ))}
       </CollapsibleSection>
 
@@ -374,8 +375,19 @@ function Card({
   return <div style={style}>{children}</div>;
 }
 
-function AuthorityBlock({ children }: { children: React.ReactNode }) {
-  return <div style={styles.authorityBlock}>{children}</div>;
+function AuthorityBlock({
+  children,
+  variant = "primary",
+}: {
+  children: React.ReactNode;
+  variant?: "primary" | "secondary";
+}) {
+  const style =
+    variant === "secondary"
+      ? styles.authorityBlock2
+      : styles.authorityBlock;
+
+  return <div style={style}>{children}</div>;
 }
 
 
@@ -459,13 +471,13 @@ const styles: Record<string, React.CSSProperties> = {
     background: colors.bgSoft,
   },
 
-    summary: {
+  summary: {
     fontSize: 16,
     lineHeight: 1.9,
     color: "#1f2937",
   },
 
-    sectionTitle: {
+  sectionTitle: {
     fontSize: 18,
     fontWeight: 600,
     marginBottom: 18,
@@ -474,13 +486,13 @@ const styles: Record<string, React.CSSProperties> = {
     paddingBottom: 6,
     },
 
-    block: {
+  block: {
     borderLeft: "3px solid #e5e7eb",
     paddingLeft: 16,
     marginBottom: 22,
     },
 
-    cardTitle: {
+   cardTitle: {
     fontSize: 15,
     fontWeight: 600,
     marginBottom: 6,
@@ -492,7 +504,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 8,
   },
 
-    articleList: {
+  articleList: {
     fontSize: 12,
     color: "#9ca3af",
     marginBottom: 6,
@@ -546,12 +558,19 @@ categoryCell: {
 
 authorityBlock: {
   background: "#f8fafc",
+  borderLeft: "4px solid #94a3b8",
+  padding: "20px 22px",
+  marginBottom: 28,
+  position: "relative",
+},
+
+authorityBlock2: {
+  background: "#f8fafc",
   border: "1px solid #e5e7eb",
   borderRadius: 12,
   padding: "20px 22px",
   marginBottom: 28,
 },
-
 
 procedureCard: {
   border: "1px solid #e5e7eb",
@@ -588,7 +607,7 @@ bridgeBlock: {
 },
 
 bridgeTitle: {
-  fontSize: 17,
+  fontSize: 15,
   fontWeight: 600,
   marginBottom: 16,
   color: "#111827",
@@ -598,7 +617,7 @@ bridgeTitle: {
 qMark: {
   marginRight: 8,
   fontWeight: 700,
-  color: "#2563eb",
+  color: "#111827",
   display: "inline-block",
   transform: "translateY(-1px)",
 },
