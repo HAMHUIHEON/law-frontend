@@ -33,6 +33,7 @@ export function ChapterThreeStep1View({ bookId, data }: Props) {
   const [showHint, setShowHint] = useState(false);
   const saveThought = useSaveThought();
   const [saving, setSaving] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
   useRecordStrategyTrace({
     userId,
@@ -93,17 +94,50 @@ export function ChapterThreeStep1View({ bookId, data }: Props) {
       {/* SUMMARY */}
       <Section title="📘 제3장 조세범칙조사">
         <div style={styles.summaryBox}>
-          {splitSentences(data.summaryText).map((sentence, idx) => (
-            <p
-              key={idx}
-              style={{
-                ...styles.summary,
-                fontWeight: idx === 0 ? 600 : 400,
-              }}
-            >
-              {sentence}
-            </p>
-          ))}
+          {(() => {
+            const sentences = splitSentences(data.summaryText);
+            const previewCount = 3;
+            const visible = summaryOpen
+              ? sentences
+              : sentences.slice(0, previewCount);
+
+            return (
+              <>
+                {visible.map((sentence, idx) => (
+                  <p
+                    key={idx}
+                    style={{
+                      ...styles.summary,
+                      fontWeight: idx === 0 ? 600 : 400,
+                    }}
+                  >
+                    {sentence}
+                  </p>
+                ))}
+
+                {sentences.length > previewCount && (
+                  <div style={{ marginTop: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => setSummaryOpen((prev) => !prev)}
+                      style={{
+                        fontSize: 13,
+                        color: "#6b7280",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      {summaryOpen
+                        ? "접기 ▲"
+                        : `더 보기 (${sentences.length - previewCount}) ▼`}
+                    </button>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       </Section>
 
@@ -138,24 +172,32 @@ export function ChapterThreeStep1View({ bookId, data }: Props) {
       </CollapsibleSection>
 
       {/* AUTHORITY */}
+      {/* AUTHORITY / CONTROL */}
       <CollapsibleSection title="🏛 권한·통제 지점">
         {data.controlPoints.map((c, idx) => (
           <Card key={idx}>
             <CardTitle>{c.control_point}</CardTitle>
 
-            <LabelBlock label="통제 주체">
+            <BodyText>
+              <span style={{ ...styles.labelBase, ...styles.labelAuthority }}>
+                통제 주체
+              </span>
               {c.who_controls}
-            </LabelBlock>
+            </BodyText>
 
-            <LabelBlock label="개입 시점">
+            <BodyText>
+              <span style={{ ...styles.labelBase, ...styles.labelTiming }}>
+                개입 시점
+              </span>
               {c.timing_in_flow}
-            </LabelBlock>
+            </BodyText>
 
-            {splitSentences(c.how_control_is_described_in_text).map(
-              (s, i) => (
-                <BodyText key={i}>{s}</BodyText>
-              )
-            )}
+            {splitSentences(c.how_control_is_described_in_text).map((s, i) => (
+              <BodyText key={i}>{s}</BodyText>
+            ))}
+
+            <ArticleList articles={c.evidence_articles} />
+            <EvidenceBadge status={c.evidence_status} />
           </Card>
         ))}
       </CollapsibleSection>
@@ -166,43 +208,61 @@ export function ChapterThreeStep1View({ bookId, data }: Props) {
           <Card key={idx}>
             <CardTitle>{m.measure_type}</CardTitle>
 
-            <LabelBlock label="발동 요건">
+            <BodyText>
+              <span style={{ ...styles.labelBase, ...styles.labelTrigger }}>
+                발동 요건
+              </span>
               {m.trigger_defined_in_text}
-            </LabelBlock>
+            </BodyText>
 
-            <LabelBlock label="승인 주체">
+            <BodyText>
+              <span style={{ ...styles.labelBase, ...styles.labelAuthority }}>
+                승인 주체
+              </span>
               {m.approving_authority}
-            </LabelBlock>
+            </BodyText>
 
-            <LabelBlock label="절차상 한계">
+            <BodyText>
+              <span style={{ ...styles.labelBase, ...styles.labelResult }}>
+                절차상 한계
+              </span>
               {m.procedural_limit_defined_in_text}
-            </LabelBlock>
+            </BodyText>
           </Card>
         ))}
       </CollapsibleSection>
 
-      {/* DECISION PIPELINE */}
-      <CollapsibleSection title="🧭 처벌 결정 파이프라인">
-        {data.decisionPipeline.map((d, idx) => (
-          <Card key={idx}>
-            <CardTitle>{d.stage}</CardTitle>
+        {/* DECISION PIPELINE */}
+        <CollapsibleSection title="🧭 처벌 결정 파이프라인">
+          {data.decisionPipeline.map((d, idx) => (
+            <Card key={idx}>
+              <CardTitle>{d.stage}</CardTitle>
 
-            <LabelBlock label="결정 주체">
-              {d.decision_maker}
-            </LabelBlock>
+              <BodyText>
+                <span style={{ ...styles.labelBase, ...styles.labelAuthority }}>
+                  결정 주체
+                </span>
+                {d.decision_maker}
+              </BodyText>
 
-            <LabelBlock label="결정 내용">
-              {d.decision_content}
-            </LabelBlock>
+              <BodyText>
+                <span style={{ ...styles.labelBase, ...styles.labelResult }}>
+                  결정 내용
+                </span>
+                {d.decision_content}
+              </BodyText>
 
-            <LabelBlock label="가능한 후속 경로">
-              {d.next_possible_outcomes.join(", ")}
-            </LabelBlock>
-          </Card>
-        ))}
-      </CollapsibleSection>
+              <BodyText>
+                <span style={{ ...styles.labelBase, ...styles.labelNext }}>
+                  가능한 후속 경로
+                </span>
+                {d.next_possible_outcomes.join(", ")}
+              </BodyText>
+            </Card>
+          ))}
+        </CollapsibleSection>
 
-      {/* TABLES */}
+          {/* TABLES */}
             {data.tables.length > 0 && (
             <Section title="📊 절차 구조 요약표">
                 {data.tables.map((table, idx) => (
@@ -254,6 +314,10 @@ export function ChapterThreeStep1View({ bookId, data }: Props) {
 /* ====================================================== */
 /* 공통 UI */
 /* ====================================================== */
+function ArticleList({ articles }: { articles: string[] }) {
+  return <div style={styles.articleList}>{articles.join(", ")}</div>;
+}
+
 function EvidenceBadge({
   status,
 }: {
@@ -469,6 +533,33 @@ td: {
   padding: "10px 12px",
   borderBottom: "1px solid #f1f5f9",
   verticalAlign: "top",
+},
+labelBase: {
+  display: "inline-block",
+  fontSize: 12,
+  fontWeight: 600,
+  marginRight: 6,
+  letterSpacing: "0.2px",
+},
+
+labelAuthority: {
+  color: "#1e3a8a", // 남색
+},
+
+labelTiming: {
+  color: "#0f766e", // 청록
+},
+
+labelTrigger: {
+  color: "#7c3aed", // 보라
+},
+
+labelResult: {
+  color: "#b45309", // 브라운 오렌지
+},
+
+labelNext: {
+  color: "#374151", // 딥그레이
 },
 
 };

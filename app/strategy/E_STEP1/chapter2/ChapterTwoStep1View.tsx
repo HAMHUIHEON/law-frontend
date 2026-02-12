@@ -66,7 +66,7 @@ export function ChapterTwoStep1View({ bookId, data }: Props) {
             }
           }}
           style={styles.floatingButton}
-                      onMouseEnter={(e) => {
+              onMouseEnter={(e) => {
               setShowHint(true);
               e.currentTarget.style.background = "#fffbeb";
               e.currentTarget.style.borderColor = "#f59e0b";
