@@ -14,7 +14,7 @@ export default function CaseIssuePage() {
 
   if (!caseId) return null;
   if (loading) return <p style={{ padding: 32 }}>불러오는 중…</p>;
-  if (!data) return <p style={{ padding: 32 }}>Report B를 불러오지 못했어요.</p>;
+  if (!data) return <p style={{ padding: 32 }}>등록되지 않은 판례입니다. 업로드 후 이용해 주세요.</p>;
 
   const vm = adaptCaseStructure(data);
 

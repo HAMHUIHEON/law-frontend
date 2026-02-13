@@ -33,7 +33,7 @@ export default function PracticePage() {
   if (!caseId) return null;
   if (practice.loading) return <p style={{ padding: 32 }}>불러오는 중…</p>;
   if (!practice.data)
-    return <p style={{ padding: 32 }}>Report C를 불러오지 못했어요.</p>;
+    return <p style={{ padding: 32 }}>등록되지 않은 판례입니다. 업로드 후 이용해 주세요.</p>;
 
   const vm = adaptCasePractice(practice.data);
 

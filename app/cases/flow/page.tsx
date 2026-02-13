@@ -13,7 +13,7 @@ export default function CaseFlowPage() {
 
   if (!caseId) return null;
   if (flow.loading) return <p style={{ padding: 32 }}>불러오는 중…</p>;
-  if (!flow.data) return <p style={{ padding: 32 }}>해당 판례를 불러오지 못했어요.</p>;
+  if (!flow.data) return <p style={{ padding: 32 }}>등록되지 않은 판례입니다. 업로드 후 이용해 주세요.</p>;
 
   return (
     <CaseFlowView
