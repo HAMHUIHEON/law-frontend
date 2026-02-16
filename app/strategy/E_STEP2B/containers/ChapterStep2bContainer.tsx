@@ -23,6 +23,8 @@ export default function ChapterStep2bContainer({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 🔥 챕터 바뀌는 순간 기존 데이터 제거
+    setData(null);
     const load = async () => {
       try {
         setLoading(true);
