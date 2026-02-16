@@ -189,9 +189,21 @@ export default function SectionStep2View({
         {data.L3.system_tension && (
           <div style={styles.highlightBox}>
             <CardTitle>구조적 긴장</CardTitle>
-            <Paragraph>
-              {data.L3.system_tension.description}
-            </Paragraph>
+            {splitIntoParagraphs(
+              data.L3.system_tension.description
+            ).map((p, i) => (
+              <Paragraph
+                key={i}
+                style={{
+                  fontWeight: i === 0 ? 500 : 400,
+                  color: i === 0 ? colors.ink : undefined,
+                }}
+              >
+                {p}
+              </Paragraph>
+            ))}
+
+
           </div>
         )}
       </LayerSection>
@@ -202,6 +214,23 @@ export default function SectionStep2View({
 /* ====================================================== */
 /* Components */
 /* ====================================================== */
+function splitIntoParagraphs(text: string): string[] {
+  if (!text) return [];
+
+  const sentences = text
+    .split(/(?<=\.)\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const paragraphs: string[] = [];
+
+  for (let i = 0; i < sentences.length; i += 2) {
+    paragraphs.push(sentences.slice(i, i + 2).join(" "));
+  }
+
+  return paragraphs;
+}
+
 function StrategyNotice() {
   return (
     <div style={styles.noticeBox}>
@@ -307,9 +336,25 @@ function Item({
   );
 }
 
-function Paragraph({ children }: { children: React.ReactNode }) {
-  return <p style={styles.paragraph}>{children}</p>;
+function Paragraph({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <p
+      style={{
+        ...styles.paragraph,
+        ...style,
+      }}
+    >
+      {children}
+    </p>
+  );
 }
+
 
 function TagRow({
   label,
