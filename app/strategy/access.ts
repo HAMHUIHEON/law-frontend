@@ -18,8 +18,8 @@ export type StrategyViewMode =
   | "JU"
   | "MJU"
   | "E_STEP1"
-  | "E_STEP2";
-
+  | "E_STEP2"
+  | "E_STEP2B";   // 🔥 추가
 /**
  * 전략 접근 결과
  */
@@ -53,6 +53,7 @@ export function getStrategyAccess(
     "RISK_TYPES",
     "MJU",
     "E_STEP2",   // 🔥 추가
+    "E_STEP2B",  // 🔥 추가
   ];
 
   if (FREE.includes(viewMode)) return "FULL";

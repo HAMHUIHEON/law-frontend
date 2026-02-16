@@ -854,6 +854,31 @@ useEffect(() => {
             </div>
           </SidebarSection>
         )}
+        {/* STEP2B */}
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 13,
+            color: "#111827",
+            cursor: "pointer",
+            marginTop: 12,
+            marginBottom: 6,
+          }}
+        >
+          <input
+            type="radio"
+            name="viewMode"
+            value="E_STEP2B"
+            checked={viewMode === "E_STEP2B"}
+            onChange={() => {
+              setViewMode("E_STEP2B");
+              setSelectedESectionSlug(null);
+            }}
+          />
+          규정 통합 분석 (Step 3)
+        </label>
 
         
         {/* =========================

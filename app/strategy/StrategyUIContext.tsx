@@ -17,7 +17,8 @@ export type StrategyViewMode =
   | "JU"
   | "MJU"
   | "E_STEP1"      // 🔥 추가
-  | "E_STEP2";     // 🔥 추가
+  | "E_STEP2"
+  | "E_STEP2B";   // 🔥 추가
   
   
 
