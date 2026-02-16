@@ -99,8 +99,6 @@ export default function SectionStep2View({
             onMouseUp={(e) => {
               e.currentTarget.style.transform = "scale(1.06)";
             }}
-
-
         >
           🔖
         </button>
@@ -260,10 +258,15 @@ function TagRow({
   if (!items?.length) return null;
 
   return (
-    <div style={{ marginTop: 10 }}>
-      <span style={styles.articleList}>
-        {label}: {items.join(", ")}
-      </span>
+    <div style={{ marginBottom: 10 }}>
+      <span style={styles.itemLabel}>{label}</span>
+      <div>
+        {items.map((t, i) => (
+          <span key={i} style={styles.tag}>
+            {t}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -383,12 +386,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   itemLabel: {
-    display: "inline-block",
-    fontSize: 12,
-    fontWeight: 600,
-    marginRight: 6,
-    color: colors.muted,
-  },
+  display: "inline-block",
+  fontSize: 13,
+  fontWeight: 600,
+  marginRight: 6,
+  color: "#374151",
+},
 
   articleList: {
     fontSize: 12,
@@ -437,4 +440,14 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 20,
     cursor: "pointer",
   },
+
+tag: {
+  display: "inline-block",
+  fontSize: 12,
+  background: "#f3f4f6",
+  padding: "4px 8px",
+  borderRadius: 8,
+  marginRight: 6,
+  marginTop: 6,
+},
 };
