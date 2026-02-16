@@ -8,7 +8,6 @@ import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
 import { getStrategyAccess } from "../../access";
 import { Step2SectionViewModel } from "../types";
 import React from "react";
-const LayerColorContext = React.createContext<string>("#1e3a8a");
 
 type Props = {
   bookId: string;
@@ -142,18 +141,18 @@ export default function SectionStep2View({
               {a.dependency_type}
             </Item>
 
-            <TagRow
-              label="내부 연결 조문"
-              items={a.internal_linkage}
-              labelStyle={styles.labelEvidence}
-            />
-
             <Item
               label="해석 한계"
               labelStyle={styles.labelLimit}
             >
               {a.interpretation_limit}
             </Item>
+
+            <TagRow
+              label="내부 연결 조문"
+              items={a.internal_linkage}
+              labelStyle={styles.labelEvidence}
+            />
           </ReportCard>
         ))}
       </LayerSection>
@@ -248,7 +247,7 @@ export default function SectionStep2View({
             </Item>
 
             <TagRow
-              label="핵심 증거"
+              label="핵심 근거"
               items={d.key_evidence}
               labelStyle={styles.labelEvidence}
             />
@@ -335,23 +334,45 @@ function LayerSection({
   hint?: string;
   children: React.ReactNode;
 }) {
-  const color = layerColors[label];
+  const [open, setOpen] = useState(false);
+
+  const childArray = React.Children.toArray(children);
+  const previewCount = 3;
+  const hasMore = childArray.length > previewCount;
+
+  const visibleChildren = open
+    ? childArray
+    : childArray.slice(0, previewCount);
 
   return (
-    <LayerColorContext.Provider value={color}>
-      <section style={{ marginBottom: 56 }}>
-        <div style={styles.layerTitleWrapper}>
-          <div style={styles.layerTitleBar} />
-          <h2 style={styles.layerTitle}>
-            {label}. {title}
-          </h2>
-        </div>
+    <section style={{ marginBottom: 56 }}>
+      <div style={styles.layerTitleWrapper}>
+        <div style={styles.layerTitleBar} />
+        <h2 style={styles.layerTitle}>
+          {label}. {title}
+        </h2>
+      </div>
 
-        {hint && <p style={styles.sectionHint}>{hint}</p>}
+      {hint && <p style={styles.sectionHint}>{hint}</p>}
 
-        {children}
-      </section>
-    </LayerColorContext.Provider>
+      <div>
+        {visibleChildren}
+
+        {hasMore && (
+          <div style={{ marginTop: 12 }}>
+            <button
+              type="button"
+              onClick={() => setOpen((prev) => !prev)}
+              style={styles.toggleButton}
+            >
+              {open
+                ? "접기 ▲"
+                : `더 보기 (${childArray.length - previewCount}) ▼`}
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
