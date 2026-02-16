@@ -785,6 +785,7 @@ useEffect(() => {
                   checked={viewMode === "E_STEP2"}
                   onChange={() => {
                     setViewMode("E_STEP2");
+                    setSelectedESectionSlug(null);
                   }}
                 />
                 규정 절차 해부 (Step2)
@@ -802,9 +803,12 @@ useEffect(() => {
                     const active = selectedEChapter === key;
 
                     return (
-                      <div
-                        key={key}
-                        onClick={() => setSelectedEChapter(key as any)}
+                    <div
+                    key={key}
+                    onClick={() => {
+                      setSelectedEChapter(key as any);
+                      setSelectedESectionSlug(null);   // 🔥 이 줄 추가
+                    }}
                         style={{
                           fontSize: 13,
                           padding: "4px 6px",
