@@ -105,7 +105,7 @@ export default function SectionStep2View({
       </div>
 
       <h1 style={styles.title}>{data.section}</h1>
-
+      <StrategyNotice />
       {/* L0 */}
       <LayerSection label="L0" title="상위 규범 연동 구조">
         {data.L0.normative_anchors.map((a, i) => (
@@ -133,6 +133,7 @@ export default function SectionStep2View({
       </LayerSection>
 
       {/* L2 */}
+
       <LayerSection label="L2" title="절차 작동 엔진">
         {data.L2.map((block) => (
           <div key={block.key} style={{ marginBottom: 40 }}>
@@ -165,6 +166,9 @@ export default function SectionStep2View({
       </LayerSection>
 
       {/* L3 */}
+      <p style={styles.sectionHint}>
+        ※ 아래 내용은 구조 이해를 위한 전략적 가정 분석입니다.
+      </p>
       <LayerSection label="L3" title="분쟁 및 방어 구조">
         {data.L3.dispute_points.items.map((d, i) => (
           <ReportCard key={i}>
@@ -193,6 +197,25 @@ export default function SectionStep2View({
 /* ====================================================== */
 /* Components */
 /* ====================================================== */
+function StrategyNotice() {
+  return (
+    <div style={styles.noticeBox}>
+      <p style={styles.noticeText}>
+        📌 본 페이지의 내용은 법령 및 공개 자료를 기반으로 AI가
+        구조적으로 재구성한 분석 자료입니다.
+      </p>
+      <p style={styles.noticeText}>
+        특히 ‘위반 시 리스크’ 및 ‘분쟁·방어 구조’는 실제 사건에 대한
+        법적 판단이 아니라, 연구 및 전략 시뮬레이션 목적의 가상 분석입니다.
+      </p>
+      <p style={styles.noticeText}>
+        개별 사실관계에 대한 적용 가능성은 보장되지 않으며,
+        구체적 사안에 대한 판단은 반드시 세무사·변호사 등 전문가의
+        개별 자문을 통해 확인하시기 바랍니다.
+      </p>
+    </div>
+  );
+}
 
 function LayerSection({
   label,
@@ -450,4 +473,19 @@ tag: {
   marginRight: 6,
   marginTop: 6,
 },
+noticeBox: {
+  border: `1px solid ${colors.line}`,
+  background: colors.bgSoft,
+  borderRadius: 12,
+  padding: "16px 18px",
+  marginBottom: 36,
+},
+
+noticeText: {
+  fontSize: 12.5,
+  lineHeight: 1.6,
+  color: colors.muted,
+  marginBottom: 6,
+},
+
 };
