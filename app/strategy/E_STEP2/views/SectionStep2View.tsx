@@ -15,6 +15,21 @@ type Props = {
   data: Step2SectionViewModel;
 };
 
+/* ====================================================== */
+/* Color System (Step1 통일) */
+/* ====================================================== */
+
+const colors = {
+  ink: "#111827",
+  muted: "#6b7280",
+  line: "#e5e7eb",
+  bgSoft: "#fafafa",
+};
+
+/* ====================================================== */
+/* View */
+/* ====================================================== */
+
 export default function SectionStep2View({
   bookId,
   chapter,
@@ -25,6 +40,7 @@ export default function SectionStep2View({
   const userAccess = useUserAccessLevel();
   const access = getStrategyAccess(userAccess, "E_STEP2");
   const isLocked = access !== "FULL";
+  const [showHint, setShowHint] = useState(false);
 
   const saveThought = useSaveThought();
   const [saving, setSaving] = useState(false);
@@ -43,44 +59,70 @@ export default function SectionStep2View({
 
   return (
     <article style={styles.container}>
-      <FloatingSaveButton
-        onClick={async () => {
-          if (!userId || saving) return;
-          setSaving(true);
-          try {
-            await saveThought({
-              parentType: "strategy",
-              parentId: bookId,
-              targetType: "reasoning",
-              targetId: `E_STEP2:${chapter}:${sectionSlug}`,
-            });
-          } finally {
-            setSaving(false);
-          }
-        }}
-      />
+      {/* Floating Save */}
+      <div style={styles.floatingWrap}>
+        <button
+          onClick={async () => {
+            if (!userId || saving) return;
+            setSaving(true);
+            try {
+              await saveThought({
+                parentType: "strategy",
+                parentId: bookId,
+                targetType: "reasoning",
+                targetId: `E_STEP2:${chapter}:${sectionSlug}`,
+              });
+            } finally {
+              setSaving(false);
+            }
+          }}
+          style={styles.floatingButton}
+            onMouseEnter={(e) => {
+              setShowHint(true);
+              e.currentTarget.style.background = "#fffbeb";
+              e.currentTarget.style.borderColor = "#f59e0b";
+              e.currentTarget.style.transform = "scale(1.06)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 14px rgba(245,158,11,0.25)";
+            }}
+            onMouseLeave={(e) => {
+              setShowHint(false);
+              e.currentTarget.style.background = "#ffffff";
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 10px rgba(0,0,0,0.08)";
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = "scale(0.96)";
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = "scale(1.06)";
+            }}
+
+
+        >
+          🔖
+        </button>
+      </div>
 
       <h1 style={styles.title}>{data.section}</h1>
 
-      <Layer
-        label="L0"
-        title="상위 규범 연동 구조"
-      >
+      {/* L0 */}
+      <LayerSection label="L0" title="상위 규범 연동 구조">
         {data.L0.normative_anchors.map((a, i) => (
           <ReportCard key={i}>
-            <Item label="상위 법령">{a.external_article}</Item>
+            <CardTitle>{a.external_article}</CardTitle>
             <Item label="법적 기능">{a.legal_function}</Item>
             <Item label="의존 유형">{a.dependency_type}</Item>
             <TagRow label="내부 연결 조문" items={a.internal_linkage} />
             <Item label="해석 한계">{a.interpretation_limit}</Item>
           </ReportCard>
         ))}
-      </Layer>
+      </LayerSection>
 
-      <Layer
-        label="L1"
-        title="적용 범위 및 구성 체계"
-      >
+      {/* L1 */}
+      <LayerSection label="L1" title="적용 범위 및 구성 체계">
         <Paragraph>{data.L1.scope_statement}</Paragraph>
 
         {data.L1.components.map((c, i) => (
@@ -90,17 +132,15 @@ export default function SectionStep2View({
             <TagRow label="근거 조문" items={c.legal_basis} />
           </ReportCard>
         ))}
-      </Layer>
+      </LayerSection>
 
-      <Layer
-        label="L2"
-        title="절차 작동 엔진"
-      >
+      {/* L2 */}
+      <LayerSection label="L2" title="절차 작동 엔진">
         {data.L2.map((block) => (
           <div key={block.key} style={{ marginBottom: 40 }}>
-            <SubTitle>{block.label}</SubTitle>
+            <CardTitle>{block.label}</CardTitle>
 
-            {block.items.map((item: any, idx: number) => (
+            {block.items.map((item, idx) => (
               <ReportCard key={idx}>
                 <Item label="작동 메커니즘">
                   {item.mechanism_statement}
@@ -110,6 +150,7 @@ export default function SectionStep2View({
                   label="내부 근거"
                   items={item.internal_legal_basis}
                 />
+
                 <TagRow
                   label="외부 근거"
                   items={item.external_legal_basis ?? []}
@@ -123,15 +164,13 @@ export default function SectionStep2View({
             ))}
           </div>
         ))}
-      </Layer>
+      </LayerSection>
 
-      <Layer
-        label="L3"
-        title="분쟁 및 방어 구조"
-      >
+      {/* L3 */}
+      <LayerSection label="L3" title="분쟁 및 방어 구조">
         {data.L3.dispute_points.items.map((d, i) => (
           <ReportCard key={i}>
-            <Item label="쟁점">{d.issue}</Item>
+            <CardTitle>{d.issue}</CardTitle>
             <Item label="납세자 주장">{d.positions.taxpayer}</Item>
             <Item label="과세관청 주장">
               {d.positions.tax_office}
@@ -141,51 +180,64 @@ export default function SectionStep2View({
         ))}
 
         {data.L3.system_tension && (
-          <HighlightBox>
-            <SubTitle>구조적 긴장</SubTitle>
+          <div style={styles.highlightBox}>
+            <CardTitle>구조적 긴장</CardTitle>
             <Paragraph>
               {data.L3.system_tension.description}
             </Paragraph>
-          </HighlightBox>
+          </div>
         )}
-      </Layer>
+      </LayerSection>
     </article>
   );
 }
 
-/* ============================= */
-/* UI COMPONENTS */
-/* ============================= */
+/* ====================================================== */
+/* Components */
+/* ====================================================== */
 
-function Layer({
+function LayerSection({
   label,
   title,
   children,
-}: any) {
+}: {
+  label: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
-    <section style={styles.layerSection}>
-      <div style={styles.layerHeader}>
-        <div style={styles.layerBar}>{label}</div>
-        <h2 style={styles.layerTitle}>{title}</h2>
+    <section style={{ marginBottom: 56 }}>
+      <div style={styles.layerTitleWrapper}>
+        <div style={styles.layerTitleBar} />
+        <h2 style={styles.layerTitle}>
+          {label}. {title}
+        </h2>
       </div>
       {children}
     </section>
   );
 }
 
-function ReportCard({ children }: any) {
+function ReportCard({ children }: { children: React.ReactNode }) {
   return <div style={styles.card}>{children}</div>;
 }
 
-function CardTitle({ children }: any) {
-  return <h3 style={styles.cardTitle}>{children}</h3>;
+function CardTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={styles.cardTitleWrapper}>
+      <div style={styles.cardTitleBar} />
+      <h3 style={styles.cardTitle}>{children}</h3>
+    </div>
+  );
 }
 
-function SubTitle({ children }: any) {
-  return <h3 style={styles.subTitle}>{children}</h3>;
-}
-
-function Item({ label, children }: any) {
+function Item({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <p style={styles.item}>
       <strong style={styles.itemLabel}>{label}</strong>
@@ -194,85 +246,58 @@ function Item({ label, children }: any) {
   );
 }
 
-function Paragraph({ children }: any) {
+function Paragraph({ children }: { children: React.ReactNode }) {
   return <p style={styles.paragraph}>{children}</p>;
 }
 
-function TagRow({ label, items }: any) {
+function TagRow({
+  label,
+  items,
+}: {
+  label: string;
+  items?: string[];
+}) {
   if (!items?.length) return null;
+
   return (
-    <div style={{ marginBottom: 10 }}>
-      <span style={styles.itemLabel}>{label}</span>
-      <div>
-        {items.map((t: string, i: number) => (
-          <span key={i} style={styles.tag}>
-            {t}
-          </span>
-        ))}
-      </div>
+    <div style={{ marginTop: 10 }}>
+      <span style={styles.articleList}>
+        {label}: {items.join(", ")}
+      </span>
     </div>
   );
 }
 
-function Collapsible({ title, content }: any) {
+function Collapsible({
+  title,
+  content,
+}: {
+  title: string;
+  content?: string;
+}) {
   const [open, setOpen] = useState(false);
   if (!content) return null;
-  return (
-    <div>
-      <div
-        style={styles.collapseToggle}
-        onClick={() => setOpen(!open)}
-      >
-        {open ? "▼ " : "▶ "}
-        {title}
-      </div>
-      {open && <div style={styles.failureBox}>{content}</div>}
-    </div>
-  );
-}
-
-function HighlightBox({ children }: any) {
-  return <div style={styles.highlightBox}>{children}</div>;
-}
-
-function FloatingSaveButton({ onClick }: any) {
-  const [showHint, setShowHint] = useState(false);
 
   return (
-    <div style={styles.floatingWrap}>
+    <div style={{ marginTop: 12 }}>
       <button
-        onClick={onClick}
-        style={styles.floatingButton}
-        onMouseEnter={(e) => {
-          setShowHint(true);
-          e.currentTarget.style.background = "#fffbeb";
-          e.currentTarget.style.borderColor = "#f59e0b";
-          e.currentTarget.style.transform = "scale(1.06)";
-          e.currentTarget.style.boxShadow =
-            "0 6px 14px rgba(245,158,11,0.25)";
-        }}
-        onMouseLeave={(e) => {
-          setShowHint(false);
-          e.currentTarget.style.background = "#ffffff";
-          e.currentTarget.style.borderColor = "#e5e7eb";
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow =
-            "0 4px 10px rgba(0,0,0,0.08)";
-        }}
-        onMouseDown={(e) => {
-          e.currentTarget.style.transform = "scale(0.96)";
-        }}
-        onMouseUp={(e) => {
-          e.currentTarget.style.transform = "scale(1.06)";
-        }}
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        style={styles.toggleButton}
       >
-        🔖
+        {open ? "접기 ▲" : `${title} ▼`}
       </button>
+
+      {open && (
+        <div style={styles.failureBox}>
+          {content}
+        </div>
+      )}
     </div>
   );
 }
 
-function CenterMessage({ children }: any) {
+function CenterMessage({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ padding: 80, textAlign: "center" }}>
       {children}
@@ -280,137 +305,135 @@ function CenterMessage({ children }: any) {
   );
 }
 
-/* ============================= */
-/* STYLES */
-/* ============================= */
+/* ====================================================== */
+/* Styles */
+/* ====================================================== */
 
-const styles: Record<string, any> = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: 920,
+    maxWidth: 960,
     margin: "0 auto",
-    paddingTop: 40,
-    lineHeight: 1.9,
-    color: "#111827",
+    paddingTop: 24,
+    lineHeight: 1.7,
+    color: colors.ink,
   },
 
   title: {
-    fontSize: 30,
-    fontWeight: 700,
-    marginBottom: 60,
-    letterSpacing: "-0.3px",
+    fontSize: 20,
+    fontWeight: 600,
+    marginBottom: 32,
   },
 
-  layerSection: {
-    marginBottom: 80,
-  },
-
-  layerHeader: {
+  layerTitleWrapper: {
     display: "flex",
     alignItems: "center",
-    marginBottom: 28,
+    marginBottom: 18,
   },
 
-  layerBar: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
+  layerTitleBar: {
+    width: 4,
+    height: 18,
     background: "#1e3a8a",
-    color: "#fff",
-    fontWeight: 700,
-    fontSize: 14,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
+    borderRadius: 2,
+    marginRight: 10,
   },
 
   layerTitle: {
-    fontSize: 20,
-    fontWeight: 700,
+    fontSize: 17,
+    fontWeight: 600,
+    margin: 0,
   },
 
   card: {
-    border: "1px solid #e5e7eb",
-    borderRadius: 16,
-    padding: 26,
-    marginBottom: 28,
+    border: `1px solid ${colors.line}`,
+    borderRadius: 12,
+    padding: "20px 22px",
+    marginBottom: 24,
     background: "#ffffff",
   },
 
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 600,
-    marginBottom: 10,
+  cardTitleWrapper: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: 12,
   },
 
-  subTitle: {
+  cardTitleBar: {
+    width: 4,
+    height: 18,
+    background: "#1e3a8a",
+    borderRadius: 2,
+    marginRight: 10,
+  },
+
+  cardTitle: {
     fontSize: 15,
     fontWeight: 600,
-    marginBottom: 12,
+    margin: 0,
   },
 
   paragraph: {
-    fontSize: 15,
-    marginBottom: 12,
+    fontSize: 14,
+    marginBottom: 10,
   },
 
   item: {
-    marginBottom: 10,
+    fontSize: 14,
+    marginBottom: 8,
   },
 
   itemLabel: {
     display: "inline-block",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 600,
     marginRight: 6,
-    color: "#374151",
+    color: colors.muted,
   },
 
-  tag: {
-    display: "inline-block",
+  articleList: {
     fontSize: 12,
-    background: "#f3f4f6",
-    padding: "4px 8px",
-    borderRadius: 8,
-    marginRight: 6,
-    marginTop: 6,
+    color: colors.muted,
   },
 
   highlightBox: {
-    padding: 24,
-    borderRadius: 14,
-    background: "#fffbeb",
-    border: "1px solid #fde68a",
-  },
-
-  collapseToggle: {
-    cursor: "pointer",
-    fontSize: 13,
-    marginTop: 10,
-    color: "#6b7280",
+    padding: 18,
+    borderRadius: 10,
+    background: colors.bgSoft,
+    border: `1px solid ${colors.line}`,
+    marginTop: 20,
   },
 
   failureBox: {
-    marginTop: 12,
-    padding: 16,
-    borderRadius: 10,
+    marginTop: 8,
+    padding: 14,
+    borderRadius: 8,
     background: "#fef2f2",
     border: "1px solid #fecaca",
+    fontSize: 13,
+  },
+
+  toggleButton: {
+    fontSize: 12,
+    color: colors.muted,
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    padding: 0,
   },
 
   floatingWrap: {
     position: "fixed",
-    right: 30,
+    right: 24,
     bottom: 160,
-    zIndex: 50,
+    zIndex: 60,
   },
 
   floatingButton: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     borderRadius: 999,
-    border: "1px solid #e5e7eb",
-    background: "#ffffff",
+    border: `1px solid ${colors.line}`,
+    background: "#fff",
     fontSize: 20,
     cursor: "pointer",
   },
