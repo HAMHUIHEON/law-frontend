@@ -850,43 +850,78 @@ useEffect(() => {
                   )}
                 </>
               )}
+              {/* STEP3 (기존 STEP2B) */}
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 13,
+                  color: "#111827",
+                  cursor: "pointer",
+                  marginTop: 12,
+                  marginBottom: 6,
+                }}
+              >
+                <input
+                  type="radio"
+                  name="viewMode"
+                  value="E_STEP2B"
+                  checked={viewMode === "E_STEP2B"}
+                  onChange={() => {
+                    setViewMode("E_STEP2B");
+                    setSelectedESectionSlug(null);
+                  }}
+                />
+                규정 통합 분석 (Step3)
+              </label>
 
+              {viewMode === "E_STEP2B" && (
+                <div style={inlineListStyle}>
+                  {[
+                    { key: "chapter1", label: "제1장 총칙" },
+                    { key: "chapter2", label: "제2장 일반세무조사" },
+                    { key: "chapter3", label: "제3장 조세범칙조사" },
+                  ].map(({ key, label }) => {
+                    const active = selectedEChapter === key;
+
+                    return (
+                      <div
+                        key={key}
+                        onClick={() => setSelectedEChapter(key as any)}
+                        style={{
+                          fontSize: 13,
+                          padding: "4px 6px",
+                          borderRadius: 4,
+                          cursor: "pointer",
+                          color: active ? "#111827" : "#6b7280",
+                          background: active ? "#f3f4f6" : "transparent",
+                        }}
+                      >
+                        {label}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </SidebarSection>
         )}
-        {/* STEP2B */}
-        <label
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 13,
-            color: "#111827",
-            cursor: "pointer",
-            marginTop: 12,
-            marginBottom: 6,
-          }}
-        >
-          <input
-            type="radio"
-            name="viewMode"
-            value="E_STEP2B"
-            checked={viewMode === "E_STEP2B"}
-            onChange={() => {
-              setViewMode("E_STEP2B");
-              setSelectedESectionSlug(null);
-            }}
-          />
-          규정 통합 분석 (Step 3)
-        </label>
 
         
         {/* =========================
             공통: 원문 읽기
           ========================= */}
-        {selectedBookId && (
-          <div style={{ marginTop: 16, paddingTop: 8, borderTop: "1px solid #e5e7eb" }}>
-            <label
+          {selectedBookId &&
+            !["E_STEP1", "E_STEP2", "E_STEP2B"].includes(viewMode ?? "") && (
+            <div
+              style={{
+                marginTop: 16,
+                paddingTop: 8,
+                borderTop: "1px solid #e5e7eb",
+              }}
+            >            
+              <label
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -934,10 +969,7 @@ useEffect(() => {
 
           </div>
         )}
-
       </div>
-
-
     </aside>
   );
 }
