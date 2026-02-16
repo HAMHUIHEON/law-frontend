@@ -8,6 +8,7 @@ import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
 import { getStrategyAccess } from "../../access";
 import { Step2SectionViewModel } from "../types";
 import React from "react";
+const LayerColorContext = React.createContext<string>("#1e3a8a");
 
 type Props = {
   bookId: string;
@@ -26,6 +27,14 @@ const colors = {
   line: "#e5e7eb",
   bgSoft: "#fafafa",
 };
+
+const layerColors: Record<string, string> = {
+  L0: "#1e3a8a",
+  L1: "#0f766e",
+  L2: "#1e40af",
+  L3: "#7c3aed",
+};
+
 
 /* ====================================================== */
 /* View */
@@ -145,14 +154,16 @@ export default function SectionStep2View({
 
             {block.items.map((item, idx) => (
               <ReportCard key={idx}>
-                <Item label="작동 메커니즘">
-                  {item.mechanism_statement}
-                </Item>
+              <Item
+                label="작동 메커니즘"
+             >
+                {item.mechanism_statement}
+              </Item>
 
-                <TagRow
-                  label="내부 근거"
-                  items={item.internal_legal_basis}
-                />
+              <TagRow
+                label="내부 근거"
+                items={item.internal_legal_basis}
+              />
 
                 <TagRow
                   label="외부 근거"
@@ -178,7 +189,11 @@ export default function SectionStep2View({
         {data.L3.dispute_points.items.map((d, i) => (
           <ReportCard key={i}>
             <CardTitle>{d.issue}</CardTitle>
-            <Item label="납세자 주장">{d.positions.taxpayer}</Item>
+            <Item
+              label="납세자 주장"
+          >
+              {d.positions.taxpayer}
+            </Item>
             <Item label="과세관청 주장">
               {d.positions.tax_office}
             </Item>
@@ -266,47 +281,26 @@ function LayerSection({
   hint?: string;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
-
-  const childArray = React.Children.toArray(children);
-  const previewCount = 3;
-  const hasMore = childArray.length > previewCount;
-
-  const visibleChildren = open
-    ? childArray
-    : childArray.slice(0, previewCount);
+  const color = layerColors[label];
 
   return (
-    <section style={{ marginBottom: 56 }}>
-      <div style={styles.layerTitleWrapper}>
-        <div style={styles.layerTitleBar} />
-        <h2 style={styles.layerTitle}>
-          {label}. {title}
-        </h2>
-      </div>
+    <LayerColorContext.Provider value={color}>
+      <section style={{ marginBottom: 56 }}>
+        <div style={styles.layerTitleWrapper}>
+          <div style={styles.layerTitleBar} />
+          <h2 style={styles.layerTitle}>
+            {label}. {title}
+          </h2>
+        </div>
 
-      {hint && <p style={styles.sectionHint}>{hint}</p>}
+        {hint && <p style={styles.sectionHint}>{hint}</p>}
 
-      <div>
-        {visibleChildren}
-
-        {hasMore && (
-          <div style={{ marginTop: 12 }}>
-            <button
-              type="button"
-              onClick={() => setOpen((prev) => !prev)}
-              style={styles.toggleButton}
-            >
-              {open
-                ? "접기 ▲"
-                : `더 보기 (${childArray.length - previewCount}) ▼`}
-            </button>
-          </div>
-        )}
-      </div>
-    </section>
+        {children}
+      </section>
+    </LayerColorContext.Provider>
   );
 }
+
 
 function ReportCard({ children }: { children: React.ReactNode }) {
   return <div style={styles.card}>{children}</div>;
@@ -328,11 +322,21 @@ function Item({
   label: string;
   children: React.ReactNode;
 }) {
+  const color = React.useContext(LayerColorContext);
+
   return (
-    <p style={styles.item}>
-      <strong style={styles.itemLabel}>{label}</strong>
-      {children}
-    </p>
+    <div style={styles.itemRow}>
+      <div
+        style={{
+          ...styles.itemBar,
+          background: color,
+        }}
+      />
+      <p style={styles.item}>
+        <strong style={styles.itemLabel}>{label}</strong>
+        {children}
+      </p>
+    </div>
   );
 }
 
@@ -363,17 +367,27 @@ function TagRow({
   label: string;
   items?: string[];
 }) {
+  const color = React.useContext(LayerColorContext);
+
   if (!items?.length) return null;
 
   return (
-    <div style={{ marginBottom: 10 }}>
-      <span style={styles.itemLabel}>{label}</span>
-      <div>
-        {items.map((t, i) => (
-          <span key={i} style={styles.tag}>
-            {t}
-          </span>
-        ))}
+    <div style={styles.itemRow}>
+      <div
+        style={{
+          ...styles.itemBar,
+          background: color,
+        }}
+      />
+      <div style={{ marginBottom: 10 }}>
+        <span style={styles.itemLabel}>{label}</span>
+        <div>
+          {items.map((t, i) => (
+            <span key={i} style={styles.tag}>
+              {t}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -455,6 +469,18 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     margin: 0,
   },
+itemRow: {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: 10,
+  marginBottom: 12,
+},
+
+itemBar: {
+  width: 4,
+  borderRadius: 2,
+  marginTop: 4,
+},
 
   card: {
     border: `1px solid ${colors.line}`,
