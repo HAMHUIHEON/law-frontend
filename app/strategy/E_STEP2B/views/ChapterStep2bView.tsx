@@ -149,7 +149,7 @@ export default function ChapterStep2bView({
 /* ================= Components ================= */
 function renderWithPreview<T>(
   sectionKey: string,
-  items: T[],
+  items: T[] | undefined,   // 👈 undefined 허용
   renderItem: (item: T, idx: number) => React.ReactNode,
   previewCount = 2,
   openSections: Record<string, boolean>,
@@ -157,6 +157,10 @@ function renderWithPreview<T>(
     React.SetStateAction<Record<string, boolean>>
   >
 ) {
+  if (!Array.isArray(items)) {
+    return null; // 👈 여기 추가
+  }
+
   const isOpen = openSections[sectionKey] ?? false;
   const visibleItems = isOpen ? items : items.slice(0, previewCount);
 
