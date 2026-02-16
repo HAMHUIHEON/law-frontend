@@ -475,9 +475,10 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     margin: 0,
   },
+
 itemRow: {
   display: "flex",
-  alignItems: "flex-start",
+  alignItems: "stretch",
   gap: 10,
   marginBottom: 12,
 },
@@ -486,6 +487,7 @@ itemBar: {
   width: 4,
   borderRadius: 2,
   marginTop: 4,
+  alignSelf: "stretch",   // 🔥 핵심
 },
 
   card: {
