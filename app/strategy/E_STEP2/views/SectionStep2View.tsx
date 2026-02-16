@@ -7,6 +7,7 @@ import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
 import { getStrategyAccess } from "../../access";
 import { Step2SectionViewModel } from "../types";
+import React from "react";
 
 type Props = {
   bookId: string;
@@ -119,6 +120,8 @@ export default function SectionStep2View({
         ))}
       </LayerSection>
 
+
+      <Divider />
       {/* L1 */}
       <LayerSection label="L1" title="적용 범위 및 구성 체계">
         <Paragraph>{data.L1.scope_statement}</Paragraph>
@@ -131,6 +134,7 @@ export default function SectionStep2View({
           </ReportCard>
         ))}
       </LayerSection>
+      <Divider />
 
       {/* L2 */}
 
@@ -164,12 +168,13 @@ export default function SectionStep2View({
           </div>
         ))}
       </LayerSection>
-
+      <Divider />
       {/* L3 */}
-      <p style={styles.sectionHint}>
-        ※ 아래 내용은 구조 이해를 위한 전략적 가정 분석입니다.
-      </p>
-      <LayerSection label="L3" title="분쟁 및 방어 구조">
+      <LayerSection
+        label="L3"
+        title="분쟁 및 방어 구조"
+        hint="※ 아래 내용은 실제 사건에 대한 법적 판단이 아닌, 구조 이해를 위한 가상 분석입니다."
+      >
         {data.L3.dispute_points.items.map((d, i) => (
           <ReportCard key={i}>
             <CardTitle>{d.issue}</CardTitle>
@@ -217,15 +222,31 @@ function StrategyNotice() {
   );
 }
 
+function Divider() {
+  return <hr style={{ borderColor: colors.line, marginBottom: 24 }} />;
+}
+
 function LayerSection({
   label,
   title,
+  hint,
   children,
 }: {
   label: string;
   title: string;
+  hint?: string;
   children: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(false);
+
+  const childArray = React.Children.toArray(children);
+  const previewCount = 3;
+  const hasMore = childArray.length > previewCount;
+
+  const visibleChildren = open
+    ? childArray
+    : childArray.slice(0, previewCount);
+
   return (
     <section style={{ marginBottom: 56 }}>
       <div style={styles.layerTitleWrapper}>
@@ -234,7 +255,26 @@ function LayerSection({
           {label}. {title}
         </h2>
       </div>
-      {children}
+
+      {hint && <p style={styles.sectionHint}>{hint}</p>}
+
+      <div>
+        {visibleChildren}
+
+        {hasMore && (
+          <div style={{ marginTop: 12 }}>
+            <button
+              type="button"
+              onClick={() => setOpen((prev) => !prev)}
+              style={styles.toggleButton}
+            >
+              {open
+                ? "접기 ▲"
+                : `더 보기 (${childArray.length - previewCount}) ▼`}
+            </button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -330,6 +370,7 @@ function CenterMessage({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
 
 /* ====================================================== */
 /* Styles */
@@ -486,6 +527,14 @@ noticeText: {
   lineHeight: 1.6,
   color: colors.muted,
   marginBottom: 6,
+},
+sectionHint: {
+  fontSize: 12,
+  lineHeight: 1.6,
+  color: colors.muted,
+  marginBottom: 18,
+  paddingBottom: 8,
+  borderBottom: `1px solid ${colors.line}`,
 },
 
 };
