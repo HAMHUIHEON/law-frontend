@@ -105,13 +105,28 @@ export type L3 = {
   system_tension: SystemTension;
 };
 
-export type Step2SectionRaw = {
+export type L2ViewBlock = {
+  key: string;            // Authority
+  label: string;          // 권한 구조
+  items: EngineItem[];
+  reason: string | null;
+};
+
+export type Step2SectionViewModel = {
   chapter: string;
   section: string;
   L0: L0;
   L1: L1;
-  L2: L2;
+  L2: L2ViewBlock[];
   L3: L3;
 };
 
-export type Step2SectionViewModel = Step2SectionRaw;
+export type Step2SectionRaw = {
+  chapter: string;
+  section: string;
+  L0: any;
+  L1: any;
+  L2: any;
+  L3: any;
+};
+
