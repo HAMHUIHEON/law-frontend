@@ -20,6 +20,7 @@ import { ChapterOneStep1Container } from "./E_STEP1/chapter1/containers/ChapterO
 import { MainLoginRequiredNotice } from "@/app/components/MainLoginRequiredNotice";
 import { ChapterTwoStep1Container } from "./E_STEP1/chapter2/ChapterTwoStep1Container";
 import { ChapterThreeStep1Container } from "./E_STEP1/chapter3/containers/ChapterThreeStep1Container";
+import SectionStep2Container from "./E_STEP2/containers/SectionStep2Container";
 
 export default function StrategyPage() {
   
@@ -207,6 +208,14 @@ if (!userId) {
           <ChapterThreeStep1Container bookId={selectedBookId} />
         )}
       </>
+    )}
+    
+    {viewMode === "E_STEP2" && selectedEChapter && selectedESectionSlug && (
+      <SectionStep2Container
+        bookId={selectedBookId}
+        chapter={selectedEChapter}
+        sectionSlug={selectedESectionSlug}
+      />
     )}
 
     
