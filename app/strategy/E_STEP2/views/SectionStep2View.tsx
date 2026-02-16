@@ -48,6 +48,12 @@ export default function SectionStep2View({
 }: Props) {
   const { userId } = useAuth();
   const userAccess = useUserAccessLevel();
+
+  // 🔥 아직 로딩 중이면 아무 것도 렌더링 안 함
+  if (!userAccess) {
+    return <CenterMessage>불러오는 중...</CenterMessage>;
+  }
+
   const access = getStrategyAccess(userAccess, "E_STEP2");
   const isLocked = access !== "FULL";
   const [showHint, setShowHint] = useState(false);
