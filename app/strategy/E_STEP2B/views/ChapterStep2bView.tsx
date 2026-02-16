@@ -47,6 +47,7 @@ export default function ChapterStep2bView({
   const saveThought = useSaveThought();
   const [saving, setSaving] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   useRecordStrategyTrace({
     userId,
@@ -62,15 +63,27 @@ export default function ChapterStep2bView({
   let content: React.ReactNode = null;
 
   if (chapter === "chapter1") {
-    content = renderChapter1(data as Step2bChapter1);
+    content = renderChapter1(
+      data as Step2bChapter1,
+      openSections,
+      setOpenSections
+    );
   }
 
   if (chapter === "chapter2") {
-    content = renderChapter2(data as Step2bChapter2);
+    content = renderChapter2(
+      data as Step2bChapter2,
+      openSections,
+      setOpenSections
+    );
   }
 
   if (chapter === "chapter3") {
-    content = renderChapter3(data as Step2bChapter3);
+    content = renderChapter3(
+      data as Step2bChapter3,
+      openSections,
+      setOpenSections
+    );
   }
   return (
     <article style={styles.container}>
@@ -134,12 +147,60 @@ export default function ChapterStep2bView({
 }
 
 /* ================= Components ================= */
-function renderChapter1(data: Step2bChapter1) {
+function renderWithPreview<T>(
+  sectionKey: string,
+  items: T[],
+  renderItem: (item: T, idx: number) => React.ReactNode,
+  previewCount = 2,
+  openSections: Record<string, boolean>,
+  setOpenSections: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >
+) {
+  const isOpen = openSections[sectionKey] ?? false;
+  const visibleItems = isOpen ? items : items.slice(0, previewCount);
+
+  return (
+    <>
+      {visibleItems.map(renderItem)}
+
+      {items.length > previewCount && (
+        <div style={{ marginTop: 12 }}>
+          <button
+            type="button"
+            onClick={() =>
+              setOpenSections((prev) => ({
+                ...prev,
+                [sectionKey]: !isOpen,
+              }))
+            }
+            style={styles.toggleButton}
+          >
+            {isOpen
+              ? "접기 ▲"
+              : `더 보기 (${items.length - previewCount}) ▼`}
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+  function renderChapter1(
+    data: Step2bChapter1,
+    openSections: Record<string, boolean>,
+    setOpenSections: React.Dispatch<
+      React.SetStateAction<Record<string, boolean>>
+    >
+  ) {
   return (
     <>
       {/* ================= L0 ================= */}
-      <LayerSection label="L0" title="상위 규범 의존 구조">
-        {data.normative_dependency_map.map((item, idx) => (
+    <LayerSection label="L0" title="상위 규범 의존 구조">
+      {renderWithPreview(
+        "chapter1-L0", // 👉 섹션 고유 키
+        data.normative_dependency_map,
+        (item, idx) => (
           <ReportCard key={idx}>
             <CardTitle>{item.external_article}</CardTitle>
 
@@ -163,83 +224,111 @@ function renderChapter1(data: Step2bChapter1) {
               labelStyle={styles.labelEvidence}
             />
           </ReportCard>
-        ))}
-      </LayerSection>
+        ),
+        2,                // 👉 2개만 미리보기
+        openSections,
+        setOpenSections
+      )}
+    </LayerSection>
+
 
       <Divider />
 
       {/* ================= L2 ================= */}
       <LayerSection label="L2" title="실체적 판단 임계 구조">
-        {data.substantive_threshold_analysis.map((item) => (
-          <ReportCard key={item.external_article}>
-            <CardTitle>{item.external_article}</CardTitle>
+        {renderWithPreview(
+          "chapter1-L2",
+          data.substantive_threshold_analysis,
+          (item, idx) => (
+            <ReportCard key={item.external_article ?? idx}>
+              <CardTitle>{item.external_article}</CardTitle>
 
-            <Item label="임계 유형" labelStyle={styles.labelFunction}>
-              {item.threshold_type}
-            </Item>
+              <Item label="임계 유형" labelStyle={styles.labelFunction}>
+                {item.threshold_type}
+              </Item>
 
-            <TagRow
-              label="내부 트리거"
-              items={item.internal_trigger_point.map(
-                (m) => `${m.section} (${m.category})`
-              )}
-              labelStyle={styles.labelEvidence}
-            />
+              <TagRow
+                label="내부 트리거"
+                items={item.internal_trigger_point.map(
+                  (m) => `${m.section} (${m.category})`
+                )}
+                labelStyle={styles.labelEvidence}
+              />
 
-            <Item label="에스컬레이션 경로" labelStyle={styles.labelDependency}>
-              {item.escalation_path}
-            </Item>
+              <Item label="에스컬레이션 경로" labelStyle={styles.labelDependency}>
+                {item.escalation_path}
+              </Item>
 
-            <Collapsible title="리스크 메모" content={item.risk_note} />
-          </ReportCard>
-        ))}
+              <Collapsible title="리스크 메모" content={item.risk_note} />
+            </ReportCard>
+          ),
+          2,
+          openSections,
+          setOpenSections
+        )}
       </LayerSection>
+
 
       <Divider />
 
       {/* ================= L3 ================= */}
       <LayerSection label="L3" title="리스크 에스컬레이션 맵">
-        {data.risk_escalation_map.map((item, idx) => (
-          <ReportCard key={idx}>
-            <CardTitle>{item.stage}</CardTitle>
+        {renderWithPreview(
+          "chapter1-L3",
+          data.risk_escalation_map,
+          (item, idx) => (
+            <ReportCard key={idx}>
+              <CardTitle>{item.stage}</CardTitle>
 
-            <TagRow
-              label="외부 규범"
-              items={item.external_norm}
-              labelStyle={styles.labelEvidence}
-            />
+              <TagRow
+                label="외부 규범"
+                items={item.external_norm}
+                labelStyle={styles.labelEvidence}
+              />
 
-            <TagRow
-              label="내부 통제 지점"
-              items={item.internal_control.map(
-                (m) => `${m.section} (${m.layer})`
-              )}
-              labelStyle={styles.labelEvidence}
-            />
+              <TagRow
+                label="내부 통제 지점"
+                items={item.internal_control.map(
+                  (m) => `${m.section} (${m.layer})`
+                )}
+                labelStyle={styles.labelEvidence}
+              />
 
-            <Item label="에스컬레이션 조건" labelStyle={styles.labelFunction}>
-              {item.escalation_condition}
-            </Item>
+              <Item label="에스컬레이션 조건" labelStyle={styles.labelFunction}>
+                {item.escalation_condition}
+              </Item>
 
-            <Item label="시스템 리스크" labelStyle={styles.labelLimit}>
-              {item.systemic_risk}
-            </Item>
+              <Item label="시스템 리스크" labelStyle={styles.labelLimit}>
+                {item.systemic_risk}
+              </Item>
 
-            <Item label="긴장 유형" labelStyle={styles.labelDependency}>
-              {item.tension_type}
-            </Item>
-          </ReportCard>
-        ))}
+              <Item label="긴장 유형" labelStyle={styles.labelDependency}>
+                {item.tension_type}
+              </Item>
+            </ReportCard>
+          ),
+          2,
+          openSections,
+          setOpenSections
+        )}
       </LayerSection>
       </>
       );
 }
-function renderChapter2(data: Step2bChapter2) {
+  function renderChapter2(
+    data: Step2bChapter2,
+    openSections: Record<string, boolean>,
+    setOpenSections: React.Dispatch<
+      React.SetStateAction<Record<string, boolean>>
+    >
+  ) {
   return (
     <>
-      {/* L0 */}
-      <LayerSection label="L0" title="상위 규범 의존 구조">
-        {data.normative_dependency_map.map((item, idx) => (
+    <LayerSection label="L0" title="상위 규범 의존 구조">
+      {renderWithPreview(
+        "chapter2-L0",
+        data.normative_dependency_map,
+        (item, idx) => (
           <ReportCard key={idx}>
             <CardTitle>{item.external_norm}</CardTitle>
 
@@ -263,14 +352,21 @@ function renderChapter2(data: Step2bChapter2) {
               labelStyle={styles.labelEvidence}
             />
           </ReportCard>
-        ))}
-      </LayerSection>
+        ),
+        2,
+        openSections,
+        setOpenSections
+      )}
+    </LayerSection>
 
       <Divider />
 
       {/* L1(혹은 L2 성격) - 절차 임계 */}
-      <LayerSection label="L2" title="절차적 임계 구조">
-        {data.procedural_threshold_analysis.map((item, idx) => (
+    <LayerSection label="L2" title="절차적 임계 구조">
+      {renderWithPreview(
+        "chapter2-L2",
+        data.procedural_threshold_analysis,
+        (item, idx) => (
           <ReportCard key={idx}>
             <CardTitle>{item.threshold_name}</CardTitle>
 
@@ -294,14 +390,21 @@ function renderChapter2(data: Step2bChapter2) {
 
             <Collapsible title="리스크 메모" content={item.risk_note} />
           </ReportCard>
-        ))}
-      </LayerSection>
+        ),
+        2,
+        openSections,
+        setOpenSections
+      )}
+    </LayerSection>
 
       <Divider />
 
       {/* 변환 통제 */}
-      <LayerSection label="L3" title="변환 통제 맵">
-        {data.conversion_control_map.map((item, idx) => (
+    <LayerSection label="L3" title="변환 통제 맵">
+      {renderWithPreview(
+        "chapter2-L3A",
+        data.conversion_control_map,
+        (item, idx) => (
           <ReportCard key={idx}>
             <CardTitle>{item.conversion_type}</CardTitle>
 
@@ -331,14 +434,21 @@ function renderChapter2(data: Step2bChapter2) {
               {item.interpretation_limit}
             </Item>
           </ReportCard>
-        ))}
-      </LayerSection>
+        ),
+        2,
+        openSections,
+        setOpenSections
+      )}
+    </LayerSection>
 
       <Divider />
 
       {/* 통제-결과 연결 */}
-      <LayerSection label="L3" title="통제-결과 연결 구조">
-        {data.control_consequence_link.map((item, idx) => (
+    <LayerSection label="L3" title="통제-결과 연결 구조">
+      {renderWithPreview(
+        "chapter2-L3B",
+        data.control_consequence_link,
+        (item, idx) => (
           <ReportCard key={idx}>
             <CardTitle>{item.control_issue}</CardTitle>
 
@@ -364,147 +474,179 @@ function renderChapter2(data: Step2bChapter2) {
               {item.tension_note}
             </Item>
           </ReportCard>
-        ))}
-      </LayerSection>
+        ),
+        2,
+        openSections,
+        setOpenSections
+      )}
+    </LayerSection>
     </>
   );
 }
 
-function renderChapter3(data: Step2bChapter3) {
+function renderChapter3(
+  data: Step2bChapter3,
+  openSections: Record<string, boolean>,
+  setOpenSections: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >
+) {
   return (
     <>
       {/* L0 */}
       <LayerSection label="L0" title="상위 규범 의존 구조">
-        {data.normative_dependency_map.map((item, idx) => (
-          <ReportCard key={idx}>
-            <CardTitle>{item.external_article}</CardTitle>
+        {renderWithPreview(
+          "chapter3-L0",
+          data.normative_dependency_map,
+          (item, idx) => (
+            <ReportCard key={idx}>
+              <CardTitle>{item.external_article}</CardTitle>
 
-            <Item label="실체 구조" labelStyle={styles.labelFunction}>
-              {item.substantive_structure}
-            </Item>
+              <Item label="실체 구조" labelStyle={styles.labelFunction}>
+                {item.substantive_structure}
+              </Item>
 
-            <Item label="의존 유형" labelStyle={styles.labelDependency}>
-              {item.dependency_type}
-            </Item>
+              <Item label="의존 유형" labelStyle={styles.labelDependency}>
+                {item.dependency_type}
+              </Item>
 
-            <Item label="해석 한계" labelStyle={styles.labelLimit}>
-              {item.interpretation_limit}
-            </Item>
+              <Item label="해석 한계" labelStyle={styles.labelLimit}>
+                {item.interpretation_limit}
+              </Item>
 
-            <TagRow
-              label="연결 내부 메커니즘"
-              items={item.linked_internal_mechanisms.map(
-                (m) => `${m.section} (${m.layer}-${m.category})`
-              )}
-              labelStyle={styles.labelEvidence}
-            />
-          </ReportCard>
-        ))}
+              <TagRow
+                label="연결 내부 메커니즘"
+                items={item.linked_internal_mechanisms.map(
+                  (m) => `${m.section} (${m.layer}-${m.category})`
+                )}
+                labelStyle={styles.labelEvidence}
+              />
+            </ReportCard>
+          ),
+          2,
+          openSections,
+          setOpenSections
+        )}
       </LayerSection>
 
       <Divider />
 
       {/* L2 */}
       <LayerSection label="L2" title="실체적 판단 임계 구조">
-        {data.substantive_threshold_analysis.map((item, idx) => (
-          <ReportCard key={idx}>
-            <CardTitle>{item.external_article}</CardTitle>
+        {renderWithPreview(
+          "chapter3-L2",
+          data.substantive_threshold_analysis,
+          (item, idx) => (
+            <ReportCard key={idx}>
+              <CardTitle>{item.external_article}</CardTitle>
 
-            <Item label="임계 유형" labelStyle={styles.labelFunction}>
-              {item.threshold_type}
-            </Item>
+              <Item label="임계 유형" labelStyle={styles.labelFunction}>
+                {item.threshold_type}
+              </Item>
 
-            <TagRow
-              label="내부 트리거"
-              items={item.internal_trigger_point.map(
-                (m) => `${m.section} (${m.layer}-${m.category})`
-              )}
-              labelStyle={styles.labelEvidence}
-            />
+              <TagRow
+                label="내부 트리거"
+                items={item.internal_trigger_point.map(
+                  (m) => `${m.section} (${m.layer}-${m.category})`
+                )}
+                labelStyle={styles.labelEvidence}
+              />
 
-            <Item label="에스컬레이션 경로" labelStyle={styles.labelDependency}>
-              {item.escalation_path}
-            </Item>
+              <Item label="에스컬레이션 경로" labelStyle={styles.labelDependency}>
+                {item.escalation_path}
+              </Item>
 
-            <Collapsible title="리스크 메모" content={item.risk_note} />
-          </ReportCard>
-        ))}
+              <Collapsible title="리스크 메모" content={item.risk_note} />
+            </ReportCard>
+          ),
+          2,
+          openSections,
+          setOpenSections
+        )}
       </LayerSection>
 
       <Divider />
 
       {/* 변환-실체 연결 */}
       <LayerSection label="L3" title="변환-실체 연결 구조">
-        {data.conversion_substance_link.map((item, idx) => (
-          <ReportCard key={idx}>
-            <CardTitle>{item.conversion_type}</CardTitle>
+        {renderWithPreview(
+          "chapter3-L3A",
+          data.conversion_substance_link,
+          (item, idx) => (
+            <ReportCard key={idx}>
+              <CardTitle>{item.conversion_type}</CardTitle>
 
-            <TagRow
-              label="외부 근거"
-              items={item.external_basis}
-              labelStyle={styles.labelEvidence}
-            />
+              <TagRow
+                label="외부 근거"
+                items={item.external_basis}
+                labelStyle={styles.labelEvidence}
+              />
 
-            <TagRow
-              label="내부 의사결정 노드"
-              items={item.internal_decision_node.map(
-                (m) => `${m.section} (${m.layer}-${m.category})`
-              )}
-              labelStyle={styles.labelEvidence}
-            />
+              <TagRow
+                label="내부 의사결정 노드"
+                items={item.internal_decision_node.map(
+                  (m) => `${m.section} (${m.layer}-${m.category})`
+                )}
+                labelStyle={styles.labelEvidence}
+              />
 
-            <TagRow
-              label="실체 참조"
-              items={item.substantive_reference}
-              labelStyle={styles.labelEvidence}
-            />
+              <Item label="결정 의존" labelStyle={styles.labelDependency}>
+                {item.decision_dependency}
+              </Item>
 
-            <Item label="결정 의존" labelStyle={styles.labelDependency}>
-              {item.decision_dependency}
-            </Item>
-
-            <Item label="해석 한계" labelStyle={styles.labelLimit}>
-              {item.interpretation_limit}
-            </Item>
-          </ReportCard>
-        ))}
+              <Item label="해석 한계" labelStyle={styles.labelLimit}>
+                {item.interpretation_limit}
+              </Item>
+            </ReportCard>
+          ),
+          2,
+          openSections,
+          setOpenSections
+        )}
       </LayerSection>
 
       <Divider />
 
-      {/* L3 리스크 */}
+      {/* 리스크 */}
       <LayerSection label="L3" title="리스크 에스컬레이션 맵">
-        {data.risk_escalation_map.map((item, idx) => (
-          <ReportCard key={idx}>
-            <CardTitle>{item.stage}</CardTitle>
+        {renderWithPreview(
+          "chapter3-L3B",
+          data.risk_escalation_map,
+          (item, idx) => (
+            <ReportCard key={idx}>
+              <CardTitle>{item.stage}</CardTitle>
 
-            <TagRow
-              label="외부 규범"
-              items={item.external_norm}
-              labelStyle={styles.labelEvidence}
-            />
+              <TagRow
+                label="외부 규범"
+                items={item.external_norm}
+                labelStyle={styles.labelEvidence}
+              />
 
-            <TagRow
-              label="내부 통제 지점"
-              items={item.internal_control.map(
-                (m) => `${m.section} (${m.layer}-${m.category})`
-              )}
-              labelStyle={styles.labelEvidence}
-            />
+              <TagRow
+                label="내부 통제 지점"
+                items={item.internal_control.map(
+                  (m) => `${m.section} (${m.layer}-${m.category})`
+                )}
+                labelStyle={styles.labelEvidence}
+              />
 
-            <Item label="에스컬레이션 조건" labelStyle={styles.labelFunction}>
-              {item.escalation_condition}
-            </Item>
+              <Item label="에스컬레이션 조건" labelStyle={styles.labelFunction}>
+                {item.escalation_condition}
+              </Item>
 
-            <Item label="시스템 리스크" labelStyle={styles.labelLimit}>
-              {item.systemic_risk}
-            </Item>
+              <Item label="시스템 리스크" labelStyle={styles.labelLimit}>
+                {item.systemic_risk}
+              </Item>
 
-            <Item label="긴장 유형" labelStyle={styles.labelDependency}>
-              {item.tension_type}
-            </Item>
-          </ReportCard>
-        ))}
+              <Item label="긴장 유형" labelStyle={styles.labelDependency}>
+                {item.tension_type}
+              </Item>
+            </ReportCard>
+          ),
+          2,
+          openSections,
+          setOpenSections
+        )}
       </LayerSection>
     </>
   );

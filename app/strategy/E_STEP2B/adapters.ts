@@ -20,7 +20,13 @@ export function adaptStep2bChapter(
       return raw as Step2bChapter1;
 
     case "chapter2":
-      return raw as Step2bChapter2;
+      return {
+        chapter: raw.chapter,
+        normative_dependency_map: raw.normative_dependency_map ?? [],
+        procedural_threshold_analysis: raw.procedural_threshold_analysis ?? [],
+        conversion_control_map: raw.conversion_control_map ?? [],
+        control_consequence_link: raw.control_consequence_link ?? [],
+      };
 
     case "chapter3":
       return {
