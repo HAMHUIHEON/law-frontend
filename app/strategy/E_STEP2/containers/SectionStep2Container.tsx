@@ -12,6 +12,9 @@ type Props = {
   sectionSlug: string | null;
 };
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+
 export default function SectionStep2Container({
   bookId,
   chapter,
@@ -30,12 +33,12 @@ export default function SectionStep2Container({
         setError(null);
 
         const res = await fetch(
-          `/api/publications/e/${bookId}/E/${chapter}/step2/sections/${sectionSlug}`,
+          `${API_BASE}/api/publications/e/${bookId}/E/${chapter}/step2/sections/${sectionSlug}`,
           { cache: "no-store" }
         );
 
         if (!res.ok) {
-          throw new Error("Failed to load Step2 section");
+          throw new Error(`Failed to load Step2 section (${res.status})`);
         }
 
         const raw = await res.json();
