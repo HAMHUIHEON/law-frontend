@@ -7,7 +7,13 @@ import { useSaveThought } from "@/app/hooks/useSaveThought";
 import { useRecordStrategyTrace } from "@/app/hooks/useRecordStrategyTrace";
 import { useUserAccessLevel } from "@/app/hooks/useUserAccessLevel";
 import { getStrategyAccess } from "../../access";
-import { Step2bChapterAnalysis } from "../types";
+import {
+  Step2bChapterAnalysis,
+  Step2bChapter1,
+  Step2bChapter2,
+  Step2bChapter3,
+} from "../types";
+
 import React from "react";
 
 type Props = {
@@ -53,7 +59,19 @@ export default function ChapterStep2bView({
   if (isLocked) {
     return <CenterMessage>접근 권한이 필요합니다.</CenterMessage>;
   }
+  let content: React.ReactNode = null;
 
+  if (chapter === "chapter1") {
+    content = renderChapter1(data as Step2bChapter1);
+  }
+
+  if (chapter === "chapter2") {
+    content = renderChapter2(data as Step2bChapter2);
+  }
+
+  if (chapter === "chapter3") {
+    content = renderChapter3(data as Step2bChapter3);
+  }
   return (
     <article style={styles.container}>
       {/* Floating Save */}
@@ -74,6 +92,28 @@ export default function ChapterStep2bView({
             }
           }}
           style={styles.floatingButton}
+              onMouseEnter={(e) => {
+              setShowHint(true);
+              e.currentTarget.style.background = "#fffbeb";
+              e.currentTarget.style.borderColor = "#f59e0b";
+              e.currentTarget.style.transform = "scale(1.06)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 14px rgba(245,158,11,0.25)";
+            }}
+            onMouseLeave={(e) => {
+              setShowHint(false);
+              e.currentTarget.style.background = "#ffffff";
+              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 10px rgba(0,0,0,0.08)";
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = "scale(0.96)";
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = "scale(1.06)";
+            }}
         >
           🔖
         </button>
@@ -87,7 +127,16 @@ export default function ChapterStep2bView({
 
       {/* 아래부터 기존 L0/L2/L3 그대로 */}
 
+     {content}  {/* ✅ 이거 추가 */}
 
+    </article>
+  );
+}
+
+/* ================= Components ================= */
+function renderChapter1(data: Step2bChapter1) {
+  return (
+    <>
       {/* ================= L0 ================= */}
       <LayerSection label="L0" title="상위 규범 의존 구조">
         {data.normative_dependency_map.map((item, idx) => (
@@ -109,7 +158,7 @@ export default function ChapterStep2bView({
             <TagRow
               label="연결 내부 메커니즘"
               items={item.linked_internal_mechanisms.map(
-                (m) => `${m.section} (${m.layer})`
+                (m) => `${m.section} (${m.layer}-${m.category})`
               )}
               labelStyle={styles.labelEvidence}
             />
@@ -182,11 +231,284 @@ export default function ChapterStep2bView({
           </ReportCard>
         ))}
       </LayerSection>
-    </article>
+      </>
+      );
+}
+function renderChapter2(data: Step2bChapter2) {
+  return (
+    <>
+      {/* L0 */}
+      <LayerSection label="L0" title="상위 규범 의존 구조">
+        {data.normative_dependency_map.map((item, idx) => (
+          <ReportCard key={idx}>
+            <CardTitle>{item.external_norm}</CardTitle>
+
+            <Item label="규범 기능" labelStyle={styles.labelFunction}>
+              {item.normative_function}
+            </Item>
+
+            <Item label="의존 진술" labelStyle={styles.labelDependency}>
+              {item.dependency_statement}
+            </Item>
+
+            <Item label="해석 한계" labelStyle={styles.labelLimit}>
+              {item.interpretation_limit}
+            </Item>
+
+            <TagRow
+              label="연결 내부 메커니즘"
+              items={item.linked_internal_mechanisms.map(
+                (m) => `${m.section} (${m.layer}-${m.category})`
+              )}
+              labelStyle={styles.labelEvidence}
+            />
+          </ReportCard>
+        ))}
+      </LayerSection>
+
+      <Divider />
+
+      {/* L1(혹은 L2 성격) - 절차 임계 */}
+      <LayerSection label="L2" title="절차적 임계 구조">
+        {data.procedural_threshold_analysis.map((item, idx) => (
+          <ReportCard key={idx}>
+            <CardTitle>{item.threshold_name}</CardTitle>
+
+            <TagRow
+              label="외부 트리거 규범"
+              items={item.external_trigger_norms}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <TagRow
+              label="내부 트리거 포인트"
+              items={item.internal_trigger_points.map(
+                (m) => `${m.section} (${m.layer}-${m.category})`
+              )}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <Item label="임계 로직" labelStyle={styles.labelFunction}>
+              {item.threshold_logic}
+            </Item>
+
+            <Collapsible title="리스크 메모" content={item.risk_note} />
+          </ReportCard>
+        ))}
+      </LayerSection>
+
+      <Divider />
+
+      {/* 변환 통제 */}
+      <LayerSection label="L3" title="변환 통제 맵">
+        {data.conversion_control_map.map((item, idx) => (
+          <ReportCard key={idx}>
+            <CardTitle>{item.conversion_type}</CardTitle>
+
+            <TagRow
+              label="외부 제약"
+              items={item.external_constraints}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <TagRow
+              label="내부 의사결정 노드"
+              items={item.internal_decision_nodes.map(
+                (m) => `${m.section} (${m.layer}-${m.category})`
+              )}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <Item label="결정 주체" labelStyle={styles.labelDependency}>
+              {item.decision_body}
+            </Item>
+
+            <Item label="고지/통지 연결" labelStyle={styles.labelFunction}>
+              {item.notice_link}
+            </Item>
+
+            <Item label="해석 한계" labelStyle={styles.labelLimit}>
+              {item.interpretation_limit}
+            </Item>
+          </ReportCard>
+        ))}
+      </LayerSection>
+
+      <Divider />
+
+      {/* 통제-결과 연결 */}
+      <LayerSection label="L3" title="통제-결과 연결 구조">
+        {data.control_consequence_link.map((item, idx) => (
+          <ReportCard key={idx}>
+            <CardTitle>{item.control_issue}</CardTitle>
+
+            <TagRow
+              label="외부 시스템"
+              items={item.external_system}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <TagRow
+              label="내부 통제"
+              items={item.internal_controls.map(
+                (m) => `${m.section} (${m.layer}-${m.category})`
+              )}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <Item label="결과 경로" labelStyle={styles.labelDependency}>
+              {item.consequence_path}
+            </Item>
+
+            <Item label="긴장 메모" labelStyle={styles.labelLimit}>
+              {item.tension_note}
+            </Item>
+          </ReportCard>
+        ))}
+      </LayerSection>
+    </>
   );
 }
 
-/* ================= Components ================= */
+function renderChapter3(data: Step2bChapter3) {
+  return (
+    <>
+      {/* L0 */}
+      <LayerSection label="L0" title="상위 규범 의존 구조">
+        {data.normative_dependency_map.map((item, idx) => (
+          <ReportCard key={idx}>
+            <CardTitle>{item.external_article}</CardTitle>
+
+            <Item label="실체 구조" labelStyle={styles.labelFunction}>
+              {item.substantive_structure}
+            </Item>
+
+            <Item label="의존 유형" labelStyle={styles.labelDependency}>
+              {item.dependency_type}
+            </Item>
+
+            <Item label="해석 한계" labelStyle={styles.labelLimit}>
+              {item.interpretation_limit}
+            </Item>
+
+            <TagRow
+              label="연결 내부 메커니즘"
+              items={item.linked_internal_mechanisms.map(
+                (m) => `${m.section} (${m.layer}-${m.category})`
+              )}
+              labelStyle={styles.labelEvidence}
+            />
+          </ReportCard>
+        ))}
+      </LayerSection>
+
+      <Divider />
+
+      {/* L2 */}
+      <LayerSection label="L2" title="실체적 판단 임계 구조">
+        {data.substantive_threshold_analysis.map((item, idx) => (
+          <ReportCard key={idx}>
+            <CardTitle>{item.external_article}</CardTitle>
+
+            <Item label="임계 유형" labelStyle={styles.labelFunction}>
+              {item.threshold_type}
+            </Item>
+
+            <TagRow
+              label="내부 트리거"
+              items={item.internal_trigger_point.map(
+                (m) => `${m.section} (${m.layer}-${m.category})`
+              )}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <Item label="에스컬레이션 경로" labelStyle={styles.labelDependency}>
+              {item.escalation_path}
+            </Item>
+
+            <Collapsible title="리스크 메모" content={item.risk_note} />
+          </ReportCard>
+        ))}
+      </LayerSection>
+
+      <Divider />
+
+      {/* 변환-실체 연결 */}
+      <LayerSection label="L3" title="변환-실체 연결 구조">
+        {data.conversion_substance_link.map((item, idx) => (
+          <ReportCard key={idx}>
+            <CardTitle>{item.conversion_type}</CardTitle>
+
+            <TagRow
+              label="외부 근거"
+              items={item.external_basis}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <TagRow
+              label="내부 의사결정 노드"
+              items={item.internal_decision_node.map(
+                (m) => `${m.section} (${m.layer}-${m.category})`
+              )}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <TagRow
+              label="실체 참조"
+              items={item.substantive_reference}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <Item label="결정 의존" labelStyle={styles.labelDependency}>
+              {item.decision_dependency}
+            </Item>
+
+            <Item label="해석 한계" labelStyle={styles.labelLimit}>
+              {item.interpretation_limit}
+            </Item>
+          </ReportCard>
+        ))}
+      </LayerSection>
+
+      <Divider />
+
+      {/* L3 리스크 */}
+      <LayerSection label="L3" title="리스크 에스컬레이션 맵">
+        {data.risk_escalation_map.map((item, idx) => (
+          <ReportCard key={idx}>
+            <CardTitle>{item.stage}</CardTitle>
+
+            <TagRow
+              label="외부 규범"
+              items={item.external_norm}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <TagRow
+              label="내부 통제 지점"
+              items={item.internal_control.map(
+                (m) => `${m.section} (${m.layer}-${m.category})`
+              )}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <Item label="에스컬레이션 조건" labelStyle={styles.labelFunction}>
+              {item.escalation_condition}
+            </Item>
+
+            <Item label="시스템 리스크" labelStyle={styles.labelLimit}>
+              {item.systemic_risk}
+            </Item>
+
+            <Item label="긴장 유형" labelStyle={styles.labelDependency}>
+              {item.tension_type}
+            </Item>
+          </ReportCard>
+        ))}
+      </LayerSection>
+    </>
+  );
+}
 
 function LayerSection({
   label,

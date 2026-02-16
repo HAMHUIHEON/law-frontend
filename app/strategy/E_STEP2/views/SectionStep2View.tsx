@@ -157,9 +157,6 @@ export default function SectionStep2View({
           </ReportCard>
         ))}
       </LayerSection>
-
-
-
       <Divider />
       {/* L1 */}
       <LayerSection label="L1" title="적용 범위 및 구성 체계">

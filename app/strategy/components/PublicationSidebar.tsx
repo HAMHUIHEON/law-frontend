@@ -909,18 +909,18 @@ useEffect(() => {
         )}
 
         
-        {/* =========================
-            공통: 원문 읽기
-          ========================= */}
-          {selectedBookId &&
-            !["E_STEP1", "E_STEP2", "E_STEP2B"].includes(viewMode ?? "") && (
-            <div
-              style={{
-                marginTop: 16,
-                paddingTop: 8,
-                borderTop: "1px solid #e5e7eb",
-              }}
-            >            
+          {/* =========================
+              공통: 원문 읽기
+            ========================= */}
+            {selectedBookId &&
+              !artifacts?.E && (
+              <div
+                style={{
+                  marginTop: 16,
+                  paddingTop: 8,
+                  borderTop: "1px solid #e5e7eb",
+                }}
+              >
               <label
               style={{
                 display: "flex",
@@ -973,7 +973,6 @@ useEffect(() => {
     </aside>
   );
 }
-
 
 function SidebarSection({
   children,
