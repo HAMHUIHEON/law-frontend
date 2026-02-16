@@ -51,7 +51,7 @@ export default function SectionStep2View({
 
   // 🔥 아직 로딩 중이면 아무 것도 렌더링 안 함
   if (!userAccess) {
-    return <CenterMessage>불러오는 중...</CenterMessage>;
+    return null; 
   }
 
   const access = getStrategyAccess(userAccess, "E_STEP2");
@@ -127,13 +127,37 @@ export default function SectionStep2View({
         {data.L0.normative_anchors.map((a, i) => (
           <ReportCard key={i}>
             <CardTitle>{a.external_article}</CardTitle>
-            <Item label="법적 기능">{a.legal_function}</Item>
-            <Item label="의존 유형">{a.dependency_type}</Item>
-            <TagRow label="내부 연결 조문" items={a.internal_linkage} />
-            <Item label="해석 한계">{a.interpretation_limit}</Item>
+
+            <Item
+              label="법적 기능"
+              labelStyle={styles.labelFunction}
+            >
+              {a.legal_function}
+            </Item>
+
+            <Item
+              label="의존 유형"
+              labelStyle={styles.labelDependency}
+            >
+              {a.dependency_type}
+            </Item>
+
+            <TagRow
+              label="내부 연결 조문"
+              items={a.internal_linkage}
+              labelStyle={styles.labelEvidence}
+            />
+
+            <Item
+              label="해석 한계"
+              labelStyle={styles.labelLimit}
+            >
+              {a.interpretation_limit}
+            </Item>
           </ReportCard>
         ))}
       </LayerSection>
+
 
 
       <Divider />
@@ -144,11 +168,18 @@ export default function SectionStep2View({
         {data.L1.components.map((c, i) => (
           <ReportCard key={i}>
             <CardTitle>{c.name}</CardTitle>
+
             <Paragraph>{c.description}</Paragraph>
-            <TagRow label="근거 조문" items={c.legal_basis} />
+
+            <TagRow
+              label="근거 조문"
+              items={c.legal_basis}
+              labelStyle={styles.labelEvidence}
+            />
           </ReportCard>
         ))}
       </LayerSection>
+
       <Divider />
 
       {/* L2 */}
@@ -160,31 +191,37 @@ export default function SectionStep2View({
 
             {block.items.map((item, idx) => (
               <ReportCard key={idx}>
-              <Item
-                label="작동 메커니즘"
-             >
-                {item.mechanism_statement}
-              </Item>
 
-              <TagRow
-                label="내부 근거"
-                items={item.internal_legal_basis}
-              />
+                <Item
+                  label="작동 메커니즘"
+                  labelStyle={styles.labelFunction}
+                >
+                  {item.mechanism_statement}
+                </Item>
+
+                <TagRow
+                  label="내부 근거"
+                  items={item.internal_legal_basis}
+                  labelStyle={styles.labelEvidence}
+                />
 
                 <TagRow
                   label="외부 근거"
                   items={item.external_legal_basis ?? []}
+                  labelStyle={styles.labelEvidence}
                 />
 
                 <Collapsible
                   title="위반 시 리스크"
                   content={item.failure_mode}
                 />
+
               </ReportCard>
             ))}
           </div>
         ))}
       </LayerSection>
+
       <Divider />
       {/* L3 */}
       <LayerSection
@@ -195,18 +232,29 @@ export default function SectionStep2View({
         {data.L3.dispute_points.items.map((d, i) => (
           <ReportCard key={i}>
             <CardTitle>{d.issue}</CardTitle>
+
             <Item
               label="납세자 주장"
-          >
+              labelStyle={styles.labelDependency}
+            >
               {d.positions.taxpayer}
             </Item>
-            <Item label="과세관청 주장">
+
+            <Item
+              label="과세관청 주장"
+              labelStyle={styles.labelDependency}
+            >
               {d.positions.tax_office}
             </Item>
-            <TagRow label="핵심 증거" items={d.key_evidence} />
+
+            <TagRow
+              label="핵심 증거"
+              items={d.key_evidence}
+              labelStyle={styles.labelEvidence}
+            />
+
           </ReportCard>
         ))}
-
         {data.L3.system_tension && (
           <div style={styles.highlightBox}>
             <CardTitle>구조적 긴장</CardTitle>
@@ -324,25 +372,17 @@ function CardTitle({ children }: { children: React.ReactNode }) {
 function Item({
   label,
   children,
+  labelStyle,
 }: {
   label: string;
   children: React.ReactNode;
+  labelStyle?: React.CSSProperties;
 }) {
-  const color = React.useContext(LayerColorContext);
-
   return (
-    <div style={styles.itemRow}>
-      <div
-        style={{
-          ...styles.itemBar,
-          background: color,
-        }}
-      />
-      <p style={styles.item}>
-        <strong style={styles.itemLabel}>{label}</strong>
-        {children}
-      </p>
-    </div>
+    <p style={styles.item}>
+      <span style={labelStyle ?? styles.labelBase}>{label}</span>
+      {children}
+    </p>
   );
 }
 
@@ -369,31 +409,23 @@ function Paragraph({
 function TagRow({
   label,
   items,
+  labelStyle,
 }: {
   label: string;
   items?: string[];
+  labelStyle?: React.CSSProperties;
 }) {
-  const color = React.useContext(LayerColorContext);
-
   if (!items?.length) return null;
 
   return (
-    <div style={styles.itemRow}>
-      <div
-        style={{
-          ...styles.itemBar,
-          background: color,
-        }}
-      />
-      <div style={{ marginBottom: 10 }}>
-        <span style={styles.itemLabel}>{label}</span>
-        <div>
-          {items.map((t, i) => (
-            <span key={i} style={styles.tag}>
-              {t}
-            </span>
-          ))}
-        </div>
+    <div style={{ marginBottom: 10 }}>
+      <span style={labelStyle ?? styles.labelBase}>{label}</span>
+      <div>
+        {items.map((t, i) => (
+          <span key={i} style={styles.tag}>
+            {t}
+          </span>
+        ))}
       </div>
     </div>
   );
@@ -475,10 +507,9 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     margin: 0,
   },
-
 itemRow: {
   display: "flex",
-  alignItems: "stretch",
+  alignItems: "flex-start",
   gap: 10,
   marginBottom: 12,
 },
@@ -487,7 +518,6 @@ itemBar: {
   width: 4,
   borderRadius: 2,
   marginTop: 4,
-  alignSelf: "stretch",   // 🔥 핵심
 },
 
   card: {
@@ -593,6 +623,7 @@ tag: {
   marginRight: 6,
   marginTop: 6,
 },
+
 noticeBox: {
   border: `1px solid ${colors.line}`,
   background: colors.bgSoft,
@@ -614,6 +645,44 @@ sectionHint: {
   marginBottom: 18,
   paddingBottom: 8,
   borderBottom: `1px solid ${colors.line}`,
+},
+labelBase: {
+  display: "inline-block",
+  fontSize: 13,
+  fontWeight: 600,
+  marginRight: 6,
+},
+
+labelFunction: {
+  display: "inline-block",
+  fontSize: 13,
+  fontWeight: 600,
+  marginRight: 6,
+  color: "#1e3a8a",
+},
+
+labelDependency: {
+  display: "inline-block",
+  fontSize: 13,
+  fontWeight: 600,
+  marginRight: 6,
+  color: "#0f766e",
+},
+
+labelEvidence: {
+  display: "inline-block",
+  fontSize: 13,
+  fontWeight: 600,
+  marginRight: 6,
+  color: "#7c3aed",
+},
+
+labelLimit: {
+  display: "inline-block",
+  fontSize: 13,
+  fontWeight: 600,
+  marginRight: 6,
+  color: "#b45309",
 },
 
 };
