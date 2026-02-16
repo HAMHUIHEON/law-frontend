@@ -30,7 +30,7 @@ export default function SectionStep2Container({
         setError(null);
 
         const res = await fetch(
-          `/api/${bookId}/E/${chapter}/step2/sections/${sectionSlug}`,
+          `/api/publications/e/${bookId}/E/${chapter}/step2/sections/${sectionSlug}`,
           { cache: "no-store" }
         );
 
