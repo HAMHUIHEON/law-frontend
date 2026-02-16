@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { adaptStep2bChapterAnalysis } from "../adapters";
+import { adaptStep2bChapter } from "../adapters";
 import { Step2bChapterAnalysis } from "../types";
 import ChapterStep2bView from "../views/ChapterStep2bView";
 
@@ -40,7 +40,7 @@ export default function ChapterStep2bContainer({
         }
 
         const raw = await res.json();
-        const adapted = adaptStep2bChapterAnalysis(raw);
+        const adapted = adaptStep2bChapter(raw, chapter);
 
         setData(adapted);
       } catch (err: any) {
