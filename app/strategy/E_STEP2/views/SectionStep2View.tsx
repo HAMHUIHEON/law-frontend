@@ -59,6 +59,7 @@ export default function SectionStep2View({
 
   const saveThought = useSaveThought();
   const [saving, setSaving] = useState(false);
+  const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({});
 
   useRecordStrategyTrace({
     userId,
@@ -183,43 +184,70 @@ export default function SectionStep2View({
 
       {/* L2 */}
 
-      <LayerSection label="L2" title="절차 작동 엔진">
-        {data.L2.map((block) => (
-          <div key={block.key} style={{ marginBottom: 40 }}>
-            <CardTitle>{block.label}</CardTitle>
+      <LayerSection2 label="L2" title="절차 작동 엔진">
+        {data.L2.map((block) => {
+          const previewCount = 2;
+          const isOpen = openBlocks[block.key] ?? false;
 
-            {block.items.map((item, idx) => (
-              <ReportCard key={idx}>
+          const visibleItems = isOpen
+            ? block.items
+            : block.items.slice(0, previewCount);
 
-                <Item
-                  label="작동 메커니즘"
-                  labelStyle={styles.labelFunction}
-                >
-                  {item.mechanism_statement}
-                </Item>
+          return (
+            <div key={block.key} style={{ marginBottom: 40 }}>
+              <CardTitle>{block.label}</CardTitle>
 
-                <TagRow
-                  label="내부 근거"
-                  items={item.internal_legal_basis}
-                  labelStyle={styles.labelEvidence}
-                />
+              {visibleItems.map((item, idx) => (
+                <ReportCard key={idx}>
+                  <Item
+                    label="작동 메커니즘"
+                    labelStyle={styles.labelFunction}
+                  >
+                    {item.mechanism_statement}
+                  </Item>
 
-                <TagRow
-                  label="외부 근거"
-                  items={item.external_legal_basis ?? []}
-                  labelStyle={styles.labelEvidence}
-                />
+                  <TagRow
+                    label="내부 근거"
+                    items={item.internal_legal_basis}
+                    labelStyle={styles.labelEvidence}
+                  />
 
-                <Collapsible
-                  title="위반 시 리스크"
-                  content={item.failure_mode}
-                />
+                  <TagRow
+                    label="외부 근거"
+                    items={item.external_legal_basis ?? []}
+                    labelStyle={styles.labelEvidence}
+                  />
 
-              </ReportCard>
-            ))}
-          </div>
-        ))}
-      </LayerSection>
+                  <Collapsible
+                    title="위반 시 리스크"
+                    content={item.failure_mode}
+                  />
+                </ReportCard>
+              ))}
+
+              {block.items.length > previewCount && (
+                <div style={{ marginTop: 12 }}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenBlocks((prev) => ({
+                        ...prev,
+                        [block.key]: !isOpen,
+                      }))
+                    }
+                    style={styles.toggleButton}
+                  >
+                    {isOpen
+                      ? "접기 ▲"
+                      : `더 보기 (${block.items.length - previewCount}) ▼`}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </LayerSection2>
+
 
       <Divider />
       {/* L3 */}
@@ -241,7 +269,7 @@ export default function SectionStep2View({
 
             <Item
               label="과세관청 주장"
-              labelStyle={styles.labelDependency}
+              labelStyle={styles.labelLimit}
             >
               {d.positions.tax_office}
             </Item>
@@ -376,6 +404,32 @@ function LayerSection({
   );
 }
 
+function LayerSection2({
+  label,
+  title,
+  hint,
+  children,
+}: {
+  label: string;
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section style={{ marginBottom: 56 }}>
+      <div style={styles.layerTitleWrapper}>
+        <div style={styles.layerTitleBar} />
+        <h2 style={styles.layerTitle}>
+          {label}. {title}
+        </h2>
+      </div>
+
+      {hint && <p style={styles.sectionHint}>{hint}</p>}
+
+      {children}
+    </section>
+  );
+}
 
 function ReportCard({ children }: { children: React.ReactNode }) {
   return <div style={styles.card}>{children}</div>;
