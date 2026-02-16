@@ -41,6 +41,8 @@ export default function ChapterStep2bContainer({
 
         const raw = await res.json();
         const adapted = adaptStep2bChapter(raw, chapter);
+        console.log("chapter param:", chapter);
+        console.log("raw:", raw);
 
         setData(adapted);
       } catch (err: any) {

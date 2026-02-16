@@ -23,7 +23,13 @@ export function adaptStep2bChapter(
       return raw as Step2bChapter2;
 
     case "chapter3":
-      return raw as Step2bChapter3;
+      return {
+        chapter: raw.chapter,
+        normative_dependency_map: raw.normative_dependency_map ?? [],
+        substantive_threshold_analysis: raw.substantive_threshold_analysis ?? [],
+        conversion_substance_link: raw.conversion_substance_link ?? [],
+        risk_escalation_map: raw.risk_escalation_map ?? [],
+      };
 
     default:
       throw new Error("Unknown chapter type");
