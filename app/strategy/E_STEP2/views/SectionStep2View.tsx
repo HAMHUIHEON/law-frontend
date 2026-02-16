@@ -159,12 +159,19 @@ export default function SectionStep2View({
 
 function Block({ title, children }: any) {
   return (
-    <section style={styles.section}>
+    <section
+      style={{
+        marginBottom: 56,
+        borderBottom: "1px solid #e5e7eb",
+        paddingBottom: 32,
+      }}
+    >
       <h2 style={styles.sectionTitle}>{title}</h2>
       {children}
     </section>
   );
 }
+
 
 function Card({ children }: any) {
   return <div style={styles.card}>{children}</div>;
@@ -213,8 +220,11 @@ function TagList({ label, items }: { label: string; items: string[] }) {
 
 function EngineBlock({ title, block }: any) {
   return (
-    <div style={{ marginBottom: 28 }}>
-      <h3 style={styles.engineTitle}>{title}</h3>
+    <div style={{ marginBottom: 36 }}>
+      <div style={styles.engineHeader}>
+        <div style={styles.engineBar} />
+        <h3 style={styles.engineTitle}>{title}</h3>
+      </div>
 
       {block.items.map((item: any, idx: number) => (
         <CollapsibleCard key={idx} item={item} />
@@ -319,9 +329,13 @@ function SystemTensionBlock({ data }: any) {
 
 const styles: Record<string, any> = {
   container: {
-    padding: "40px 60px",
-    maxWidth: 1100,
-  },
+    maxWidth: 960,
+    margin: "0 auto",
+    paddingTop: 18,
+    lineHeight: 1.7,
+    color: colors.ink,
+},
+
   title: {
     fontSize: 26,
     fontWeight: 700,
@@ -336,11 +350,12 @@ const styles: Record<string, any> = {
   },
   card: {
     border: "1px solid #e5e7eb",
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 16,
+    borderRadius: 12,
+    padding: "20px 22px",
+    marginBottom: 24,
     background: "#ffffff",
   },
+
   cardTitle: {
     fontSize: 16,
     fontWeight: 600,
@@ -370,26 +385,50 @@ const styles: Record<string, any> = {
     borderRadius: 6,
   },
   engineTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 600,
     marginBottom: 12,
   },
+
   failureToggle: {
     cursor: "pointer",
     fontSize: 13,
     color: "#374151",
     marginTop: 8,
   },
-  failureBox: {
-    marginTop: 10,
-    padding: 12,
-    background: "#f9fafb",
-    borderRadius: 6,
-    fontSize: 14,
-  },
-  tensionBox: {
-    padding: 20,
-    borderRadius: 8,
-    background: "#fef3c7",
-  },
+
+failureBox: {
+  marginTop: 12,
+  padding: 14,
+  background: "#fef2f2",
+  border: "1px solid #fecaca",
+  borderRadius: 8,
+  fontSize: 14,
+},
+
+tensionBox: {
+  padding: 20,
+  borderRadius: 12,
+  background: "#fef9c3",
+  border: "1px solid #fde68a",
+},
+
+
+  engineHeader: {
+  display: "flex",
+  alignItems: "center",
+  marginBottom: 16,
+},
+
+engineBar: {
+  width: 4,
+  height: 18,
+  background: "#7c3aed", // 보라 (엔진 강조)
+  borderRadius: 2,
+  marginRight: 10,
+},
+
+
+
 };
+
