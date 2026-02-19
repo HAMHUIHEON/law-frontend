@@ -190,7 +190,7 @@ function SubscribePageInner() {
         {/* CTA */}
         <section style={ctaSectionStyle}>
           <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>월 결제 이용권</p>
-          <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ 12,800/ 월</p>
+          <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ 15,800/ 월</p>
 
         <button
         onClick={async () => {
