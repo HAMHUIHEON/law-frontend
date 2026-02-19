@@ -229,7 +229,7 @@ function SubscribePageInner() {
               pay_method: "card",
               merchant_uid,
               name: "월 이용 멤버십",
-              amount: 12800, // 테스트 금액
+              amount: 15800, // 테스트 금액
               buyer_email: "yoonsuel_m@naver.com",
               buyer_name: "테스트 사용자",
             },
