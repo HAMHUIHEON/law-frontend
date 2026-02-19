@@ -60,7 +60,7 @@ export default function SectionStep2Container({
   }
 
   if (loading) {
-    return <div style={{ padding: 24 }}>Loading...</div>;
+    return <div style={{ padding: 24 }}>불러오는 중...</div>;
   }
 
   if (error) {

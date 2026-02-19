@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "LAPIS NEXUS",
   description:
-    "Where thought flows, sharpens, and extends. LAPIS NEXUS는 조세법과 제도의 구조를 해석하고 판단의 좌표계를 제공하는 전략적 사고 도구입니다. 국제조세조정법, 조세범처벌법, 조세범칙 세무조사 등 고난도 영역에서 리스크의 발생 지점과 판단 구조를 체계적으로 탐색할 수 있도록 설계되었습니다.",
+    "조세법과 제도의 구조를 해석하고 판단의 좌표계를 제공하는 AI 확장형 전략적 사고 시스템입니다. 생성형 AI를 활용하여 법 조문, 판례, 조사 실무를 교차 분석하고, 국제조세조정법·조세범처벌법·범칙 세무조사 등 고난도 영역에서 리스크의 발생 지점과 판단 구조를 다층적으로 구조화합니다.",
   icons: {
     icon: "/favicon.ico",
   },

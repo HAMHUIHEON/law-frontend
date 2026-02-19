@@ -190,7 +190,7 @@ function SubscribePageInner() {
         {/* CTA */}
         <section style={ctaSectionStyle}>
           <p style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>월 결제 이용권</p>
-          <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ 29,800/ 월</p>
+          <p style={{ fontSize: 28, fontWeight: 700, marginBottom: 28 }}>₩ 12,800/ 월</p>
 
         <button
         onClick={async () => {
@@ -229,7 +229,7 @@ function SubscribePageInner() {
               pay_method: "card",
               merchant_uid,
               name: "월 이용 멤버십",
-              amount: 29800, // 테스트 금액
+              amount: 12800, // 테스트 금액
               buyer_email: "yoonsuel_m@naver.com",
               buyer_name: "테스트 사용자",
             },
