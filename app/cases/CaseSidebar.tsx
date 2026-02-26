@@ -190,8 +190,8 @@ export default function CaseSidebar() {
 
   const modes: [Exclude<CaseViewMode, "HOME">, string][] = [
     ["FLOW", "판례 흐름 요약"],
-    ["STRUCTURE", "쟁점 · 판단 구조"],
-    ["PRACTICE", "논증 · 적용"],
+    ["STRUCTURE", "쟁점 분석 · 판단 구조"],
+    ["PRACTICE", "핵심 법리 · 실무 활용"],
   ];
 
 
