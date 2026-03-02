@@ -131,7 +131,7 @@ export function makeLabel(
       "";
 
     const body = title ? shortText(String(title), 110) : shortText(cid, 80);
-    return `[국세조세조정에 관한 관계 법령]\n${body}`;
+    return `[국제조세조정에 관한 관계 법령]\n${body}`;
 
   }
 
