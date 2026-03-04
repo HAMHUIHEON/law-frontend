@@ -61,7 +61,10 @@ export default function HomePage() {
           borderLeft: `3px solid ${depthColors.A}`,
           }}
         >   
-         <p>사건의 개요와 결론을 중심으로 핵심만 정리해요.</p>
+         <p>
+          판례의 쟁점과 판단 구조를 따라가며<br/>
+          사건이 어떤 논증을 통해 결론에 이르렀는지 살펴봐요.
+        </p>
         </div>
         </button>
 
@@ -89,7 +92,10 @@ export default function HomePage() {
             borderLeft: `3px solid ${depthColors.B}`,
           }}
         >   
-            <p>조문 하나가 아니라 전체 맥락을 이해하고 싶어요.</p>
+            <p>
+            조문과 쟁점 구조를 통해<br/>
+            법령이 실제로 어떻게 작동하는지 살펴봐요.
+            </p>
           </div>
         </button>
 
@@ -117,7 +123,10 @@ export default function HomePage() {
 
           }}
         >   
-            <p>실무 관점의 판단 포인트와 전략이 필요해요.</p>
+            <p>
+              실무 관점에서 어떤 판단 포인트가 중요한지<br/>
+              전략적 대응 방향을 정리해요.
+            </p>
           </div>
         </button>
       </div>
