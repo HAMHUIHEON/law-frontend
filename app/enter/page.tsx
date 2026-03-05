@@ -33,12 +33,10 @@ export default function HomePage() {
         <UserButton />
       </SignedIn>
     </div>
-
       <h1 style={styles.title}>어떤 관점에서 살펴보고 싶으신가요?</h1>
       <p style={styles.subtitle}>
       판례 · 법령 · 전략 중 하나를 선택해 시작하세요.
       </p>
-      <div style={styles.titleSpacer} />
       <div style={styles.cardContainer}>
       <button
         style={{
@@ -175,7 +173,7 @@ utilityButton: {
     fontSize: "32px",
     fontWeight: 500,
     color: "rgba(255,255,255,0.88)",
-    marginBottom: "48px",   // ↓ 기존 48px → 32px
+    marginBottom: "10px",   //기존 48
     lineHeight: 1.3,
   },
 
@@ -231,16 +229,11 @@ cardDesc: {
   borderLeft: "3px solid #e5e5e5",
   lineHeight: 1.6,
 },
-
-  titleSpacer: {
-    height: "1px",
-  },
-
-  subtitle: {
+subtitle: {
   fontSize: "14px",
   color: "rgba(255,255,255,0.6)",
-  marginBottom: "28px",
-}
+  marginBottom: "32px",
+},
 };
 
 
