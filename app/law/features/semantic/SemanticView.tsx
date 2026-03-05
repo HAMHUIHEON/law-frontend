@@ -280,8 +280,21 @@ export default function SemanticView({ snapshot, currentChapter }: Props) {
                 <Block
                   title="📚 관련 규정" items={currentIssue.cross_refs}
                 />
-              </>
-            )}
+              {/* 🔗 Law → Case bridge */}
+              <div style={styles.caseBridge}>
+                <p style={styles.caseBridgeText}>
+                🔗 이 쟁점이 실제 판례에서 어떻게 적용되는지 확인해보세요.
+                </p>
+
+                <button
+                  style={styles.caseBridgeButton}
+                  onClick={() => router.push("/cases")}
+                >
+                  관련 판례의 논증 구조 보기 →
+                </button>
+              </div>
+            </>
+          )}
             </div>
               {/* 🔒 잠금 오버레이 */}
               {isLocked && (
@@ -572,4 +585,25 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#6b7280",
     lineHeight: 1.6,
   },
+    caseBridge: {
+  marginTop: 26,
+  paddingTop: 18,
+  borderTop: "1px solid #e5e7eb",
+},
+
+caseBridgeText: {
+  fontSize: 13.5,
+  color: "#374151",
+  marginBottom: 10,
+},
+
+caseBridgeButton: {
+  padding: "8px 12px",
+  fontSize: 13,
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  cursor: "pointer",
+},
 };

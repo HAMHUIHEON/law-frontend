@@ -330,7 +330,7 @@ return (
                 {/* 🔗 Law → Case bridge */}
                 <div style={styles.caseBridge}>
                   <p style={styles.caseBridgeText}>
-                    이 논증이 실제 판례에서 어떻게 적용되는지 확인해보세요.
+                    🔗 이 논증이 실제 판례에서 어떻게 적용되는지 확인해보세요.
                   </p>
 
                   <button
@@ -343,7 +343,7 @@ return (
               </>
             )}
           </div>
-          
+
           {/* 🔒 잠금 오버레이 */}
           {isLocked && (
             <div style={lockOverlayStyle}>
