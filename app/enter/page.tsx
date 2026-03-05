@@ -35,10 +35,10 @@ export default function HomePage() {
     </div>
 
       <h1 style={styles.title}>어떤 관점에서 살펴보고 싶으신가요?</h1>
-      <div style={styles.titleSpacer} />
       <p style={styles.subtitle}>
       판례 · 법령 · 전략 중 하나를 선택해 시작하세요.
       </p>
+      <div style={styles.titleSpacer} />
       <div style={styles.cardContainer}>
       <button
         style={{
@@ -233,8 +233,9 @@ cardDesc: {
 },
 
   titleSpacer: {
-    height: "12px",
+    height: "1px",
   },
+
   subtitle: {
   fontSize: "14px",
   color: "rgba(255,255,255,0.6)",
