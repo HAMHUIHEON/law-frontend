@@ -327,10 +327,23 @@ return (
                 <MiniBlock title="🚧 예외 조건" items={currentStep.exceptions} />
                 <MiniBlock title="🧮 산식 · 절차" items={currentStep.methods} />
                 <MiniBlock title="📖 근거 조문" items={currentStep.based_on} />
+                {/* 🔗 Law → Case bridge */}
+                <div style={styles.caseBridge}>
+                  <p style={styles.caseBridgeText}>
+                    이 논증이 실제 판례에서 어떻게 적용되는지 확인해보세요.
+                  </p>
+
+                  <button
+                    style={styles.caseBridgeButton}
+                    onClick={() => router.push("/cases")}
+                  >
+                    판례 분석 보러가기 →
+                  </button>
+                </div>
               </>
             )}
           </div>
-
+          
           {/* 🔒 잠금 오버레이 */}
           {isLocked && (
             <div style={lockOverlayStyle}>
@@ -568,4 +581,25 @@ stepTabs: {
     marginBottom: 6,
     color: "#111827",
   },
+  caseBridge: {
+  marginTop: 26,
+  paddingTop: 18,
+  borderTop: "1px solid #e5e7eb",
+},
+
+caseBridgeText: {
+  fontSize: 13.5,
+  color: "#374151",
+  marginBottom: 10,
+},
+
+caseBridgeButton: {
+  padding: "8px 12px",
+  fontSize: 13,
+  borderRadius: 8,
+  border: "1px solid #111827",
+  background: "#111827",
+  color: "#fff",
+  cursor: "pointer",
+},
 };
