@@ -7,6 +7,11 @@ import { useRouter } from "next/navigation";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
+function extractCaseNumber(raw: string): string | null {
+  const m = raw.match(/\b(\d{2}|\d{4})[가-힣]{1,3}\d+\b/);
+  if (!m) return null;
+  return m[0];
+}
 export default function IssueSearchPage() {
   const router = useRouter();
 
@@ -109,9 +114,12 @@ export default function IssueSearchPage() {
         {results.map((r, i) => (
           <div
             key={i}
-            onClick={() =>
-              router.push(`/cases?case_id=${encodeURIComponent(r.case_id)}`)
-            }
+            onClick={() => {
+            const normalized = extractCaseNumber(r.case_id);
+            if (!normalized) return;
+
+            router.push(`/cases?case_id=${encodeURIComponent(normalized)}`);
+            }}
             style={{
               padding: 18,
               border: "1px solid #e5e7eb",
