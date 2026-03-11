@@ -113,10 +113,10 @@ export default function IssueSearchPage() {
               router.push(`/cases?case_id=${encodeURIComponent(r.case_id)}`)
             }
             style={{
-              padding: 16,
-              border: "1px solid #eee",
-              borderRadius: 8,
-              marginBottom: 12,
+              padding: 18,
+              border: "1px solid #e5e7eb",
+              borderRadius: 10,
+              marginBottom: 14,
               cursor: "pointer",
               background: "#fff",
               transition: "all 0.15s ease",
@@ -128,29 +128,81 @@ export default function IssueSearchPage() {
               e.currentTarget.style.background = "#fff";
             }}
           >
-            <div style={{ fontWeight: 700 }}>
-              {r.case_id}
-            </div>
-
+            {/* 사건번호 + score */}
             <div
               style={{
-                marginTop: 4,
-                fontSize: 14,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              {r.core_issue}
+              <div style={{ fontWeight: 700, fontSize: 15 }}>
+                {r.case_id}
+              </div>
+
+              {r.score && (
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "#6b7280",
+                    fontWeight: 600,
+                  }}
+                >
+                  score {r.score.toFixed(3)}
+                </div>
+              )}
             </div>
 
-            {r.mini_conclusion && (
+            {/* 상위 쟁점 */}
+            <div
+              style={{
+                marginTop: 8,
+                fontSize: 14,
+                color: "#111827",
+              }}
+            >
+              <b>상위 쟁점</b> · {r.core_issue}
+            </div>
+
+            {/* 세부 쟁점 */}
+            {r.matched_issue && (
+              <div
+                style={{
+                  marginTop: 4,
+                  fontSize: 13,
+                  color: "#374151",
+                }}
+              >
+                <b>세부 쟁점</b> · {r.matched_issue}
+              </div>
+            )}
+
+            {/* 관련 법령 */}
+            {r.statutes && r.statutes.length > 0 && (
               <div
                 style={{
                   marginTop: 6,
-                  fontSize: 13,
-                  color: "#555",
-                  lineHeight: 1.5,
+                  fontSize: 12,
+                  color: "#6b7280",
                 }}
               >
-                {r.mini_conclusion.slice(0, 200)}...
+                <b>관련 법령</b> · {r.statutes.slice(0, 3).join(" / ")}
+              </div>
+            )}
+
+            {/* 소결론 */}
+            {r.mini_conclusion && (
+              <div
+                style={{
+                  marginTop: 8,
+                  fontSize: 13,
+                  color: "#4b5563",
+                  lineHeight: 1.6,
+                }}
+              >
+                {r.mini_conclusion.length > 220
+                  ? r.mini_conclusion.slice(0, 220) + "..."
+                  : r.mini_conclusion}
               </div>
             )}
           </div>

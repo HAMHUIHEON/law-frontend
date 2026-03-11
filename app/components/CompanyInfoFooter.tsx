@@ -16,8 +16,9 @@ export function CompanyInfoFooter() {
   const hideOnFlow = pathname.startsWith("/cases/flow");
   const hideOnStructure = pathname.startsWith("/cases/structure");
   const hideOnPractice = pathname.startsWith("/cases/practice");
+  const hideOnSearch = pathname.startsWith("/cases/search");
 
-  if (hideOnFlow || hideOnStructure || hideOnPractice) {
+  if (hideOnFlow || hideOnStructure || hideOnPractice || hideOnSearch) {
     return null;
   }
 
