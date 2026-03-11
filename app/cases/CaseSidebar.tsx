@@ -326,7 +326,32 @@ const routeByMode: Record<Exclude<CaseViewMode, "HOME">, string> = {
           </label>
         ))}
       </section>
+      {/* ================= 쟁점 검색 ================= */}
+      <section>
+        <p style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>
+          쟁점 검색
+        </p>
 
+        <button
+          onClick={() => router.push("/cases/search")}
+          style={{
+            width: "100%",
+            padding: "8px 12px",
+            borderRadius: 8,
+            border: "1px solid #d1d5db",
+            background: "#fff",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          🔎 쟁점 기반 판례 검색
+        </button>
+
+        <div style={{ fontSize: 12, color: "#6b7280", marginTop: 6 }}>
+          쟁점 키워드로 유사 판례를 찾습니다.
+        </div>
+      </section>
+      
       <hr style={{ borderTop: "1px solid #e5e7eb" }} />
 
       <button
