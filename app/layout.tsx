@@ -5,7 +5,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { GlobalDisclaimerFooter } from "./components/GlobalDisclaimerFooter";
 import Script from "next/script";
-import { CompanyInfoFooter } from "./components/CompanyInfoFooter";
+// import { CompanyInfoFooter } from "./components/CompanyInfoFooter";
 import { UserSync } from "./components/UserSync";
 
 const geistSans = Geist({
@@ -47,7 +47,7 @@ export default function RootLayout({
           <UserSync />
           <div style={{ minHeight: "100vh" }}>
             {children}
-            <CompanyInfoFooter />
+            {/* <CompanyInfoFooter /> */}
             <GlobalDisclaimerFooter />
           </div>
         </ClerkProvider>
