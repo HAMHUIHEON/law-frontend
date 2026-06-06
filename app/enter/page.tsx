@@ -35,7 +35,7 @@ export default function HomePage() {
     </div>
       <h1 style={styles.title}>어떤 관점에서 살펴보고 싶으신가요?</h1>
       <p style={styles.subtitle}>
-      판례 · 법령 · 전략 중 하나를 선택해 시작하세요.
+      판례 · 법령 · 전략 · AI 에이전트 중 하나를 선택해 시작하세요.
       </p>
       <div style={styles.cardContainer}>
       <button
@@ -130,6 +130,36 @@ export default function HomePage() {
             </p>
           </div>
         </button>
+
+      <button
+        style={{
+          ...styles.card,
+          ...(hovered === 3 ? styles.cardHover : {}),
+        }}
+        onMouseEnter={() => setHovered(3)}
+        onMouseLeave={() => setHovered(null)}
+        onClick={() => router.push("/agent")}
+      >
+          <div
+            style={{
+              ...styles.cardTitle,
+              ...(hovered === 3 ? styles.cardTitleHover : {}),
+            }}
+          >
+            <h2>AI 에이전트에게 직접 물어보고 싶어요</h2>
+          </div>
+        <div
+          style={{
+            ...styles.cardDesc,
+            borderLeft: `3px solid ${depthColors.D}`,
+          }}
+        >
+            <p>
+              판례 DB와 법령을 교차 탐색해<br/>
+              질문에 맞는 전략 보고서를 자동 생성해요.
+            </p>
+          </div>
+        </button>
       </div>
     </main>
   );
@@ -138,6 +168,7 @@ const depthColors = {
   A: "#059669", // 초록
   B: "#1d4ed8", // 남색
   C: "#6d28d9", // 보라
+  D: "#0891b2", // 청록 (AI 에이전트)
 };
 
 
