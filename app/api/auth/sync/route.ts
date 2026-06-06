@@ -1,5 +1,7 @@
 // 29_FINAL/law-frontend/app/api/auth/sync/route.ts
 
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/app/lib/supabaseServer";
