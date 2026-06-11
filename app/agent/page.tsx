@@ -189,8 +189,7 @@ function InsightResultView({ result }: { result: InsightResult }) {
 function MultiResultView({ result }: { result: MultiResult }) {
   const searchResults = result.case_context?.search_results ?? [];
   const patternResult = result.case_context?.pattern_results;
-  const relatedIssues = result.law_context?.related_issues ?? [];
-  const articles = result.law_context?.articles ?? [];
+  const lawArticles = result.law_articles_context ?? [];
   const precResults = result.taxlaw_prec_context ?? [];
   const taxtrResults = result.taxtr_context ?? [];
 
@@ -298,39 +297,28 @@ function MultiResultView({ result }: { result: MultiResult }) {
         </SectionCard>
       )}
 
-      {(relatedIssues.length > 0 || articles.length > 0) && (
-        <SectionCard title="ITCL 법령 컨텍스트" defaultOpen>
-          {relatedIssues.length > 0 && (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#6b7280", marginBottom: 8 }}>관련 쟁점</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {relatedIssues.map((issue, i) => (
-                  <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 12px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{issue.issue_title}</span>
-                      {issue.similarity != null && <span style={{ fontSize: 11, color: "#6b7280" }}>{Math.round(issue.similarity * 100)}%</span>}
-                    </div>
-                    {issue.issue_summary && <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>{issue.issue_summary}</div>}
-                    {issue.similarity != null && <SimilarityBar value={issue.similarity} />}
+      {lawArticles.length > 0 && (
+        <SectionCard title={`세법 조문 (${lawArticles.length}건)`} defaultOpen>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {lawArticles.map((art, i) => {
+              const scopeLabel: Record<string, string> = { LAW: "법", DECREE: "시행령", RULE: "시행규칙" };
+              const scopeColor: Record<string, string> = { LAW: "#1e40af", DECREE: "#065f46", RULE: "#92400e" };
+              const sl = scopeLabel[art.scope] ?? art.scope;
+              const sc = scopeColor[art.scope] ?? "#6b7280";
+              return (
+                <div key={i} style={{ background: "#f9fafb", borderRadius: 6, padding: "8px 12px", borderLeft: `3px solid ${sc}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>
+                      {art.law_name} 제{art.article_no}조 {art.title}
+                    </span>
+                    <span style={{ fontSize: 11, color: sc, background: `${sc}18`, padding: "1px 6px", borderRadius: 10 }}>{sl}</span>
+                    {art.domain && <span style={{ fontSize: 11, color: "#6b7280" }}>[{art.domain}]</span>}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {articles.length > 0 && (
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#6b7280", marginBottom: 8 }}>관련 조문</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {articles.map((art, i) => (
-                  <div key={i} style={{ background: "#f9fafb", borderRadius: 6, padding: "8px 10px", borderLeft: "3px solid #7c3aed" }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{art.article_title}</span>
-                    {art.scope && <span style={{ fontSize: 11, color: "#7c3aed", marginLeft: 8 }}>{art.scope}</span>}
-                    {art.related_issue && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>쟁점: {art.related_issue}</div>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+                  {art.document && <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>{art.document.slice(0, 200)}</div>}
+                </div>
+              );
+            })}
+          </div>
         </SectionCard>
       )}
     </div>

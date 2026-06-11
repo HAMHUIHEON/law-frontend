@@ -56,10 +56,15 @@ export interface MultiResult {
     title: string;
     document: string;
   }[];
-  law_context: {
-    related_issues: { set_key: string; issue_id: string; issue_title: string; issue_summary: string; similarity: number }[];
-    articles: { scope: string; version_key: string; article_id: string; article_title: string; related_issue: string }[];
-  };
+  law_articles_context?: {
+    doc_id: string;
+    law_name: string;
+    scope: string;
+    article_no: string;
+    title: string;
+    domain: string;
+    document: string;
+  }[];
   tools_used: string[];
 }
 

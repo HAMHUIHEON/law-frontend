@@ -9,7 +9,7 @@ const AGENT_BLUE = "#1e40af";
 const AGENT_LABELS: Record<AgentType, { name: string; desc: string; placeholder: string; color: string }> = {
   MULTI: {
     name: "종합 리서치",
-    desc: "판례 DB + ITCL 법령을 결합한 멀티 에이전트",
+    desc: "판례·재결례·14개 세법 조문을 결합한 멀티 에이전트",
     placeholder: "예) 이전가격 조작으로 인한 과세처분 취소 판례의 공통된 판단 기준은?",
     color: "#1e40af",
   },
