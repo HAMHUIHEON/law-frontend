@@ -178,6 +178,29 @@ function InsightResultView({ result }: { result: InsightResult }) {
           </SectionCard>
         </SectionCard>
       )}
+
+      {(result.law_articles_context ?? []).length > 0 && (
+        <SectionCard title={`관련 세법 조문 (${result.law_articles_context!.length}건)`} accent="#059669">
+          {result.law_articles_context!.map((a, i) => {
+            const scopeLabel: Record<string,string> = { law: "법", decree: "시행령", rule: "시행규칙" };
+            return (
+              <div key={i} style={{ borderBottom: "1px solid #e5e7eb", paddingBottom: 10, marginBottom: 10 }}>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, background: "#d1fae5", color: "#065f46", borderRadius: 4, padding: "1px 6px", fontWeight: 600 }}>
+                    {scopeLabel[a.scope] ?? a.scope}
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#1f2937" }}>{a.law_name}</span>
+                  <span style={{ fontSize: 12, color: "#6b7280" }}>{a.article_no}</span>
+                  {a.title && <span style={{ fontSize: 12, color: "#374151" }}>{a.title}</span>}
+                </div>
+                <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+                  {a.document?.slice(0, 300)}{a.document?.length > 300 ? "…" : ""}
+                </div>
+              </div>
+            );
+          })}
+        </SectionCard>
+      )}
     </div>
   );
 }

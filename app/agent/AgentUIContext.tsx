@@ -21,6 +21,10 @@ export interface InsightResult {
       risk_view: { taxpayer_risk: string; tax_authority_risk: string; precedent_signal: string };
     };
   } | null;
+  law_articles_context?: {
+    doc_id: string; law_name: string; scope: string;
+    article_no: string; title: string; domain: string; document: string;
+  }[];
   steps: string[];
 }
 
