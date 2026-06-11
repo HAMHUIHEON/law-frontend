@@ -6,265 +6,213 @@ import { useState } from "react";
 import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/nextjs";
 import { LegalLinks } from "./LegalLinks";
 
+const AGENTS = [
+  {
+    key: "MULTI",
+    title: "종합 리서치",
+    desc: "판례 DB + ITCL 국제조세조정법을 동시에 탐색해 종합 보고서 생성",
+    color: "#1e40af",
+    badge: "멀티 에이전트",
+  },
+  {
+    key: "INSIGHT",
+    title: "판례 심층 분석",
+    desc: "쿼리 분해 → 판례 탐색 → 사건번호 기반 전략 보고서",
+    color: "#7c3aed",
+    badge: "InsightAgent",
+  },
+  {
+    key: "TAXLAW_PREC",
+    title: "법원 판례 검색",
+    desc: "국세청 taxlaw 32,628건 법원 판례 — 국승/국패·세법 유형별 분석",
+    color: "#065f46",
+    badge: "32,000+ 판례",
+  },
+  {
+    key: "TAXTR",
+    title: "조세심판 재결례",
+    desc: "조세심판원 2,463건 재결례 DB — 유사 사건 검색 및 전략 분석",
+    color: "#92400e",
+    badge: "2,463건",
+  },
+];
 
-export default function HomePage() {
+export default function EnterPage() {
   const router = useRouter();
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
     <main style={styles.container}>
-    <LegalLinks />
-    <div style={styles.topUtility}>
-      <SignedOut>
-        <SignInButton mode="modal">
-          <button style={styles.utilityButton}>
-            Login
+      <LegalLinks />
+      <div style={styles.topUtility}>
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button style={styles.utilityButton}>Login</button>
+          </SignInButton>
+        </SignedOut>
+        <SignedIn>
+          <button style={styles.utilityButton} onClick={() => router.push("/me")}>
+            MyPage
           </button>
-        </SignInButton>
-      </SignedOut>
+          <UserButton />
+        </SignedIn>
+      </div>
 
-      <SignedIn>
-        <button
-          style={styles.utilityButton}
-          onClick={() => router.push("/me")}
-        >
-          MyPage
-        </button>
-        <UserButton />
-      </SignedIn>
-    </div>
-      <h1 style={styles.title}>어떤 관점에서 살펴보고 싶으신가요?</h1>
+      <div style={styles.brand}>LAPIS NEXUS</div>
+      <h1 style={styles.title}>AI 에이전트와 대화하세요</h1>
       <p style={styles.subtitle}>
-      판례 · 법령 · 전략 · AI 에이전트 중 하나를 선택해 시작하세요.
+        세법 판례·재결례 DB를 탐색하는 4개의 에이전트가 준비되어 있습니다.
       </p>
+
       <div style={styles.cardContainer}>
-      <button
-        style={{
-          ...styles.card,
-          ...(hovered === 0 ? styles.cardHover : {}),
-        }}
-        onMouseEnter={() => setHovered(0)}
-        onMouseLeave={() => setHovered(null)}
-        onClick={() => router.push("/cases")}
-      >
-          <div
+        {AGENTS.map((agent, i) => (
+          <button
+            key={agent.key}
             style={{
-              ...styles.cardTitle,
-              ...(hovered === 0 ? styles.cardTitleHover : {}),
+              ...styles.card,
+              ...(hovered === i ? styles.cardHover : {}),
+              borderTop: `3px solid ${agent.color}`,
             }}
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+            onClick={() => router.push("/agent")}
           >
-            <h2>판례를 이해해야 하는 상황이에요</h2>
-          </div>
-          
-        <div
-          style={{
-            ...styles.cardDesc,
-          borderLeft: `3px solid ${depthColors.A}`,
-          }}
-        >   
-         <p>
-          판례의 쟁점과 판단 구조를 따라가며<br/>
-          사건이 어떤 논증을 통해 결론에 이르렀는지 살펴봐요.
-        </p>
-        </div>
-        </button>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+              <h2 style={{ ...styles.cardTitle, color: hovered === i ? agent.color : "#111827" }}>
+                {agent.title}
+              </h2>
+              <span style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: agent.color,
+                background: `${agent.color}12`,
+                border: `1px solid ${agent.color}30`,
+                borderRadius: 999,
+                padding: "2px 8px",
+                whiteSpace: "nowrap" as const,
+                flexShrink: 0,
+                marginLeft: 8,
+              }}>
+                {agent.badge}
+              </span>
+            </div>
+            <p style={styles.cardDesc}>{agent.desc}</p>
+          </button>
+        ))}
+      </div>
 
       <button
         style={{
-          ...styles.card,
-          ...(hovered === 1 ? styles.cardHover : {}),
+          ...styles.ctaButton,
+          ...(hovered === 99 ? styles.ctaButtonHover : {}),
         }}
-        onMouseEnter={() => setHovered(1)}
-        onMouseLeave={() => setHovered(null)}
-        onClick={() => router.push("/law")}
-      >
-          <div
-            style={{
-              ...styles.cardTitle,
-              ...(hovered === 1 ? styles.cardTitleHover : {}),
-            }}
-          >
-
-            <h2>특정 법령의 구조와 의미를 보고 싶어요</h2>
-          </div>
-        <div
-          style={{
-            ...styles.cardDesc,
-            borderLeft: `3px solid ${depthColors.B}`,
-          }}
-        >   
-            <p>
-            조문과 쟁점 구조를 통해<br/>
-            법령이 실제로 어떻게 작동하는지 살펴봐요.
-            </p>
-          </div>
-        </button>
-
-      <button
-        style={{
-          ...styles.card,
-          ...(hovered === 2 ? styles.cardHover : {}),
-        }}
-        onMouseEnter={() => setHovered(2)}
-        onMouseLeave={() => setHovered(null)}
-        onClick={() => router.push("/strategy")}
-      >
-          <div
-            style={{
-              ...styles.cardTitle,
-              ...(hovered === 2 ? styles.cardTitleHover : {}),
-            }}
-          >
-            <h2>실무적으로 어떻게 대응할지 판단하고 싶어요</h2>
-          </div>
-        <div
-          style={{
-            ...styles.cardDesc,
-            borderLeft: `3px solid ${depthColors.C}`,
-
-          }}
-        >   
-            <p>
-              실무 관점에서 어떤 판단 포인트가 중요한지<br/>
-              전략적 대응 방향을 정리해요.
-            </p>
-          </div>
-        </button>
-
-      <button
-        style={{
-          ...styles.card,
-          ...(hovered === 3 ? styles.cardHover : {}),
-        }}
-        onMouseEnter={() => setHovered(3)}
+        onMouseEnter={() => setHovered(99)}
         onMouseLeave={() => setHovered(null)}
         onClick={() => router.push("/agent")}
       >
-          <div
-            style={{
-              ...styles.cardTitle,
-              ...(hovered === 3 ? styles.cardTitleHover : {}),
-            }}
-          >
-            <h2>AI 에이전트에게 직접 물어보고 싶어요</h2>
-          </div>
-        <div
-          style={{
-            ...styles.cardDesc,
-            borderLeft: `3px solid ${depthColors.D}`,
-          }}
-        >
-            <p>
-              판례 DB와 법령을 교차 탐색해<br/>
-              질문에 맞는 전략 보고서를 자동 생성해요.
-            </p>
-          </div>
-        </button>
-      </div>
+        에이전트 시작하기 →
+      </button>
     </main>
   );
 }
-const depthColors = {
-  A: "#059669", // 초록
-  B: "#1d4ed8", // 남색
-  C: "#6d28d9", // 보라
-  D: "#0891b2", // 청록 (AI 에이전트)
-};
 
-
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: "100vh",
-    padding: "60px 24px 100px", // 🔑 footer 높이 + 여유
+    padding: "60px 24px 100px",
     display: "flex",
-    flexDirection: "column" as const,
+    flexDirection: "column",
     alignItems: "center",
-    backgroundColor: "#111827", // lapis 계열 다크 네이비
-
+    backgroundColor: "#111827",
   },
-topUtility: {
-  position: "absolute" as const,
-  top: "20px",
-  right: "32px",
-  display: "flex",
-  gap: "16px",
-},
-
-utilityButton: {
-  background: "none",
-  border: "none",
-  padding: 0,
-  fontSize: "13px",
-  color: "rgba(255,255,255,0.55)",
-  cursor: "pointer",
-  letterSpacing: "0.02em",
-},
-
+  topUtility: {
+    position: "absolute",
+    top: "20px",
+    right: "32px",
+    display: "flex",
+    gap: "16px",
+  },
+  utilityButton: {
+    background: "none",
+    border: "none",
+    padding: 0,
+    fontSize: "13px",
+    color: "rgba(255,255,255,0.55)",
+    cursor: "pointer",
+    letterSpacing: "0.02em",
+  },
+  brand: {
+    fontSize: "13px",
+    letterSpacing: "0.32em",
+    fontWeight: 500,
+    color: "rgba(255,255,255,0.4)",
+    marginBottom: "32px",
+    textTransform: "uppercase",
+  },
   title: {
     fontSize: "32px",
     fontWeight: 500,
     color: "rgba(255,255,255,0.88)",
-    marginBottom: "10px",   //기존 48
+    marginBottom: "10px",
     lineHeight: 1.3,
+    textAlign: "center",
   },
-
+  subtitle: {
+    fontSize: "14px",
+    color: "rgba(255,255,255,0.55)",
+    marginBottom: "36px",
+    textAlign: "center",
+  },
   cardContainer: {
     display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: "20px",
-    maxWidth: "640px",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "16px",
+    maxWidth: "680px",
     width: "100%",
+    marginBottom: "32px",
   },
-card: {
-  padding: "24px",
-  borderRadius: "14px",
-  border: "1px solid rgba(255,255,255,0.03)",
-  backgroundColor: "rgba(236,239,244,0.88)",
-  textAlign: "left" as const,
-  cursor: "pointer",
-  boxShadow: "0 1px 1px rgba(0,0,0,0.12)",
-  transition: "transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease",
-},
-
-cardActive: {
-    transform: "translateY(0)",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+  card: {
+    padding: "20px",
+    borderRadius: "12px",
+    border: "1px solid rgba(255,255,255,0.06)",
+    backgroundColor: "rgba(236,239,244,0.9)",
+    textAlign: "left",
+    cursor: "pointer",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+    transition: "transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease",
   },
-
-cardHover: {
-  backgroundColor: "rgba(245,247,250,0.95)",
-  border: "1px solid rgba(255,255,255,0.18)",
-  boxShadow: `
-    0 10px 22px rgba(0,0,0,0.35),
-    0 2px 6px rgba(0,0,0,0.18)
-  `,
-  transform: "translateY(-3px)",
-},
-
-cardTitle: {
-  fontSize: "18px",
-  fontWeight: 600,
-  marginBottom: "8px",
-  color: "#111827", // 완전 검정 말고
-},
-
-  cardTitleHover: {
-    color: "#111827",
-    letterSpacing: "-0.004em",
+  cardHover: {
+    backgroundColor: "rgba(245,247,250,0.97)",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.28), 0 2px 6px rgba(0,0,0,0.12)",
+    transform: "translateY(-2px)",
   },
-
-cardDesc: {
-  fontSize: "14px",
-  color: "#4b5563", // 기존보다 살짝 딥
-  paddingLeft: "12px",
-  borderLeft: "3px solid #e5e5e5",
-  lineHeight: 1.6,
-},
-subtitle: {
-  fontSize: "14px",
-  color: "rgba(255,255,255,0.6)",
-  marginBottom: "32px",
-},
+  cardTitle: {
+    fontSize: "15px",
+    fontWeight: 700,
+    margin: 0,
+    lineHeight: 1.3,
+    transition: "color 150ms ease",
+  },
+  cardDesc: {
+    fontSize: "12px",
+    color: "#4b5563",
+    lineHeight: 1.6,
+    margin: 0,
+  },
+  ctaButton: {
+    padding: "13px 36px",
+    borderRadius: "10px",
+    border: "none",
+    background: "#1e40af",
+    color: "#fff",
+    fontSize: "14px",
+    fontWeight: 700,
+    cursor: "pointer",
+    letterSpacing: "0.03em",
+    transition: "background 160ms ease, transform 160ms ease",
+  },
+  ctaButtonHover: {
+    background: "#1d3a9e",
+    transform: "translateY(-1px)",
+  },
 };
-
-

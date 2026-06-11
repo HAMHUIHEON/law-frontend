@@ -5,7 +5,9 @@ import { useAuth } from "@clerk/nextjs";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
-export type AgentType = "INSIGHT" | "MULTI";
+export type AgentType = "INSIGHT" | "MULTI" | "TAXLAW_PREC" | "TAXTR";
+
+/* ── result types ── */
 
 export interface InsightResult {
   query: string;
@@ -45,6 +47,22 @@ export interface MultiResult {
   tools_used: string[];
 }
 
+export interface TaxlawPrecResult {
+  query: string;
+  question: string;
+  answer: string;
+}
+
+export interface TaxtrResult {
+  query: string;
+  question: string;
+  answer: string;
+}
+
+export type AnyResult = InsightResult | MultiResult | TaxlawPrecResult | TaxtrResult;
+
+/* ── context shape ── */
+
 interface AgentUIState {
   agentType: AgentType;
   setAgentType: (t: AgentType) => void;
@@ -53,7 +71,7 @@ interface AgentUIState {
   caseId: string;
   setCaseId: (id: string) => void;
   isRunning: boolean;
-  result: InsightResult | MultiResult | null;
+  result: AnyResult | null;
   steps: string[];
   error: string | null;
   sidebarOpen: boolean;
@@ -71,7 +89,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
   const [query, setQuery] = useState("");
   const [caseId, setCaseId] = useState("");
   const [isRunning, setIsRunning] = useState(false);
-  const [result, setResult] = useState<InsightResult | MultiResult | null>(null);
+  const [result, setResult] = useState<AnyResult | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -92,28 +110,52 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const endpoint = agentType === "INSIGHT" ? "/api/agent/insight" : "/api/agent/multi";
-    const body =
-      agentType === "INSIGHT"
-        ? { query: query.trim(), ...(caseId.trim() ? { case_id: caseId.trim() } : {}) }
-        : { query: query.trim() };
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     try {
-      const res = await fetch(`${API_BASE}${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(body),
-      });
+      let json: any;
 
-      if (!res.ok) {
-        const msg = await res.text().catch(() => "");
-        throw new Error(msg || `오류 ${res.status}`);
+      if (agentType === "INSIGHT") {
+        const res = await fetch(`${API_BASE}/api/agent/insight`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ query: query.trim(), ...(caseId.trim() ? { case_id: caseId.trim() } : {}) }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        json = await res.json();
+
+      } else if (agentType === "MULTI") {
+        const res = await fetch(`${API_BASE}/api/agent/multi`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ query: query.trim() }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        json = await res.json();
+
+      } else if (agentType === "TAXLAW_PREC") {
+        const res = await fetch(`${API_BASE}/api/prec/ask`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ question: query.trim() }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        const raw = await res.json();
+        json = { query: query.trim(), question: raw.question, answer: raw.answer } as TaxlawPrecResult;
+
+      } else {
+        // TAXTR
+        const res = await fetch(`${API_BASE}/api/taxtr/ask`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ question: query.trim() }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        const raw = await res.json();
+        json = { query: query.trim(), question: raw.question, answer: raw.answer } as TaxtrResult;
       }
 
-      const json = await res.json();
       setResult(json);
       if (json.steps) setSteps(json.steps);
     } catch (err: any) {

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useAgentUI, InsightResult, MultiResult } from "./AgentUIContext";
+import { useAgentUI, InsightResult, MultiResult, TaxlawPrecResult, TaxtrResult, AgentType } from "./AgentUIContext";
 
 const AGENT_BLUE = "#1e40af";
 
 /* ─────────────────────────────────────────
- * Helpers
+ * Shared helpers
  * ───────────────────────────────────────── */
 
 function SectionCard({
@@ -71,9 +71,7 @@ function SimilarityBar({ value }: { value: number }) {
   const pct = Math.round(value * 100);
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-      <div style={{
-        flex: 1, height: 4, borderRadius: 2, background: "#e5e7eb", overflow: "hidden",
-      }}>
+      <div style={{ flex: 1, height: 4, borderRadius: 2, background: "#e5e7eb", overflow: "hidden" }}>
         <div style={{ height: "100%", width: `${pct}%`, background: AGENT_BLUE, borderRadius: 2 }} />
       </div>
       <span style={{ fontSize: 11, color: "#6b7280", minWidth: 32 }}>{pct}%</span>
@@ -105,12 +103,10 @@ function InsightResultView({ result }: { result: InsightResult }) {
 
   return (
     <div>
-      {/* Final Report */}
       <SectionCard title="분석 보고서" defaultOpen accent={AGENT_BLUE}>
         <ReportText text={result.final_report} />
       </SectionCard>
 
-      {/* Executive Summary */}
       {exec && (
         <SectionCard title="판결 요약" defaultOpen accent="#7c3aed">
           <div style={{ marginBottom: 10 }}>
@@ -198,7 +194,6 @@ function MultiResultView({ result }: { result: MultiResult }) {
 
   return (
     <div>
-      {/* Tools used */}
       {result.tools_used?.length > 0 && (
         <div style={{ marginBottom: 12, display: "flex", gap: 6, alignItems: "center" }}>
           <span style={{ fontSize: 12, color: "#6b7280" }}>사용 도구:</span>
@@ -208,42 +203,27 @@ function MultiResultView({ result }: { result: MultiResult }) {
         </div>
       )}
 
-      {/* Final Report */}
       <SectionCard title="종합 분석 보고서" defaultOpen accent={AGENT_BLUE}>
         <ReportText text={result.final_report} />
       </SectionCard>
 
-      {/* Case Search Results */}
       {searchResults.length > 0 && (
         <SectionCard title={`관련 판례 (${searchResults.length}건)`} defaultOpen>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {searchResults.map((c, i) => (
-              <div key={i} style={{
-                border: "1px solid #e5e7eb", borderRadius: 8, padding: "12px 14px",
-              }}>
+              <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "12px 14px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
                   <div>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{c.case_number}</span>
-                    {c.court_name && (
-                      <span style={{ fontSize: 12, color: "#6b7280", marginLeft: 8 }}>{c.court_name}</span>
-                    )}
-                    {c.judgment_date && (
-                      <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 6 }}>{c.judgment_date}</span>
-                    )}
+                    {c.court_name && <span style={{ fontSize: 12, color: "#6b7280", marginLeft: 8 }}>{c.court_name}</span>}
+                    {c.judgment_date && <span style={{ fontSize: 12, color: "#9ca3af", marginLeft: 6 }}>{c.judgment_date}</span>}
                   </div>
                   {c.conclusion && (
-                    <Badge
-                      label={c.conclusion}
-                      color={c.conclusion.includes("기각") || c.conclusion.includes("패소") ? "#dc2626" : "#065f46"}
-                    />
+                    <Badge label={c.conclusion} color={c.conclusion.includes("기각") || c.conclusion.includes("패소") ? "#dc2626" : "#065f46"} />
                   )}
                 </div>
-                {c.issue && (
-                  <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 4 }}>{c.issue}</div>
-                )}
-                {c.mini_conclusion && (
-                  <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.5, marginTop: 4 }}>{c.mini_conclusion}</div>
-                )}
+                {c.issue && <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 4 }}>{c.issue}</div>}
+                {c.mini_conclusion && <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.5, marginTop: 4 }}>{c.mini_conclusion}</div>}
                 {c.similarity != null && <SimilarityBar value={c.similarity} />}
               </div>
             ))}
@@ -251,7 +231,6 @@ function MultiResultView({ result }: { result: MultiResult }) {
         </SectionCard>
       )}
 
-      {/* Pattern Results */}
       {patternResult && (
         <SectionCard title="판례 패턴 분석">
           {patternResult.related_cases?.length > 0 && (
@@ -273,7 +252,6 @@ function MultiResultView({ result }: { result: MultiResult }) {
         </SectionCard>
       )}
 
-      {/* Law Context */}
       {(relatedIssues.length > 0 || articles.length > 0) && (
         <SectionCard title="ITCL 법령 컨텍스트" defaultOpen>
           {relatedIssues.length > 0 && (
@@ -284,36 +262,24 @@ function MultiResultView({ result }: { result: MultiResult }) {
                   <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 12px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{issue.issue_title}</span>
-                      {issue.similarity != null && (
-                        <span style={{ fontSize: 11, color: "#6b7280" }}>{Math.round(issue.similarity * 100)}%</span>
-                      )}
+                      {issue.similarity != null && <span style={{ fontSize: 11, color: "#6b7280" }}>{Math.round(issue.similarity * 100)}%</span>}
                     </div>
-                    {issue.issue_summary && (
-                      <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>{issue.issue_summary}</div>
-                    )}
+                    {issue.issue_summary && <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>{issue.issue_summary}</div>}
                     {issue.similarity != null && <SimilarityBar value={issue.similarity} />}
                   </div>
                 ))}
               </div>
             </div>
           )}
-
           {articles.length > 0 && (
             <div>
               <div style={{ fontSize: 12, fontWeight: 600, color: "#6b7280", marginBottom: 8 }}>관련 조문</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {articles.map((art, i) => (
-                  <div key={i} style={{
-                    background: "#f9fafb", borderRadius: 6, padding: "8px 10px",
-                    borderLeft: "3px solid #7c3aed",
-                  }}>
+                  <div key={i} style={{ background: "#f9fafb", borderRadius: 6, padding: "8px 10px", borderLeft: "3px solid #7c3aed" }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{art.article_title}</span>
-                    {art.scope && (
-                      <span style={{ fontSize: 11, color: "#7c3aed", marginLeft: 8 }}>{art.scope}</span>
-                    )}
-                    {art.related_issue && (
-                      <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>쟁점: {art.related_issue}</div>
-                    )}
+                    {art.scope && <span style={{ fontSize: 11, color: "#7c3aed", marginLeft: 8 }}>{art.scope}</span>}
+                    {art.related_issue && <div style={{ fontSize: 11, color: "#6b7280", marginTop: 3 }}>쟁점: {art.related_issue}</div>}
                   </div>
                 ))}
               </div>
@@ -326,10 +292,85 @@ function MultiResultView({ result }: { result: MultiResult }) {
 }
 
 /* ─────────────────────────────────────────
+ * Simple answer view (TAXLAW_PREC / TAXTR)
+ * ───────────────────────────────────────── */
+
+function SimpleAnswerView({
+  result,
+  accentColor,
+  label,
+}: {
+  result: TaxlawPrecResult | TaxtrResult;
+  accentColor: string;
+  label: string;
+}) {
+  return (
+    <div>
+      <div style={{
+        marginBottom: 12,
+        padding: "10px 14px",
+        background: `${accentColor}0d`,
+        borderRadius: 8,
+        border: `1px solid ${accentColor}30`,
+        fontSize: 12,
+        fontWeight: 600,
+        color: accentColor,
+        letterSpacing: "0.04em",
+        textTransform: "uppercase" as const,
+      }}>
+        {label}
+      </div>
+      <div style={{
+        background: "#fff",
+        border: "1px solid #e5e7eb",
+        borderRadius: 12,
+        padding: "20px 22px",
+        fontSize: 14,
+        lineHeight: 1.9,
+        color: "#1f2937",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
+        fontFamily: "var(--font-geist-sans), sans-serif",
+      }}>
+        {result.answer}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
  * Empty / Loading states
  * ───────────────────────────────────────── */
 
-function EmptyState({ agentType }: { agentType: "INSIGHT" | "MULTI" }) {
+const EMPTY_CONTENT: Record<AgentType, { title: string; desc: string; chips: string[]; color: string }> = {
+  MULTI: {
+    title: "판례 + 법령을 교차 분석합니다",
+    desc: "SupervisorAgent는 판례 DB와 ITCL 국제조세조정법 레이어를 동시에 탐색해 최적의 법령 컨텍스트와 관련 판례를 종합 보고서로 생성합니다.",
+    chips: ["판례 벡터 검색", "ITCL 쟁점 매핑", "패턴 분석", "법령 조문 연계"],
+    color: "#1e40af",
+  },
+  INSIGHT: {
+    title: "판례 전략 보고서를 생성합니다",
+    desc: "InsightAgent는 쿼리를 분해하고 관련 판례를 탐색한 뒤, 사건번호 입력 시 ExportC 심층 분석을 포함한 전략 보고서를 작성합니다.",
+    chips: ["쿼리 자동 분해", "판례 패턴 분석", "심층 논리 추출", "전략 보고서 생성"],
+    color: "#7c3aed",
+  },
+  TAXLAW_PREC: {
+    title: "32,000+ 법원 판례를 검색합니다",
+    desc: "국세청 taxlaw.nts.go.kr에서 수집한 32,628건의 세법 법원 판례에서 질문과 관련된 판례를 찾아 분석합니다. 국승/국패 분류, 세법 유형별 필터를 지원합니다.",
+    chips: ["국승/국패 분류", "세법 유형 필터", "요지 기반 검색", "트렌드 분석"],
+    color: "#065f46",
+  },
+  TAXTR: {
+    title: "조세심판원 재결례를 분석합니다",
+    desc: "조세심판원 2,463건의 재결례 DB에서 유사 사건을 검색하고, 승소 전략과 결정 패턴을 분석합니다.",
+    chips: ["재결례 벡터 검색", "승소 전략 분석", "결정 패턴", "세법 유형별"],
+    color: "#92400e",
+  },
+};
+
+function EmptyState({ agentType }: { agentType: AgentType }) {
+  const c = EMPTY_CONTENT[agentType];
   return (
     <div style={{
       background: "#f9fafb",
@@ -338,24 +379,17 @@ function EmptyState({ agentType }: { agentType: "INSIGHT" | "MULTI" }) {
       padding: "40px 36px",
       maxWidth: 680,
     }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: AGENT_BLUE, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
-        {agentType === "MULTI" ? "종합 리서치 에이전트" : "판례 심층 분석 에이전트"}
+      <div style={{ fontSize: 12, fontWeight: 700, color: c.color, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
+        AI 에이전트
       </div>
       <h2 style={{ fontSize: 20, fontWeight: 600, color: "#111827", marginBottom: 12, lineHeight: 1.35 }}>
-        {agentType === "MULTI"
-          ? "판례 + 법령을 교차 분석합니다"
-          : "판례 전략 보고서를 생성합니다"}
+        {c.title}
       </h2>
       <p style={{ fontSize: 14, color: "#4b5563", lineHeight: 1.75, marginBottom: 24 }}>
-        {agentType === "MULTI"
-          ? "SupervisorAgent는 판례 DB와 ITCL 국제조세조정법 레이어를 동시에 탐색해 최적의 법령 컨텍스트와 관련 판례를 종합 보고서로 생성합니다."
-          : "InsightAgent는 쿼리를 분해하고 관련 판례를 탐색한 뒤, 사건번호 입력 시 ExportC 심층 분석을 포함한 전략 보고서를 작성합니다."}
+        {c.desc}
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, fontSize: 13, color: "#374151" }}>
-        {(agentType === "MULTI"
-          ? ["판례 벡터 검색", "ITCL 쟁점 매핑", "패턴 분석", "법령 조문 연계"]
-          : ["쿼리 자동 분해", "판례 패턴 분석", "심층 논리 추출", "전략 보고서 생성"]
-        ).map((item) => (
+        {c.chips.map((item) => (
           <div key={item} style={{
             background: "#fff",
             borderRadius: 8,
@@ -365,7 +399,7 @@ function EmptyState({ agentType }: { agentType: "INSIGHT" | "MULTI" }) {
             alignItems: "center",
             gap: 8,
           }}>
-            <span style={{ color: AGENT_BLUE, fontSize: 14 }}>✓</span>
+            <span style={{ color: c.color, fontSize: 14 }}>✓</span>
             {item}
           </div>
         ))}
@@ -377,7 +411,7 @@ function EmptyState({ agentType }: { agentType: "INSIGHT" | "MULTI" }) {
   );
 }
 
-function LoadingState() {
+function LoadingState({ color }: { color: string }) {
   return (
     <div style={{
       background: "#fff",
@@ -392,15 +426,15 @@ function LoadingState() {
     }}>
       <div style={{
         width: 48, height: 48, borderRadius: "50%",
-        border: `3px solid #dbeafe`,
-        borderTopColor: AGENT_BLUE,
+        border: `3px solid #e5e7eb`,
+        borderTopColor: color,
         animation: "spin 0.8s linear infinite",
       }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#111827", marginBottom: 6 }}>에이전트가 분석 중입니다</div>
         <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.6 }}>
-          그래프 탐색과 LLM 추론이 순차적으로 실행됩니다.
+          검색과 LLM 추론이 순차적으로 실행됩니다.
           <br />완료까지 수십 초~수 분 소요될 수 있습니다.
         </div>
       </div>
@@ -412,8 +446,16 @@ function LoadingState() {
  * Main Page
  * ───────────────────────────────────────── */
 
+const AGENT_COLORS: Record<AgentType, string> = {
+  MULTI: "#1e40af",
+  INSIGHT: "#7c3aed",
+  TAXLAW_PREC: "#065f46",
+  TAXTR: "#92400e",
+};
+
 export default function AgentPage() {
   const { agentType, isRunning, result, error } = useAgentUI();
+  const color = AGENT_COLORS[agentType];
 
   return (
     <div style={{
@@ -422,7 +464,6 @@ export default function AgentPage() {
       padding: "32px 40px 80px",
     }}>
       <div style={{ maxWidth: 840, margin: "0 auto" }}>
-        {/* Error */}
         {error && (
           <div style={{
             marginBottom: 16,
@@ -437,35 +478,35 @@ export default function AgentPage() {
           </div>
         )}
 
-        {/* Loading */}
-        {isRunning && !result && <LoadingState />}
+        {isRunning && !result && <LoadingState color={color} />}
 
-        {/* Result */}
         {!isRunning && result && (
           <>
-            {/* Query echo */}
             <div style={{
               marginBottom: 16,
               padding: "10px 14px",
-              background: "#eff6ff",
+              background: `${color}10`,
               borderRadius: 8,
-              border: "1px solid #bfdbfe",
+              border: `1px solid ${color}30`,
               fontSize: 13,
-              color: "#1e40af",
+              color: color,
               lineHeight: 1.5,
             }}>
               <strong>Q.</strong> {result.query}
             </div>
 
-            {"steps" in result && (result as InsightResult).steps?.length > 0 ? (
+            {agentType === "INSIGHT" && "steps" in result ? (
               <InsightResultView result={result as InsightResult} />
-            ) : (
+            ) : agentType === "MULTI" ? (
               <MultiResultView result={result as MultiResult} />
+            ) : agentType === "TAXLAW_PREC" ? (
+              <SimpleAnswerView result={result as TaxlawPrecResult} accentColor={color} label="법원 판례 에이전트 답변" />
+            ) : (
+              <SimpleAnswerView result={result as TaxtrResult} accentColor={color} label="조세심판 재결례 에이전트 답변" />
             )}
           </>
         )}
 
-        {/* Empty state */}
         {!isRunning && !result && !error && <EmptyState agentType={agentType} />}
       </div>
     </div>

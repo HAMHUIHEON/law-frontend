@@ -1,15 +1,39 @@
 "use client";
 
-import { AgentUIProvider, useAgentUI } from "./AgentUIContext";
+import { AgentUIProvider, useAgentUI, AgentType } from "./AgentUIContext";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
 
 const AGENT_BLUE = "#1e40af";
 
-const AGENT_LABELS = {
-  MULTI: { name: "종합 리서치", desc: "판례 DB + ITCL 법령을 결합한 멀티 에이전트" },
-  INSIGHT: { name: "판례 심층 분석", desc: "특정 판례 또는 쟁점 중심 전략 보고서" },
+const AGENT_LABELS: Record<AgentType, { name: string; desc: string; placeholder: string; color: string }> = {
+  MULTI: {
+    name: "종합 리서치",
+    desc: "판례 DB + ITCL 법령을 결합한 멀티 에이전트",
+    placeholder: "예) 이전가격 조작으로 인한 과세처분 취소 판례의 공통된 판단 기준은?",
+    color: "#1e40af",
+  },
+  INSIGHT: {
+    name: "판례 심층 분석",
+    desc: "특정 판례 또는 쟁점 중심 전략 보고서",
+    placeholder: "예) 이 판례에서 법원이 납세자 승소 판결을 내린 핵심 근거는?",
+    color: "#7c3aed",
+  },
+  TAXLAW_PREC: {
+    name: "법원 판례 검색",
+    desc: "국세청 taxlaw 32,000+ 법원 판례 — 세법 유형·결정별 검색",
+    placeholder: "예) 부가가치세 매입세액 불공제 관련 납세자가 이긴 판례 알려줘",
+    color: "#065f46",
+  },
+  TAXTR: {
+    name: "조세심판 재결례",
+    desc: "조세심판원 2,463건 재결례 — 유사 사건 전략 분석",
+    placeholder: "예) 법인세 부당행위계산 부인 처분 관련 최근 재결 경향은?",
+    color: "#92400e",
+  },
 };
+
+const AGENT_ORDER: AgentType[] = ["MULTI", "INSIGHT", "TAXLAW_PREC", "TAXTR"];
 
 const STEP_LABELS: Record<string, string> = {
   planned: "쿼리 분해",
@@ -38,6 +62,7 @@ function AgentSidebar() {
   } = useAgentUI();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const agent = AGENT_LABELS[agentType];
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -48,8 +73,8 @@ function AgentSidebar() {
 
   return (
     <aside style={{
-      width: 290,
-      minWidth: 290,
+      width: 300,
+      minWidth: 300,
       borderRight: "1px solid #e5e7eb",
       backgroundColor: "#fafafa",
       padding: "16px 14px",
@@ -63,9 +88,10 @@ function AgentSidebar() {
     }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span
-          style={{ fontSize: 13, fontWeight: 700, color: AGENT_BLUE, letterSpacing: "0.05em", textTransform: "uppercase" }}
-        >
+        <span style={{
+          fontSize: 13, fontWeight: 700, color: AGENT_BLUE,
+          letterSpacing: "0.05em", textTransform: "uppercase",
+        }}>
           AI 법률 에이전트
         </span>
         <button
@@ -79,40 +105,51 @@ function AgentSidebar() {
 
       {/* Agent Type */}
       <section>
-        <p style={{ fontSize: 12, fontWeight: 600, color: "#6b7280", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
           에이전트 선택
         </p>
-        {(["MULTI", "INSIGHT"] as const).map((type) => (
-          <button
-            key={type}
-            onClick={() => { setAgentType(type); clear(); }}
-            style={{
-              width: "100%",
-              textAlign: "left",
-              padding: "10px 12px",
-              marginBottom: 6,
-              borderRadius: 8,
-              border: `1px solid ${agentType === type ? AGENT_BLUE : "#e5e7eb"}`,
-              background: agentType === type ? "#eff6ff" : "#fff",
-              cursor: "pointer",
-              transition: "all 120ms ease",
-            }}
-          >
-            <div style={{ fontSize: 13, fontWeight: 700, color: agentType === type ? AGENT_BLUE : "#374151" }}>
-              {AGENT_LABELS[type].name}
-            </div>
-            <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2, lineHeight: 1.4 }}>
-              {AGENT_LABELS[type].desc}
-            </div>
-          </button>
-        ))}
+        {AGENT_ORDER.map((type) => {
+          const a = AGENT_LABELS[type];
+          const active = agentType === type;
+          return (
+            <button
+              key={type}
+              onClick={() => { setAgentType(type); clear(); }}
+              style={{
+                width: "100%",
+                textAlign: "left",
+                padding: "9px 11px",
+                marginBottom: 6,
+                borderRadius: 8,
+                border: `1px solid ${active ? a.color : "#e5e7eb"}`,
+                background: active ? `${a.color}10` : "#fff",
+                cursor: "pointer",
+                transition: "all 120ms ease",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 2 }}>
+                <span style={{
+                  width: 7, height: 7, borderRadius: "50%",
+                  background: active ? a.color : "#d1d5db",
+                  flexShrink: 0,
+                }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: active ? a.color : "#374151" }}>
+                  {a.name}
+                </span>
+              </div>
+              <div style={{ fontSize: 11, color: "#6b7280", lineHeight: 1.4, paddingLeft: 14 }}>
+                {a.desc}
+              </div>
+            </button>
+          );
+        })}
       </section>
 
       <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: 0 }} />
 
       {/* Query */}
       <section>
-        <p style={{ fontSize: 12, fontWeight: 600, color: "#6b7280", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
           질의
         </p>
         <textarea
@@ -120,9 +157,7 @@ function AgentSidebar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={agentType === "MULTI"
-            ? "예) 이전가격 조작으로 인한 과세처분 취소 판례의 공통된 판단 기준은?"
-            : "예) 이 판례에서 법원이 납세자 승소 판결을 내린 핵심 근거는?"}
+          placeholder={agent.placeholder}
           rows={5}
           style={{
             width: "100%",
@@ -135,6 +170,7 @@ function AgentSidebar() {
             color: "#111827",
             outline: "none",
             boxSizing: "border-box",
+            fontFamily: "inherit",
           }}
         />
         <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4 }}>Ctrl + Enter로 실행</div>
@@ -143,7 +179,7 @@ function AgentSidebar() {
       {/* Case ID (InsightAgent only) */}
       {agentType === "INSIGHT" && (
         <section>
-          <p style={{ fontSize: 12, fontWeight: 600, color: "#6b7280", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
             사건번호 <span style={{ fontWeight: 400, textTransform: "none" }}>(선택)</span>
           </p>
           <input
@@ -159,6 +195,7 @@ function AgentSidebar() {
               borderRadius: 8,
               outline: "none",
               boxSizing: "border-box",
+              fontFamily: "inherit",
             }}
           />
           <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4 }}>
@@ -176,7 +213,7 @@ function AgentSidebar() {
           padding: "11px 0",
           borderRadius: 8,
           border: "none",
-          background: !query.trim() || isRunning ? "#e5e7eb" : AGENT_BLUE,
+          background: !query.trim() || isRunning ? "#e5e7eb" : agent.color,
           color: !query.trim() || isRunning ? "#9ca3af" : "#fff",
           fontSize: 14,
           fontWeight: 700,
@@ -191,7 +228,7 @@ function AgentSidebar() {
       {/* Steps Progress */}
       {(isRunning || steps.length > 0) && (
         <section>
-          <p style={{ fontSize: 12, fontWeight: 600, color: "#6b7280", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
             실행 단계
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -248,7 +285,7 @@ function AgentSidebar() {
       <div style={{ marginTop: "auto", borderTop: "1px solid #e5e7eb", paddingTop: 12 }}>
         <div
           onClick={() => router.push("/")}
-          style={{ fontSize: 12, color: "#9ca3af", cursor: "pointer", marginBottom: 4 }}
+          style={{ fontSize: 12, color: "#9ca3af", cursor: "pointer" }}
         >
           ← 홈으로
         </div>
@@ -260,6 +297,7 @@ function AgentSidebar() {
 function TopBar() {
   const router = useRouter();
   const { sidebarOpen, setSidebarOpen, agentType } = useAgentUI();
+  const agent = AGENT_LABELS[agentType];
 
   return (
     <div style={{
@@ -288,8 +326,8 @@ function TopBar() {
       <div style={{ fontSize: 14, color: "#374151", display: "flex", alignItems: "center", gap: 6 }}>
         <span style={{ cursor: "pointer", textDecoration: "underline" }} onClick={() => router.push("/")}>홈</span>
         <span style={{ color: "#9ca3af" }}>/</span>
-        <span style={{ color: AGENT_BLUE, fontWeight: 600 }}>
-          AI 에이전트 — {AGENT_LABELS[agentType].name}
+        <span style={{ fontWeight: 600, color: agent.color }}>
+          {agent.name}
         </span>
       </div>
     </div>

@@ -11,11 +11,11 @@ export default function PublicHome() {
           Where thought flows, sharpens, and extends.
         </h1>
         <p style={styles.subtitle}>
-          생각의 흐름 속에서 사고를 정제하고 확장하는 공간
+          세법 판례·재결례를 탐색하는 AI 에이전트
         </p>
 
         <Link href="/enter" style={styles.enter}>
-          Enter
+          에이전트 시작하기
         </Link>
       </div>
     </main>
