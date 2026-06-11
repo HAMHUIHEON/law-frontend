@@ -40,6 +40,22 @@ export interface MultiResult {
     }[];
     pattern_results: { query: string; related_cases: string[]; statutes_cited: string[] };
   };
+  taxlaw_prec_context?: {
+    doc_id: string;
+    case_no: string;
+    tax_type: string;
+    decision: string;
+    title: string;
+    attr_yr: string;
+    document: string;
+  }[];
+  taxtr_context?: {
+    doc_id: string;
+    dem_no: string;
+    decision_type: string;
+    title: string;
+    document: string;
+  }[];
   law_context: {
     related_issues: { set_key: string; issue_id: string; issue_title: string; issue_summary: string; similarity: number }[];
     articles: { scope: string; version_key: string; article_id: string; article_title: string; related_issue: string }[];

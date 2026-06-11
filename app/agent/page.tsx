@@ -191,6 +191,8 @@ function MultiResultView({ result }: { result: MultiResult }) {
   const patternResult = result.case_context?.pattern_results;
   const relatedIssues = result.law_context?.related_issues ?? [];
   const articles = result.law_context?.articles ?? [];
+  const precResults = result.taxlaw_prec_context ?? [];
+  const taxtrResults = result.taxtr_context ?? [];
 
   return (
     <div>
@@ -225,6 +227,50 @@ function MultiResultView({ result }: { result: MultiResult }) {
                 {c.issue && <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginBottom: 4 }}>{c.issue}</div>}
                 {c.mini_conclusion && <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.5, marginTop: 4 }}>{c.mini_conclusion}</div>}
                 {c.similarity != null && <SimilarityBar value={c.similarity} />}
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+      )}
+
+      {precResults.length > 0 && (
+        <SectionCard title={`NTS 법원 판례 (${precResults.length}건)`} defaultOpen>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {precResults.map((p, i) => (
+              <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{p.case_no || p.doc_id}</span>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {p.tax_type && <Badge label={p.tax_type} color="#065f46" />}
+                    {p.decision && (
+                      <Badge
+                        label={p.decision}
+                        color={p.decision.includes("국패") ? "#065f46" : "#dc2626"}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
+                  {p.title || p.document?.slice(0, 100)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+      )}
+
+      {taxtrResults.length > 0 && (
+        <SectionCard title={`조세심판 재결례 (${taxtrResults.length}건)`} defaultOpen>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {taxtrResults.map((t, i) => (
+              <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{t.dem_no || t.doc_id}</span>
+                  {t.decision_type && <Badge label={t.decision_type} color="#92400e" />}
+                </div>
+                <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
+                  {t.title || t.document?.slice(0, 100)}
+                </div>
               </div>
             ))}
           </div>
