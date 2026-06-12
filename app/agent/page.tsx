@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, KeyboardEvent } from "react";
+import Link from "next/link";
 import {
   useAgentUI,
   InsightResult, MultiResult, TaxlawPrecResult, TaxtrResult,
@@ -10,6 +11,37 @@ import {
 } from "./AgentUIContext";
 
 const AGENT_BLUE = "#1e40af";
+
+/* ─────────────────────────────────────────
+ * Agent config
+ * ───────────────────────────────────────── */
+
+const AGENT_LABELS: Record<AgentType, { name: string; color: string; placeholder: string }> = {
+  MULTI:       { name: "종합 리서치",     color: "#1e40af", placeholder: "예) 이전가격 과소신고 관련 판례와 세법 조문을 종합 분석해줘" },
+  INSIGHT:     { name: "판례 심층 분석",  color: "#7c3aed", placeholder: "예) 부당행위계산부인 적용 기준에 관한 판례 전략 보고서를 작성해줘" },
+  TAXLAW_PREC: { name: "법원 판례 검색",  color: "#065f46", placeholder: "예) 명의신탁 증여세 과세처분 관련 법원 판례를 찾아줘" },
+  TAXTR:       { name: "조세심판 재결례", color: "#92400e", placeholder: "예) 경비 부인 처분에 대한 조세심판 재결례를 분석해줘" },
+  STRATEGY:    { name: "불복전략 분석",   color: "#0f766e", placeholder: "예) 이전가격 과세처분을 받았습니다. 불복 전략을 분석해줘" },
+  REBUTTAL:    { name: "반론 초안 작성",  color: "#c2410c", placeholder: "과세처분 이유서를 붙여넣으면 납세자 승소 판례 기반 반론 초안을 작성합니다" },
+  TREND:       { name: "판례 트렌드",     color: "#0369a1", placeholder: "예) 최근 5년간 부가세 매입세액 공제 거부 판례 트렌드를 분석해줘" },
+  ITCL:        { name: "국제조세 분석",   color: "#6d28d9", placeholder: "예) GLOBE 필라2 세액공제 관련 국제조세 판례와 법령을 분석해줘" },
+  RISK:        { name: "개정법령 리스크",  color: "#b91c1c", placeholder: "법령명을 입력하세요 (예: 조세특례제한법)" },
+};
+
+const AGENT_ORDER: AgentType[] = [
+  "MULTI", "INSIGHT", "TAXLAW_PREC", "TAXTR",
+  "STRATEGY", "REBUTTAL", "TREND", "ITCL", "RISK",
+];
+
+const STEP_LABELS: Record<string, string> = {
+  planned:        "쿼리 분해",
+  executed:       "판례 검색",
+  deep_insight:   "심층 분석",
+  reported:       "보고서 생성",
+  search_cases:   "판례 검색",
+  search_itcl_law:"법령 검색",
+  synthesized:    "결과 통합",
+};
 
 /* ─────────────────────────────────────────
  * Shared helpers
@@ -492,7 +524,7 @@ function LawArticlesSection({ articles, title }: { articles: LawArticle[]; title
 }
 
 /* ─────────────────────────────────────────
- * StrategyAgent result view
+ * Agent-specific result views
  * ───────────────────────────────────────── */
 
 function StrategyResultView({ result }: { result: StrategyResult }) {
@@ -508,10 +540,6 @@ function StrategyResultView({ result }: { result: StrategyResult }) {
   );
 }
 
-/* ─────────────────────────────────────────
- * RebuttalAgent result view
- * ───────────────────────────────────────── */
-
 function RebuttalResultView({ result }: { result: RebuttalResult }) {
   return (
     <div>
@@ -524,10 +552,6 @@ function RebuttalResultView({ result }: { result: RebuttalResult }) {
     </div>
   );
 }
-
-/* ─────────────────────────────────────────
- * TrendAgent result view
- * ───────────────────────────────────────── */
 
 function TrendResultView({ result }: { result: TrendResult }) {
   const yearStats = result.trend_data?.year_stats ?? {};
@@ -584,10 +608,6 @@ function TrendResultView({ result }: { result: TrendResult }) {
   );
 }
 
-/* ─────────────────────────────────────────
- * ITCLAgent result view
- * ───────────────────────────────────────── */
-
 function ITCLResultView({ result }: { result: ITCLResult }) {
   const itclIssues = result.itcl_issues ?? [];
 
@@ -618,10 +638,6 @@ function ITCLResultView({ result }: { result: ITCLResult }) {
   );
 }
 
-/* ─────────────────────────────────────────
- * RiskAgent result view
- * ───────────────────────────────────────── */
-
 function RiskResultView({ result }: { result: RiskResult }) {
   return (
     <div>
@@ -636,197 +652,385 @@ function RiskResultView({ result }: { result: RiskResult }) {
 }
 
 /* ─────────────────────────────────────────
- * Empty / Loading states
+ * Main Page — full-screen search UI
  * ───────────────────────────────────────── */
-
-const EMPTY_CONTENT: Record<AgentType, { title: string; desc: string; chips: string[]; color: string }> = {
-  MULTI: {
-    title: "판례 + 법령을 교차 분석합니다",
-    desc: "SupervisorAgent는 판례 DB와 ITCL 국제조세조정법 레이어를 동시에 탐색해 최적의 법령 컨텍스트와 관련 판례를 종합 보고서로 생성합니다.",
-    chips: ["판례 벡터 검색", "ITCL 쟁점 매핑", "패턴 분석", "법령 조문 연계"],
-    color: "#1e40af",
-  },
-  INSIGHT: {
-    title: "판례 전략 보고서를 생성합니다",
-    desc: "InsightAgent는 쿼리를 분해하고 관련 판례를 탐색한 뒤, 사건번호 입력 시 ExportC 심층 분석을 포함한 전략 보고서를 작성합니다.",
-    chips: ["쿼리 자동 분해", "판례 패턴 분석", "심층 논리 추출", "전략 보고서 생성"],
-    color: "#7c3aed",
-  },
-  TAXLAW_PREC: {
-    title: "32,000+ 법원 판례를 검색합니다",
-    desc: "국세청 taxlaw.nts.go.kr에서 수집한 32,628건의 세법 법원 판례에서 질문과 관련된 판례를 찾아 분석합니다. 국승/국패 분류, 세법 유형별 필터를 지원합니다.",
-    chips: ["국승/국패 분류", "세법 유형 필터", "요지 기반 검색", "트렌드 분석"],
-    color: "#065f46",
-  },
-  TAXTR: {
-    title: "조세심판원 재결례를 분석합니다",
-    desc: "조세심판원 2,463건의 재결례 DB에서 유사 사건을 검색하고, 승소 전략과 결정 패턴을 분석합니다.",
-    chips: ["재결례 벡터 검색", "승소 전략 분석", "결정 패턴", "세법 유형별"],
-    color: "#92400e",
-  },
-  STRATEGY: {
-    title: "유사 판례 기반 불복전략을 분석합니다",
-    desc: "사건 개요를 입력하면 32,628건 법원 판례·2,463건 재결례에서 유사 사례를 찾아 구체적인 불복전략 보고서를 생성합니다.",
-    chips: ["유사 사건 검색", "판례·재결례 교차 분석", "불복전략 도출", "세법 조문 연계"],
-    color: "#0f766e",
-  },
-  REBUTTAL: {
-    title: "납세자 승소 판례 기반 반론을 작성합니다",
-    desc: "과세처분 이유서를 붙여넣으면 납세자 승소 판례와 인용 재결례만 필터링해 반론 초안을 자동 생성합니다.",
-    chips: ["승소 판례 필터링", "인용 재결례 검색", "반론 초안 생성", "자기 검토(Reflection)"],
-    color: "#c2410c",
-  },
-  TREND: {
-    title: "연도별 판례 트렌드를 분석합니다",
-    desc: "쟁점을 입력하면 관련 법원 판례의 연도별 건수·납세자 승소율을 집계하고, 최근 판례 흐름 해설 보고서를 생성합니다.",
-    chips: ["연도별 승소율 통계", "판례 흐름 분석", "최근 트렌드 해설", "조세심판 비교"],
-    color: "#0369a1",
-  },
-  ITCL: {
-    title: "국제조세 판례·법령을 분석합니다",
-    desc: "국제조세조정법 관련 쟁점을 입력하면 관련 판례, 법령 조문, Neo4j 그래프 쟁점을 통합 분석한 보고서를 생성합니다.",
-    chips: ["이전가격 판례 검색", "ITCL 법령 조문", "Neo4j 쟁점 그래프", "통합 분석 보고서"],
-    color: "#6d28d9",
-  },
-  RISK: {
-    title: "법령 개정의 판례 영향을 분석합니다",
-    desc: "법령명과 개정 내용을 입력하면 기존 법원 판례·재결례 중 영향받는 사건을 식별하고 리스크 보고서를 생성합니다.",
-    chips: ["영향 판례 식별", "재결례 리스크 분석", "개정 조문 매핑", "시행일 기준 필터"],
-    color: "#b91c1c",
-  },
-};
-
-function EmptyState({ agentType }: { agentType: AgentType }) {
-  const c = EMPTY_CONTENT[agentType];
-  return (
-    <div style={{
-      background: "#f9fafb",
-      border: "1px solid #e5e7eb",
-      borderRadius: 14,
-      padding: "40px 36px",
-      maxWidth: 680,
-    }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: c.color, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
-        AI 에이전트
-      </div>
-      <h2 style={{ fontSize: 20, fontWeight: 600, color: "#111827", marginBottom: 12, lineHeight: 1.35 }}>
-        {c.title}
-      </h2>
-      <p style={{ fontSize: 14, color: "#4b5563", lineHeight: 1.75, marginBottom: 24 }}>
-        {c.desc}
-      </p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, fontSize: 13, color: "#374151" }}>
-        {c.chips.map((item) => (
-          <div key={item} style={{
-            background: "#fff",
-            borderRadius: 8,
-            border: "1px solid #e5e7eb",
-            padding: "10px 12px",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}>
-            <span style={{ color: c.color, fontSize: 14 }}>✓</span>
-            {item}
-          </div>
-        ))}
-      </div>
-      <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px dashed #e5e7eb", fontSize: 13, color: "#9ca3af" }}>
-        ← 왼쪽에서 질의를 입력하고 <strong style={{ color: "#374151" }}>에이전트 실행</strong>을 누르세요.
-      </div>
-    </div>
-  );
-}
-
-function LoadingState({ color }: { color: string }) {
-  return (
-    <div style={{
-      background: "#fff",
-      border: "1px solid #e5e7eb",
-      borderRadius: 14,
-      padding: "40px 36px",
-      maxWidth: 480,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: 16,
-    }}>
-      <div style={{
-        width: 48, height: 48, borderRadius: "50%",
-        border: `3px solid #e5e7eb`,
-        borderTopColor: color,
-        animation: "spin 0.8s linear infinite",
-      }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#111827", marginBottom: 6 }}>에이전트가 분석 중입니다</div>
-        <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.6 }}>
-          검색과 LLM 추론이 순차적으로 실행됩니다.
-          <br />완료까지 수십 초~수 분 소요될 수 있습니다.
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────
- * Main Page
- * ───────────────────────────────────────── */
-
-const AGENT_COLORS: Record<AgentType, string> = {
-  MULTI: "#1e40af",
-  INSIGHT: "#7c3aed",
-  TAXLAW_PREC: "#065f46",
-  TAXTR: "#92400e",
-  STRATEGY: "#0f766e",
-  REBUTTAL: "#c2410c",
-  TREND: "#0369a1",
-  ITCL: "#6d28d9",
-  RISK: "#b91c1c",
-};
 
 export default function AgentPage() {
-  const { agentType, isRunning, result, error } = useAgentUI();
-  const color = AGENT_COLORS[agentType];
+  const {
+    agentType, setAgentType,
+    query, setQuery,
+    caseId, setCaseId,
+    riskRevision, setRiskRevision,
+    riskEffectiveDate, setRiskEffectiveDate,
+    isRunning, result, steps, error,
+    run, clear,
+  } = useAgentUI();
+
+  const [chipHover, setChipHover] = useState<AgentType | null>(null);
+
+  const color = AGENT_LABELS[agentType].color;
+  const isIdle = !isRunning && !result && !error;
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!isRunning && query.trim()) run();
+    }
+  };
+
+  const handleAgentSwitch = (type: AgentType) => {
+    setAgentType(type);
+    clear();
+  };
 
   return (
-    <div style={{
-      minHeight: "calc(100vh - 55px)",
-      backgroundColor: "#f5f6f8",
-      padding: "32px 40px 80px",
-    }}>
-      <div style={{ maxWidth: 840, margin: "0 auto" }}>
-        {error && (
-          <div style={{
-            marginBottom: 16,
-            padding: "12px 16px",
-            background: "#fef2f2",
-            border: "1px solid #fca5a5",
-            borderRadius: 8,
-            fontSize: 13,
-            color: "#dc2626",
-          }}>
-            오류: {error}
-          </div>
-        )}
+    <div style={{ minHeight: "100vh", background: "#f5f6f8", display: "flex", flexDirection: "column" }}>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        ::-webkit-scrollbar { height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+      `}</style>
 
-        {isRunning && !result && <LoadingState color={color} />}
-
-        {!isRunning && result && (
+      {/* ── Top Nav ── */}
+      <nav style={{
+        height: 52,
+        background: "#fff",
+        borderBottom: "1px solid #e5e7eb",
+        display: "flex",
+        alignItems: "center",
+        padding: "0 24px",
+        gap: 20,
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        flexShrink: 0,
+      }}>
+        <Link href="/" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.18em", color: "#111827", textDecoration: "none" }}>
+          LAPIS NEXUS
+        </Link>
+        <div style={{ width: 1, height: 16, background: "#e5e7eb" }} />
+        <Link href="/enter" style={{ fontSize: 13, color: "#6b7280", textDecoration: "none" }}>
+          ← 에이전트 선택
+        </Link>
+        {result && (
           <>
+            <div style={{ flex: 1 }} />
+            <button
+              onClick={() => { clear(); setQuery(""); }}
+              style={{
+                fontSize: 12,
+                color: "#6b7280",
+                background: "none",
+                border: "1px solid #e5e7eb",
+                borderRadius: 6,
+                padding: "5px 12px",
+                cursor: "pointer",
+              }}
+            >
+              새 질의
+            </button>
+          </>
+        )}
+      </nav>
+
+      {/* ── Content area ── */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "0 20px 80px",
+      }}>
+
+        {/* Input panel — centered when idle, near top when active */}
+        <div style={{
+          width: "100%",
+          maxWidth: 760,
+          marginTop: isIdle ? "clamp(60px, 18vh, 160px)" : 32,
+          marginBottom: 28,
+          transition: "margin-top 0.2s ease",
+        }}>
+
+          {/* Heading (idle only) */}
+          {isIdle && (
+            <div style={{ textAlign: "center", marginBottom: 28 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.22em", color: "#9ca3af", textTransform: "uppercase", marginBottom: 10 }}>
+                LAPIS NEXUS
+              </div>
+              <h1 style={{ fontSize: 26, fontWeight: 600, color: "#111827", margin: "0 0 8px", lineHeight: 1.3 }}>
+                세법 AI 에이전트
+              </h1>
+              <p style={{ fontSize: 14, color: "#6b7280", margin: 0 }}>
+                에이전트를 선택하고 질의를 입력하세요. Enter로 실행합니다.
+              </p>
+            </div>
+          )}
+
+          {/* Agent chip row */}
+          <div style={{
+            display: "flex",
+            gap: 6,
+            overflowX: "auto",
+            paddingBottom: 6,
+            marginBottom: 12,
+            scrollbarWidth: "thin" as const,
+          }}>
+            {AGENT_ORDER.map((type) => {
+              const active = agentType === type;
+              const hov = chipHover === type;
+              const c = AGENT_LABELS[type].color;
+              return (
+                <button
+                  key={type}
+                  onClick={() => handleAgentSwitch(type)}
+                  onMouseEnter={() => setChipHover(type)}
+                  onMouseLeave={() => setChipHover(null)}
+                  style={{
+                    flexShrink: 0,
+                    padding: "6px 14px",
+                    borderRadius: 999,
+                    border: `1.5px solid ${active ? c : hov ? c + "80" : "#e5e7eb"}`,
+                    background: active ? c : hov ? c + "10" : "#fff",
+                    color: active ? "#fff" : hov ? c : "#374151",
+                    fontSize: 12,
+                    fontWeight: active ? 700 : 500,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                    whiteSpace: "nowrap" as const,
+                  }}
+                >
+                  {AGENT_LABELS[type].name}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Textarea container */}
+          <div style={{
+            position: "relative",
+            background: "#fff",
+            border: `2px solid ${isRunning ? color : "#e5e7eb"}`,
+            borderRadius: 16,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            transition: "border-color 0.2s ease",
+          }}>
+            <textarea
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={AGENT_LABELS[agentType].placeholder}
+              rows={isIdle ? 4 : 3}
+              disabled={isRunning}
+              style={{
+                width: "100%",
+                padding: "16px 56px 16px 18px",
+                border: "none",
+                borderRadius: 14,
+                resize: "none",
+                fontSize: 14,
+                lineHeight: 1.65,
+                color: "#111827",
+                background: "transparent",
+                outline: "none",
+                fontFamily: "var(--font-geist-sans), sans-serif",
+                boxSizing: "border-box" as const,
+              }}
+            />
+            {/* Submit button */}
+            <button
+              onClick={() => run()}
+              disabled={isRunning || !query.trim()}
+              style={{
+                position: "absolute",
+                right: 12,
+                bottom: 12,
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                border: "none",
+                background: !isRunning && query.trim() ? color : "#e5e7eb",
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: 700,
+                cursor: !isRunning && query.trim() ? "pointer" : "default",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "background 0.15s ease",
+                lineHeight: 1,
+              }}
+            >
+              {isRunning ? (
+                <span style={{
+                  display: "block",
+                  width: 14,
+                  height: 14,
+                  borderRadius: "50%",
+                  border: "2px solid rgba(255,255,255,0.4)",
+                  borderTopColor: "#fff",
+                  animation: "spin 0.7s linear infinite",
+                }} />
+              ) : "↑"}
+            </button>
+          </div>
+
+          {/* INSIGHT extra: case ID */}
+          {agentType === "INSIGHT" && (
+            <div style={{ marginTop: 8 }}>
+              <input
+                value={caseId}
+                onChange={(e) => setCaseId(e.target.value)}
+                placeholder="사건번호 (선택 사항, 예: 2024구합12345) — 입력 시 해당 판결 심층 분석 포함"
+                disabled={isRunning}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 10,
+                  fontSize: 13,
+                  color: "#374151",
+                  background: "#fff",
+                  outline: "none",
+                  boxSizing: "border-box" as const,
+                  fontFamily: "var(--font-geist-sans), sans-serif",
+                }}
+              />
+            </div>
+          )}
+
+          {/* RISK extra: revision summary + effective date */}
+          {agentType === "RISK" && (
+            <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "2fr 1fr", gap: 8 }}>
+              <textarea
+                value={riskRevision}
+                onChange={(e) => setRiskRevision(e.target.value)}
+                placeholder="개정 내용 요약 (예: 제15조 외국납부세액공제 한도 축소 — 기존 100% → 80%로 변경)"
+                rows={2}
+                disabled={isRunning}
+                style={{
+                  padding: "10px 14px",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 10,
+                  fontSize: 13,
+                  color: "#374151",
+                  background: "#fff",
+                  outline: "none",
+                  resize: "none",
+                  fontFamily: "var(--font-geist-sans), sans-serif",
+                }}
+              />
+              <input
+                value={riskEffectiveDate}
+                onChange={(e) => setRiskEffectiveDate(e.target.value)}
+                placeholder="시행일 (예: 2025-01-01)"
+                disabled={isRunning}
+                style={{
+                  padding: "10px 14px",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 10,
+                  fontSize: 13,
+                  color: "#374151",
+                  background: "#fff",
+                  outline: "none",
+                  fontFamily: "var(--font-geist-sans), sans-serif",
+                }}
+              />
+            </div>
+          )}
+
+          {/* Loading indicator */}
+          {isRunning && (
+            <div style={{
+              marginTop: 14,
+              padding: "12px 16px",
+              background: `${color}08`,
+              border: `1px solid ${color}20`,
+              borderRadius: 10,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}>
+              <div style={{
+                width: 18,
+                height: 18,
+                borderRadius: "50%",
+                border: `2.5px solid ${color}30`,
+                borderTopColor: color,
+                animation: "spin 0.8s linear infinite",
+                flexShrink: 0,
+              }} />
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 2 }}>
+                  {AGENT_LABELS[agentType].name} 에이전트가 분석 중입니다
+                </div>
+                <div style={{ fontSize: 12, color: "#6b7280" }}>
+                  검색 → LLM 추론 → 보고서 생성 순서로 진행됩니다. 수십 초~수 분 소요.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Completed steps */}
+          {steps.length > 0 && !isRunning && (
+            <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {steps.map((s, i) => (
+                <span key={i} style={{
+                  fontSize: 11,
+                  padding: "3px 9px",
+                  borderRadius: 999,
+                  background: `${color}12`,
+                  color,
+                  border: `1px solid ${color}30`,
+                  fontWeight: 600,
+                }}>
+                  ✓ {STEP_LABELS[s] ?? s}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Error */}
+          {error && (
+            <div style={{
+              marginTop: 10,
+              padding: "10px 14px",
+              background: "#fef2f2",
+              border: "1px solid #fca5a5",
+              borderRadius: 8,
+              fontSize: 13,
+              color: "#dc2626",
+            }}>
+              오류: {error}
+            </div>
+          )}
+        </div>
+
+        {/* ── Results ── */}
+        {result && !isRunning && (
+          <div style={{ width: "100%", maxWidth: 760 }}>
+            {/* Query echo */}
             <div style={{
               marginBottom: 16,
               padding: "10px 14px",
-              background: `${color}10`,
-              borderRadius: 8,
-              border: `1px solid ${color}30`,
+              background: `${color}0c`,
+              borderRadius: 10,
+              border: `1px solid ${color}25`,
               fontSize: 13,
-              color: color,
+              color: "#374151",
               lineHeight: 1.5,
             }}>
-              <strong>Q.</strong> {result.query}
+              <span style={{ fontWeight: 700, color }}>Q. </span>
+              {result.query}
+              {agentType === "RISK" && riskRevision && (
+                <span style={{ display: "block", marginTop: 4, fontSize: 12, color: "#6b7280" }}>
+                  개정 내용: {riskRevision}
+                  {riskEffectiveDate && ` / 시행일: ${riskEffectiveDate}`}
+                </span>
+              )}
             </div>
 
+            {/* Result views */}
             {agentType === "INSIGHT" ? (
               <InsightResultView result={result as InsightResult} />
             ) : agentType === "MULTI" ? (
@@ -846,10 +1050,8 @@ export default function AgentPage() {
             ) : (
               <RiskResultView result={result as RiskResult} />
             )}
-          </>
+          </div>
         )}
-
-        {!isRunning && !result && !error && <EmptyState agentType={agentType} />}
       </div>
     </div>
   );
