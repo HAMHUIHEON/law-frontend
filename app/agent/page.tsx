@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useAgentUI, InsightResult, MultiResult, TaxlawPrecResult, TaxtrResult, AgentType } from "./AgentUIContext";
+import {
+  useAgentUI,
+  InsightResult, MultiResult, TaxlawPrecResult, TaxtrResult,
+  StrategyResult, RebuttalResult, TrendResult, ITCLResult, RiskResult,
+  CourtCase, TaxtrCase, LawArticle,
+  AgentType,
+} from "./AgentUIContext";
 
 const AGENT_BLUE = "#1e40af";
 
@@ -187,14 +193,14 @@ function InsightResultView({ result }: { result: InsightResult }) {
               <div key={i} style={{ borderBottom: "1px solid #e5e7eb", paddingBottom: 10, marginBottom: 10 }}>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 4 }}>
                   <span style={{ fontSize: 11, background: "#d1fae5", color: "#065f46", borderRadius: 4, padding: "1px 6px", fontWeight: 600 }}>
-                    {scopeLabel[a.scope] ?? a.scope}
+                    {a.scope ? (scopeLabel[a.scope] ?? a.scope) : ""}
                   </span>
                   <span style={{ fontSize: 12, fontWeight: 700, color: "#1f2937" }}>{a.law_name}</span>
                   <span style={{ fontSize: 12, color: "#6b7280" }}>{a.article_no}</span>
                   {a.title && <span style={{ fontSize: 12, color: "#374151" }}>{a.title}</span>}
                 </div>
                 <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
-                  {a.document?.slice(0, 300)}{a.document?.length > 300 ? "…" : ""}
+                  {a.document?.slice(0, 300)}{(a.document?.length ?? 0) > 300 ? "…" : ""}
                 </div>
               </div>
             );
@@ -326,8 +332,9 @@ function MultiResultView({ result }: { result: MultiResult }) {
             {lawArticles.map((art, i) => {
               const scopeLabel: Record<string, string> = { LAW: "법", DECREE: "시행령", RULE: "시행규칙" };
               const scopeColor: Record<string, string> = { LAW: "#1e40af", DECREE: "#065f46", RULE: "#92400e" };
-              const sl = scopeLabel[art.scope] ?? art.scope;
-              const sc = scopeColor[art.scope] ?? "#6b7280";
+              const scopeKey = art.scope ?? "";
+              const sl = scopeLabel[scopeKey] ?? scopeKey;
+              const sc = scopeColor[scopeKey] ?? "#6b7280";
               return (
                 <div key={i} style={{ background: "#f9fafb", borderRadius: 6, padding: "8px 12px", borderLeft: `3px solid ${sc}` }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
@@ -396,6 +403,239 @@ function SimpleAnswerView({
 }
 
 /* ─────────────────────────────────────────
+ * Shared result section helpers
+ * ───────────────────────────────────────── */
+
+function CourtCasesSection({ cases, title }: { cases: CourtCase[]; title: string }) {
+  if (!cases || cases.length === 0) return null;
+  return (
+    <SectionCard title={`${title} (${cases.length}건)`} defaultOpen>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {cases.map((c, i) => (
+          <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{c.case_no || c.doc_id}</span>
+              <div style={{ display: "flex", gap: 4 }}>
+                {c.attr_yr && <Badge label={c.attr_yr} />}
+                {c.tax_type && <Badge label={c.tax_type} color="#065f46" />}
+                {c.decision && (
+                  <Badge
+                    label={c.decision}
+                    color={c.decision.includes("국패") || c.decision.includes("취소") ? "#065f46" : "#dc2626"}
+                  />
+                )}
+              </div>
+            </div>
+            <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
+              {c.title || c.document?.slice(0, 120)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </SectionCard>
+  );
+}
+
+function TaxtrCasesSection({ cases, title }: { cases: TaxtrCase[]; title: string }) {
+  if (!cases || cases.length === 0) return null;
+  return (
+    <SectionCard title={`${title} (${cases.length}건)`} defaultOpen>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {cases.map((t, i) => (
+          <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{t.dem_no || t.doc_id}</span>
+              {t.decision_type && (
+                <Badge
+                  label={t.decision_type}
+                  color={["인용","취소","감액"].some(k => t.decision_type?.includes(k)) ? "#065f46" : "#92400e"}
+                />
+              )}
+            </div>
+            <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
+              {t.title || t.document?.slice(0, 120)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </SectionCard>
+  );
+}
+
+function LawArticlesSection({ articles, title }: { articles: LawArticle[]; title: string }) {
+  if (!articles || articles.length === 0) return null;
+  return (
+    <SectionCard title={`${title} (${articles.length}건)`}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {articles.map((art, i) => {
+          const SCOPE_LABEL: Record<string, string> = { LAW: "법", DECREE: "시행령", RULE: "시행규칙", law: "법", decree: "시행령", rule: "시행규칙" };
+          const SCOPE_COLOR: Record<string, string> = { LAW: "#1e40af", DECREE: "#065f46", RULE: "#92400e", law: "#1e40af", decree: "#065f46", rule: "#92400e" };
+          const scopeKey = art.scope ?? "";
+          const sl = SCOPE_LABEL[scopeKey] ?? scopeKey;
+          const sc = SCOPE_COLOR[scopeKey] ?? "#6b7280";
+          return (
+            <div key={i} style={{ background: "#f9fafb", borderRadius: 6, padding: "8px 12px", borderLeft: `3px solid ${sc}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>
+                  {art.law_name} 제{art.article_no}조 {art.title}
+                </span>
+                <span style={{ fontSize: 11, color: sc, background: `${sc}18`, padding: "1px 6px", borderRadius: 10 }}>{sl}</span>
+                {art.domain && <span style={{ fontSize: 11, color: "#6b7280" }}>[{art.domain}]</span>}
+              </div>
+              {art.document && <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>{art.document.slice(0, 200)}</div>}
+            </div>
+          );
+        })}
+      </div>
+    </SectionCard>
+  );
+}
+
+/* ─────────────────────────────────────────
+ * StrategyAgent result view
+ * ───────────────────────────────────────── */
+
+function StrategyResultView({ result }: { result: StrategyResult }) {
+  return (
+    <div>
+      <SectionCard title="불복전략 보고서" defaultOpen accent="#0f766e">
+        <ReportText text={result.final_report} />
+      </SectionCard>
+      <CourtCasesSection cases={result.court_cases ?? []} title="관련 법원 판례" />
+      <TaxtrCasesSection cases={result.taxtr_cases ?? []} title="관련 조세심판 재결례" />
+      <LawArticlesSection articles={result.law_articles ?? []} title="관련 세법 조문" />
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+ * RebuttalAgent result view
+ * ───────────────────────────────────────── */
+
+function RebuttalResultView({ result }: { result: RebuttalResult }) {
+  return (
+    <div>
+      <SectionCard title="반론 초안" defaultOpen accent="#c2410c">
+        <ReportText text={result.final_report} />
+      </SectionCard>
+      <CourtCasesSection cases={result.winning_court_cases ?? []} title="납세자 승소 판례" />
+      <TaxtrCasesSection cases={result.favorable_taxtr_cases ?? []} title="인용·취소 재결례" />
+      <LawArticlesSection articles={result.law_articles ?? []} title="관련 세법 조문" />
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+ * TrendAgent result view
+ * ───────────────────────────────────────── */
+
+function TrendResultView({ result }: { result: TrendResult }) {
+  const yearStats = result.trend_data?.year_stats ?? {};
+  const sortedYears = Object.keys(yearStats).sort((a, b) => Number(a) - Number(b));
+
+  return (
+    <div>
+      <SectionCard title="판례 트렌드 분석 보고서" defaultOpen accent="#0369a1">
+        <ReportText text={result.final_report} />
+      </SectionCard>
+
+      {sortedYears.length > 0 && (
+        <SectionCard title={`연도별 통계 (총 ${result.trend_data?.total_cases ?? 0}건)`} defaultOpen accent="#0369a1">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: "#f1f5f9" }}>
+                  {["연도", "총건수", "납세자 승소", "승소율"].map((h) => (
+                    <th key={h} style={{ padding: "8px 12px", textAlign: "center", fontWeight: 700, color: "#374151", borderBottom: "1px solid #e5e7eb" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sortedYears.map((yr) => {
+                  const s = yearStats[yr];
+                  const winPct = Math.round((s.win_rate ?? 0) * 100);
+                  return (
+                    <tr key={yr} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                      <td style={{ padding: "7px 12px", textAlign: "center", fontWeight: 600, color: "#0369a1" }}>{yr}</td>
+                      <td style={{ padding: "7px 12px", textAlign: "center", color: "#374151" }}>{s.total}</td>
+                      <td style={{ padding: "7px 12px", textAlign: "center", color: "#065f46" }}>{s.taxpayer_win}</td>
+                      <td style={{ padding: "7px 12px", textAlign: "center" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
+                          <div style={{ width: 60, height: 6, borderRadius: 3, background: "#e5e7eb", overflow: "hidden" }}>
+                            <div style={{ height: "100%", width: `${winPct}%`, background: "#0369a1", borderRadius: 3 }} />
+                          </div>
+                          <span style={{ fontSize: 12, color: "#374151" }}>{winPct}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </SectionCard>
+      )}
+
+      {(result.trend_data?.sample ?? []).length > 0 && (
+        <CourtCasesSection cases={result.trend_data!.sample!} title="대표 판례 샘플" />
+      )}
+      <TaxtrCasesSection cases={result.taxtr_sample ?? []} title="조세심판 참고 사례" />
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+ * ITCLAgent result view
+ * ───────────────────────────────────────── */
+
+function ITCLResultView({ result }: { result: ITCLResult }) {
+  const itclIssues = result.itcl_issues ?? [];
+
+  return (
+    <div>
+      <SectionCard title="국제조세 분석 보고서" defaultOpen accent="#6d28d9">
+        <ReportText text={result.final_report} />
+      </SectionCard>
+      <CourtCasesSection cases={result.court_cases ?? []} title="관련 법원 판례" />
+      <LawArticlesSection articles={result.law_articles ?? []} title="국제조세조정법 조문" />
+      {itclIssues.length > 0 && (
+        <SectionCard title={`ITCL 쟁점 분석 (${itclIssues.length}건)`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {itclIssues.map((issue: any, i: number) => (
+              <div key={i} style={{ background: "#faf5ff", border: "1px solid #e9d5ff", borderRadius: 8, padding: "10px 14px" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#6d28d9", marginBottom: 4 }}>
+                  {issue.title ?? issue.issue ?? `쟁점 ${i + 1}`}
+                </div>
+                <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
+                  {typeof issue === "string" ? issue : issue.description ?? issue.content ?? JSON.stringify(issue).slice(0, 200)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+ * RiskAgent result view
+ * ───────────────────────────────────────── */
+
+function RiskResultView({ result }: { result: RiskResult }) {
+  return (
+    <div>
+      <SectionCard title="법령 개정 리스크 분석 보고서" defaultOpen accent="#b91c1c">
+        <ReportText text={result.final_report} />
+      </SectionCard>
+      <CourtCasesSection cases={result.affected_court_cases ?? []} title="영향받는 법원 판례" />
+      <TaxtrCasesSection cases={result.affected_taxtr_cases ?? []} title="영향받는 조세심판 재결례" />
+      <LawArticlesSection articles={result.revised_articles ?? []} title="개정 대상 조문" />
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
  * Empty / Loading states
  * ───────────────────────────────────────── */
 
@@ -423,6 +663,36 @@ const EMPTY_CONTENT: Record<AgentType, { title: string; desc: string; chips: str
     desc: "조세심판원 2,463건의 재결례 DB에서 유사 사건을 검색하고, 승소 전략과 결정 패턴을 분석합니다.",
     chips: ["재결례 벡터 검색", "승소 전략 분석", "결정 패턴", "세법 유형별"],
     color: "#92400e",
+  },
+  STRATEGY: {
+    title: "유사 판례 기반 불복전략을 분석합니다",
+    desc: "사건 개요를 입력하면 32,628건 법원 판례·2,463건 재결례에서 유사 사례를 찾아 구체적인 불복전략 보고서를 생성합니다.",
+    chips: ["유사 사건 검색", "판례·재결례 교차 분석", "불복전략 도출", "세법 조문 연계"],
+    color: "#0f766e",
+  },
+  REBUTTAL: {
+    title: "납세자 승소 판례 기반 반론을 작성합니다",
+    desc: "과세처분 이유서를 붙여넣으면 납세자 승소 판례와 인용 재결례만 필터링해 반론 초안을 자동 생성합니다.",
+    chips: ["승소 판례 필터링", "인용 재결례 검색", "반론 초안 생성", "자기 검토(Reflection)"],
+    color: "#c2410c",
+  },
+  TREND: {
+    title: "연도별 판례 트렌드를 분석합니다",
+    desc: "쟁점을 입력하면 관련 법원 판례의 연도별 건수·납세자 승소율을 집계하고, 최근 판례 흐름 해설 보고서를 생성합니다.",
+    chips: ["연도별 승소율 통계", "판례 흐름 분석", "최근 트렌드 해설", "조세심판 비교"],
+    color: "#0369a1",
+  },
+  ITCL: {
+    title: "국제조세 판례·법령을 분석합니다",
+    desc: "국제조세조정법 관련 쟁점을 입력하면 관련 판례, 법령 조문, Neo4j 그래프 쟁점을 통합 분석한 보고서를 생성합니다.",
+    chips: ["이전가격 판례 검색", "ITCL 법령 조문", "Neo4j 쟁점 그래프", "통합 분석 보고서"],
+    color: "#6d28d9",
+  },
+  RISK: {
+    title: "법령 개정의 판례 영향을 분석합니다",
+    desc: "법령명과 개정 내용을 입력하면 기존 법원 판례·재결례 중 영향받는 사건을 식별하고 리스크 보고서를 생성합니다.",
+    chips: ["영향 판례 식별", "재결례 리스크 분석", "개정 조문 매핑", "시행일 기준 필터"],
+    color: "#b91c1c",
   },
 };
 
@@ -508,6 +778,11 @@ const AGENT_COLORS: Record<AgentType, string> = {
   INSIGHT: "#7c3aed",
   TAXLAW_PREC: "#065f46",
   TAXTR: "#92400e",
+  STRATEGY: "#0f766e",
+  REBUTTAL: "#c2410c",
+  TREND: "#0369a1",
+  ITCL: "#6d28d9",
+  RISK: "#b91c1c",
 };
 
 export default function AgentPage() {
@@ -552,14 +827,24 @@ export default function AgentPage() {
               <strong>Q.</strong> {result.query}
             </div>
 
-            {agentType === "INSIGHT" && "steps" in result ? (
+            {agentType === "INSIGHT" ? (
               <InsightResultView result={result as InsightResult} />
             ) : agentType === "MULTI" ? (
               <MultiResultView result={result as MultiResult} />
             ) : agentType === "TAXLAW_PREC" ? (
               <SimpleAnswerView result={result as TaxlawPrecResult} accentColor={color} label="법원 판례 에이전트 답변" />
-            ) : (
+            ) : agentType === "TAXTR" ? (
               <SimpleAnswerView result={result as TaxtrResult} accentColor={color} label="조세심판 재결례 에이전트 답변" />
+            ) : agentType === "STRATEGY" ? (
+              <StrategyResultView result={result as StrategyResult} />
+            ) : agentType === "REBUTTAL" ? (
+              <RebuttalResultView result={result as RebuttalResult} />
+            ) : agentType === "TREND" ? (
+              <TrendResultView result={result as TrendResult} />
+            ) : agentType === "ITCL" ? (
+              <ITCLResultView result={result as ITCLResult} />
+            ) : (
+              <RiskResultView result={result as RiskResult} />
             )}
           </>
         )}

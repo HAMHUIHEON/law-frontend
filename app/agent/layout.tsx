@@ -3,6 +3,7 @@
 import { AgentUIProvider, useAgentUI, AgentType } from "./AgentUIContext";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
+import React from "react";
 
 const AGENT_BLUE = "#1e40af";
 
@@ -31,9 +32,39 @@ const AGENT_LABELS: Record<AgentType, { name: string; desc: string; placeholder:
     placeholder: "예) 법인세 부당행위계산 부인 처분 관련 최근 재결 경향은?",
     color: "#92400e",
   },
+  STRATEGY: {
+    name: "불복전략 분석",
+    desc: "사건 요약 → 유사 판례·재결례 검색 + 불복 전략 보고서",
+    placeholder: "예) 이전가격 조작 혐의로 법인세 과세처분을 받았습니다. 국내 관계사 간 용역거래의 정상가격 산출방법 다툼입니다.",
+    color: "#0f766e",
+  },
+  REBUTTAL: {
+    name: "반론 초안 작성",
+    desc: "과세처분 이유서 → 납세자 승소 판례 중심 반론 초안 생성",
+    placeholder: "예) 과세관청은 원고가 세금계산서를 허위로 작성하여 부가가치세 매입세액을 부당하게 공제받았다고 판단하였습니다.",
+    color: "#c2410c",
+  },
+  TREND: {
+    name: "판례 트렌드 분석",
+    desc: "특정 세법 쟁점의 연도별 판례 흐름·납세자 승소율 추이",
+    placeholder: "예) 최근 10년간 이전가격 관련 법원 판례에서 납세자 승소 비율 추이",
+    color: "#0369a1",
+  },
+  ITCL: {
+    name: "국제조세 분석",
+    desc: "국제조세조정법 관련 판례·법령 조문·Neo4j 쟁점 분석",
+    placeholder: "예) 비교가능 제3자 가격법(CUP) 적용 시 국내외 거래 비교가능성 판단 기준은?",
+    color: "#6d28d9",
+  },
+  RISK: {
+    name: "개정법령 리스크",
+    desc: "법령 개정 내용 → 기존 판례·재결례 영향 리스크 분석",
+    placeholder: "법령명 (예: 국제조세조정에 관한 법률)",
+    color: "#b91c1c",
+  },
 };
 
-const AGENT_ORDER: AgentType[] = ["MULTI", "INSIGHT", "TAXLAW_PREC", "TAXTR"];
+const AGENT_ORDER: AgentType[] = ["MULTI", "INSIGHT", "TAXLAW_PREC", "TAXTR", "STRATEGY", "REBUTTAL", "TREND", "ITCL", "RISK"];
 
 const STEP_LABELS: Record<string, string> = {
   planned: "쿼리 분해",
@@ -56,6 +87,8 @@ function AgentSidebar() {
     agentType, setAgentType,
     query, setQuery,
     caseId, setCaseId,
+    riskRevision, setRiskRevision,
+    riskEffectiveDate, setRiskEffectiveDate,
     isRunning, result, steps,
     run, clear,
     setSidebarOpen,
@@ -202,6 +235,57 @@ function AgentSidebar() {
             입력 시 해당 판례 심층 분석 포함
           </div>
         </section>
+      )}
+
+      {/* Risk extra fields */}
+      {agentType === "RISK" && (
+        <>
+          <section>
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+              개정 내용
+            </p>
+            <textarea
+              value={riskRevision}
+              onChange={(e) => setRiskRevision(e.target.value)}
+              placeholder="예) 제5조 제1항 — 정상가격 산출방법에 이익분할법을 추가하고 비교가능 제3자 가격법 우선순위를 변경"
+              rows={4}
+              style={{
+                width: "100%",
+                fontSize: 13,
+                padding: "10px 12px",
+                border: "1px solid #d1d5db",
+                borderRadius: 8,
+                resize: "vertical",
+                lineHeight: 1.6,
+                color: "#111827",
+                outline: "none",
+                boxSizing: "border-box",
+                fontFamily: "inherit",
+              }}
+            />
+          </section>
+          <section>
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+              시행일 <span style={{ fontWeight: 400, textTransform: "none" }}>(선택)</span>
+            </p>
+            <input
+              type="text"
+              value={riskEffectiveDate}
+              onChange={(e) => setRiskEffectiveDate(e.target.value)}
+              placeholder="예: 2026-01-01"
+              style={{
+                width: "100%",
+                fontSize: 13,
+                padding: "8px 12px",
+                border: "1px solid #d1d5db",
+                borderRadius: 8,
+                outline: "none",
+                boxSizing: "border-box",
+                fontFamily: "inherit",
+              }}
+            />
+          </section>
+        </>
       )}
 
       {/* Run Button */}

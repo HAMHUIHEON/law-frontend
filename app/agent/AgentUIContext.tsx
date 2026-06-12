@@ -5,7 +5,38 @@ import { useAuth } from "@clerk/nextjs";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 
-export type AgentType = "INSIGHT" | "MULTI" | "TAXLAW_PREC" | "TAXTR";
+export type AgentType =
+  | "INSIGHT" | "MULTI" | "TAXLAW_PREC" | "TAXTR"
+  | "STRATEGY" | "REBUTTAL" | "TREND" | "ITCL" | "RISK";
+
+/* ── shared sub-types ── */
+export type CourtCase = {
+  doc_id: string;
+  case_no?: string;
+  tax_type?: string;
+  decision?: string;
+  title?: string;
+  attr_yr?: string;
+  document?: string;
+};
+
+export type TaxtrCase = {
+  doc_id: string;
+  dem_no?: string;
+  decision_type?: string;
+  title?: string;
+  document?: string;
+};
+
+export type LawArticle = {
+  doc_id: string;
+  law_name?: string;
+  scope?: string;
+  article_no?: string;
+  title?: string;
+  domain?: string;
+  document?: string;
+};
 
 /* ── result types ── */
 
@@ -21,10 +52,7 @@ export interface InsightResult {
       risk_view: { taxpayer_risk: string; tax_authority_risk: string; precedent_signal: string };
     };
   } | null;
-  law_articles_context?: {
-    doc_id: string; law_name: string; scope: string;
-    article_no: string; title: string; domain: string; document: string;
-  }[];
+  law_articles_context?: LawArticle[];
   steps: string[];
 }
 
@@ -44,31 +72,9 @@ export interface MultiResult {
     }[];
     pattern_results: { query: string; related_cases: string[]; statutes_cited: string[] };
   };
-  taxlaw_prec_context?: {
-    doc_id: string;
-    case_no: string;
-    tax_type: string;
-    decision: string;
-    title: string;
-    attr_yr: string;
-    document: string;
-  }[];
-  taxtr_context?: {
-    doc_id: string;
-    dem_no: string;
-    decision_type: string;
-    title: string;
-    document: string;
-  }[];
-  law_articles_context?: {
-    doc_id: string;
-    law_name: string;
-    scope: string;
-    article_no: string;
-    title: string;
-    domain: string;
-    document: string;
-  }[];
+  taxlaw_prec_context?: CourtCase[];
+  taxtr_context?: TaxtrCase[];
+  law_articles_context?: LawArticle[];
   tools_used: string[];
 }
 
@@ -84,7 +90,52 @@ export interface TaxtrResult {
   answer: string;
 }
 
-export type AnyResult = InsightResult | MultiResult | TaxlawPrecResult | TaxtrResult;
+export interface StrategyResult {
+  query: string;
+  final_report: string;
+  court_cases?: CourtCase[];
+  taxtr_cases?: TaxtrCase[];
+  law_articles?: LawArticle[];
+}
+
+export interface RebuttalResult {
+  query: string;
+  final_report: string;
+  winning_court_cases?: CourtCase[];
+  favorable_taxtr_cases?: TaxtrCase[];
+  law_articles?: LawArticle[];
+}
+
+export interface TrendResult {
+  query: string;
+  final_report: string;
+  trend_data?: {
+    total_cases?: number;
+    year_stats?: Record<string, { total: number; taxpayer_win: number; win_rate: number }>;
+    sample?: CourtCase[];
+  };
+  taxtr_sample?: TaxtrCase[];
+}
+
+export interface ITCLResult {
+  query: string;
+  final_report: string;
+  court_cases?: CourtCase[];
+  law_articles?: LawArticle[];
+  itcl_issues?: any[];
+}
+
+export interface RiskResult {
+  query: string;
+  final_report: string;
+  affected_court_cases?: CourtCase[];
+  affected_taxtr_cases?: TaxtrCase[];
+  revised_articles?: LawArticle[];
+}
+
+export type AnyResult =
+  | InsightResult | MultiResult | TaxlawPrecResult | TaxtrResult
+  | StrategyResult | RebuttalResult | TrendResult | ITCLResult | RiskResult;
 
 /* ── context shape ── */
 
@@ -95,6 +146,10 @@ interface AgentUIState {
   setQuery: (q: string) => void;
   caseId: string;
   setCaseId: (id: string) => void;
+  riskRevision: string;
+  setRiskRevision: (v: string) => void;
+  riskEffectiveDate: string;
+  setRiskEffectiveDate: (v: string) => void;
   isRunning: boolean;
   result: AnyResult | null;
   steps: string[];
@@ -113,6 +168,8 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
   const [agentType, setAgentType] = useState<AgentType>("MULTI");
   const [query, setQuery] = useState("");
   const [caseId, setCaseId] = useState("");
+  const [riskRevision, setRiskRevision] = useState("");
+  const [riskEffectiveDate, setRiskEffectiveDate] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<AnyResult | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
@@ -143,8 +200,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
 
       if (agentType === "INSIGHT") {
         const res = await fetch(`${API_BASE}/api/agent/insight`, {
-          method: "POST",
-          headers,
+          method: "POST", headers,
           body: JSON.stringify({ query: query.trim(), ...(caseId.trim() ? { case_id: caseId.trim() } : {}) }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
@@ -152,8 +208,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
 
       } else if (agentType === "MULTI") {
         const res = await fetch(`${API_BASE}/api/agent/multi`, {
-          method: "POST",
-          headers,
+          method: "POST", headers,
           body: JSON.stringify({ query: query.trim() }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
@@ -161,24 +216,71 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
 
       } else if (agentType === "TAXLAW_PREC") {
         const res = await fetch(`${API_BASE}/api/prec/ask`, {
-          method: "POST",
-          headers,
+          method: "POST", headers,
           body: JSON.stringify({ question: query.trim() }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         const raw = await res.json();
         json = { query: query.trim(), question: raw.question, answer: raw.answer } as TaxlawPrecResult;
 
-      } else {
-        // TAXTR
+      } else if (agentType === "TAXTR") {
         const res = await fetch(`${API_BASE}/api/taxtr/ask`, {
-          method: "POST",
-          headers,
+          method: "POST", headers,
           body: JSON.stringify({ question: query.trim() }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         const raw = await res.json();
         json = { query: query.trim(), question: raw.question, answer: raw.answer } as TaxtrResult;
+
+      } else if (agentType === "STRATEGY") {
+        const res = await fetch(`${API_BASE}/api/strategy/strategy`, {
+          method: "POST", headers,
+          body: JSON.stringify({ summary: query.trim() }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        const raw = await res.json();
+        json = { query: query.trim(), ...raw } as StrategyResult;
+
+      } else if (agentType === "REBUTTAL") {
+        const res = await fetch(`${API_BASE}/api/strategy/rebuttal`, {
+          method: "POST", headers,
+          body: JSON.stringify({ disposition_text: query.trim() }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        const raw = await res.json();
+        json = { query: query.trim(), ...raw } as RebuttalResult;
+
+      } else if (agentType === "TREND") {
+        const res = await fetch(`${API_BASE}/api/trend/ask`, {
+          method: "POST", headers,
+          body: JSON.stringify({ query: query.trim() }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        const raw = await res.json();
+        json = { query: query.trim(), ...raw } as TrendResult;
+
+      } else if (agentType === "ITCL") {
+        const res = await fetch(`${API_BASE}/api/itcl/ask`, {
+          method: "POST", headers,
+          body: JSON.stringify({ query: query.trim() }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        const raw = await res.json();
+        json = { query: query.trim(), ...raw } as ITCLResult;
+
+      } else {
+        // RISK
+        const res = await fetch(`${API_BASE}/api/strategy/risk`, {
+          method: "POST", headers,
+          body: JSON.stringify({
+            statute_name: query.trim(),
+            revision_summary: riskRevision.trim(),
+            effective_date: riskEffectiveDate.trim(),
+          }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        const raw = await res.json();
+        json = { query: query.trim(), ...raw } as RiskResult;
       }
 
       setResult(json);
@@ -202,6 +304,8 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
         agentType, setAgentType,
         query, setQuery,
         caseId, setCaseId,
+        riskRevision, setRiskRevision,
+        riskEffectiveDate, setRiskEffectiveDate,
         isRunning, result, steps, error,
         sidebarOpen, setSidebarOpen,
         run, clear,
