@@ -322,17 +322,21 @@ function MultiResultView({ result }: { result: MultiResult }) {
       {taxtrResults.length > 0 && (
         <SectionCard title={`조세심판 재결례 (${taxtrResults.length}건)`} defaultOpen>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {taxtrResults.map((t, i) => (
-              <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{t.dem_no || t.doc_id}</span>
-                  {t.decision_type && <Badge label={t.decision_type} color="#92400e" />}
+            {taxtrResults.map((t, i) => {
+              const caseNo = t.case_no || t.dem_no || t.doc_id || "";
+              const decisionLabel = t.decision_type || t.decision || "";
+              return (
+                <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{caseNo}</span>
+                    {decisionLabel && <Badge label={decisionLabel} color="#92400e" />}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
+                    {t.title || t.document?.slice(0, 100)}
+                  </div>
                 </div>
-                <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
-                  {t.title || t.document?.slice(0, 100)}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </SectionCard>
       )}
@@ -473,22 +477,25 @@ function TaxtrCasesSection({ cases, title }: { cases: TaxtrCase[]; title: string
   return (
     <SectionCard title={`${title} (${cases.length}건)`} defaultOpen>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {cases.map((t, i) => (
-          <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{t.dem_no || t.doc_id}</span>
-              {t.decision_type && (
-                <Badge
-                  label={t.decision_type}
-                  color={["인용","취소","감액"].some(k => t.decision_type?.includes(k)) ? "#065f46" : "#92400e"}
-                />
-              )}
+        {cases.map((t, i) => {
+          const caseNo = t.case_no || t.dem_no || t.doc_id || "";
+          const decisionLabel = t.decision_type || t.decision || "";
+          const favorable = ["인용","취소","감액"].some(k => decisionLabel.includes(k));
+          return (
+            <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{caseNo}</span>
+                <div style={{ display: "flex", gap: 4 }}>
+                  {t.tax_type && <Badge label={t.tax_type} />}
+                  {decisionLabel && <Badge label={decisionLabel} color={favorable ? "#065f46" : "#92400e"} />}
+                </div>
+              </div>
+              <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
+                {t.title || t.document?.slice(0, 120)}
+              </div>
             </div>
-            <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>
-              {t.title || t.document?.slice(0, 120)}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </SectionCard>
   );

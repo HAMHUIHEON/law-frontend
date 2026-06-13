@@ -21,9 +21,12 @@ export type CourtCase = {
 };
 
 export type TaxtrCase = {
-  doc_id: string;
+  doc_id?: string;
+  case_no?: string;
   dem_no?: string;
+  decision?: string;
   decision_type?: string;
+  tax_type?: string;
   title?: string;
   document?: string;
 };
