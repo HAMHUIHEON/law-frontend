@@ -188,11 +188,13 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     const DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === "true";
-    const token = DEV_MODE ? null : await getToken({ template: "backend-api" });
-    if (!token && !DEV_MODE) {
-      setError("로그인이 필요합니다.");
-      setIsRunning(false);
-      return;
+    let token: string | null = null;
+    if (!DEV_MODE) {
+      try {
+        token = await getToken({ template: "backend-api" });
+      } catch {
+        try { token = await getToken(); } catch { /* proceed without token */ }
+      }
     }
 
     const headers: Record<string, string> = { "Content-Type": "application/json" };
