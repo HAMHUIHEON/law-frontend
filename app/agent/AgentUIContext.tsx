@@ -165,6 +165,9 @@ export type AnyResult =
   | InsightResult | MultiResult | TaxlawPrecResult | TaxtrResult
   | StrategyResult | RebuttalResult | TrendResult | ITCLResult | RiskResult;
 
+export type ChatMessage = { role: "user" | "assistant"; content: string };
+export type ConversationTurn = { query: string; result: AnyResult };
+
 /* ── context shape ── */
 
 interface AgentUIState {
@@ -214,6 +217,10 @@ interface AgentUIState {
   error: string | null;
   sidebarOpen: boolean;
   setSidebarOpen: (v: boolean) => void;
+  // 멀티턴 대화
+  conversationHistory: ConversationTurn[];
+  chatMessages: ChatMessage[];   // 백엔드 전송용 [{role, content}]
+  startNewConversation: () => void;
   run: () => Promise<void>;
   clear: () => void;
 }
@@ -250,6 +257,8 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
   const [steps, setSteps] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [conversationHistory, setConversationHistory] = useState<ConversationTurn[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const run = async () => {
     if (!query.trim() || isRunning) return;
@@ -272,13 +281,16 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
+    // 현재 대화 히스토리 (백엔드 전송용)
+    const currentMessages = [...chatMessages];
+
     try {
       let json: any;
 
       if (agentType === "INSIGHT") {
         const res = await fetch(`${API_BASE}/api/agent/insight`, {
           method: "POST", headers,
-          body: JSON.stringify({ query: query.trim(), ...(caseId.trim() ? { case_id: caseId.trim() } : {}) }),
+          body: JSON.stringify({ query: query.trim(), ...(caseId.trim() ? { case_id: caseId.trim() } : {}), messages: currentMessages }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         json = await res.json();
@@ -286,7 +298,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
       } else if (agentType === "MULTI") {
         const res = await fetch(`${API_BASE}/api/agent/multi`, {
           method: "POST", headers,
-          body: JSON.stringify({ query: query.trim() }),
+          body: JSON.stringify({ query: query.trim(), messages: currentMessages }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         json = await res.json();
@@ -294,7 +306,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
       } else if (agentType === "TAXLAW_PREC") {
         const res = await fetch(`${API_BASE}/api/prec/ask`, {
           method: "POST", headers,
-          body: JSON.stringify({ question: query.trim() }),
+          body: JSON.stringify({ question: query.trim(), messages: currentMessages }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         const raw = await res.json();
@@ -303,7 +315,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
       } else if (agentType === "TAXTR") {
         const res = await fetch(`${API_BASE}/api/taxtr/ask`, {
           method: "POST", headers,
-          body: JSON.stringify({ question: query.trim() }),
+          body: JSON.stringify({ question: query.trim(), messages: currentMessages }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         const raw = await res.json();
@@ -317,6 +329,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
             ...(dispositionDate.trim() ? { disposition_date: dispositionDate.trim() } : {}),
             ...(taxAmount.trim() ? { tax_amount: taxAmount.trim() } : {}),
             already_filed: alreadyFiled,
+            messages: currentMessages,
           }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
@@ -347,6 +360,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
               ...(dispositionDate.trim() ? { disposition_date: dispositionDate.trim() } : {}),
               ...(taxAmount.trim() ? { tax_amount: taxAmount.trim() } : {}),
               ...(rebuttalTaxType.trim() ? { tax_type: rebuttalTaxType.trim() } : {}),
+              messages: currentMessages,
             }),
           });
         }
@@ -357,7 +371,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
       } else if (agentType === "TREND") {
         const res = await fetch(`${API_BASE}/api/trend/ask`, {
           method: "POST", headers,
-          body: JSON.stringify({ query: query.trim() }),
+          body: JSON.stringify({ query: query.trim(), messages: currentMessages }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         const raw = await res.json();
@@ -372,6 +386,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
             ...(relatedPartyCountry.trim() ? { related_party_country: relatedPartyCountry.trim() } : {}),
             ...(transactionAmountKrw.trim() ? { transaction_amount_krw: parseInt(transactionAmountKrw.replace(/,/g, ""), 10) || 0 } : {}),
             ...(transactionYear.trim() ? { transaction_year: transactionYear.trim() } : {}),
+            messages: currentMessages,
           }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
@@ -395,11 +410,27 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
 
       setResult(json);
       if (json.steps) setSteps(json.steps);
+
+      // 대화 히스토리 누적
+      const userMsg: ChatMessage = { role: "user", content: query.trim() };
+      const assistantContent = (json.final_report || json.answer || "").slice(0, 800);
+      const assistantMsg: ChatMessage = { role: "assistant", content: assistantContent };
+      setChatMessages(prev => [...prev, userMsg, assistantMsg]);
+      setConversationHistory(prev => [...prev, { query: query.trim(), result: json }]);
     } catch (err: any) {
       setError(err?.message ?? "알 수 없는 오류가 발생했습니다.");
     } finally {
       setIsRunning(false);
     }
+  };
+
+  const startNewConversation = () => {
+    setResult(null);
+    setSteps([]);
+    setError(null);
+    setConversationHistory([]);
+    setChatMessages([]);
+    setQuery("");
   };
 
   const clear = () => {
@@ -444,6 +475,8 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
         transactionYear, setTransactionYear,
         isRunning, result, steps, error,
         sidebarOpen, setSidebarOpen,
+        conversationHistory, chatMessages,
+        startNewConversation,
         run, clear,
       }}
     >

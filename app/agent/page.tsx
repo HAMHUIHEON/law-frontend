@@ -7,7 +7,7 @@ import {
   InsightResult, MultiResult, TaxlawPrecResult, TaxtrResult,
   StrategyResult, RebuttalResult, TrendResult, ITCLResult, RiskResult,
   CourtCase, TaxtrCase, LawArticle,
-  AgentType,
+  AgentType, AnyResult, ConversationTurn,
 } from "./AgentUIContext";
 
 const ITCL_TX_TYPES = [
@@ -803,6 +803,97 @@ function RiskResultView({ result }: { result: RiskResult }) {
 }
 
 /* ─────────────────────────────────────────
+ * Previous conversation turn card
+ * ───────────────────────────────────────── */
+
+function ResultDispatch({ agentType, result }: { agentType: AgentType; result: AnyResult }) {
+  const color = AGENT_LABELS[agentType].color;
+  if (agentType === "INSIGHT") return <InsightResultView result={result as InsightResult} />;
+  if (agentType === "MULTI") return <MultiResultView result={result as MultiResult} />;
+  if (agentType === "TAXLAW_PREC") return <SimpleAnswerView result={result as TaxlawPrecResult} accentColor={color} label="법원 판례 에이전트 답변" />;
+  if (agentType === "TAXTR") return <SimpleAnswerView result={result as TaxtrResult} accentColor={color} label="조세심판 재결례 에이전트 답변" />;
+  if (agentType === "STRATEGY") return <StrategyResultView result={result as StrategyResult} />;
+  if (agentType === "REBUTTAL") return <RebuttalResultView result={result as RebuttalResult} />;
+  if (agentType === "TREND") return <TrendResultView result={result as TrendResult} />;
+  if (agentType === "ITCL") return <ITCLResultView result={result as ITCLResult} />;
+  return <RiskResultView result={result as RiskResult} />;
+}
+
+function PreviousTurnCard({
+  turn,
+  index,
+  agentType,
+}: {
+  turn: ConversationTurn;
+  index: number;
+  agentType: AgentType;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const color = AGENT_LABELS[agentType].color;
+  const snippet = (
+    (turn.result as any).final_report ||
+    (turn.result as any).answer ||
+    ""
+  ).slice(0, 120);
+
+  return (
+    <div style={{
+      border: "1px solid #e5e7eb",
+      borderRadius: 10,
+      marginBottom: 10,
+      overflow: "hidden",
+      opacity: 0.82,
+    }}>
+      <button
+        onClick={() => setExpanded(v => !v)}
+        style={{
+          width: "100%",
+          textAlign: "left",
+          padding: "10px 14px",
+          background: "#f9fafb",
+          border: "none",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 10,
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+            <span style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color,
+              background: `${color}15`,
+              padding: "1px 7px",
+              borderRadius: 999,
+              flexShrink: 0,
+            }}>
+              #{index + 1} {AGENT_LABELS[agentType].name}
+            </span>
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#111827", marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {turn.query}
+          </div>
+          {!expanded && snippet && (
+            <div style={{ fontSize: 12, color: "#6b7280", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {snippet}{snippet.length >= 120 ? "…" : ""}
+            </div>
+          )}
+        </div>
+        <span style={{ fontSize: 12, color: "#9ca3af", flexShrink: 0 }}>{expanded ? "▲ 접기" : "▼ 펼치기"}</span>
+      </button>
+      {expanded && (
+        <div style={{ padding: "14px 16px", background: "#fff", borderTop: "1px solid #f3f4f6" }}>
+          <ResultDispatch agentType={agentType} result={turn.result} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
  * Main Page — full-screen search UI
  * ───────────────────────────────────────── */
 
@@ -827,6 +918,7 @@ export default function AgentPage() {
     transactionAmountKrw, setTransactionAmountKrw,
     transactionYear, setTransactionYear,
     isRunning, result, steps, error,
+    conversationHistory, startNewConversation,
     run, clear,
   } = useAgentUI();
 
@@ -879,9 +971,25 @@ export default function AgentPage() {
         <Link href="/enter" style={{ fontSize: 13, color: "#6b7280", textDecoration: "none" }}>
           ← 에이전트 선택
         </Link>
-        {result && (
+        {(result || conversationHistory.length > 0) && (
           <>
             <div style={{ flex: 1 }} />
+            {conversationHistory.length > 0 && (
+              <button
+                onClick={startNewConversation}
+                style={{
+                  fontSize: 12,
+                  color: "#b91c1c",
+                  background: "none",
+                  border: "1px solid #fca5a5",
+                  borderRadius: 6,
+                  padding: "5px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                새 대화 시작
+              </button>
+            )}
             <button
               onClick={() => { clear(); setQuery(""); }}
               style={{
@@ -1411,6 +1519,19 @@ export default function AgentPage() {
           )}
         </div>
 
+        {/* ── Previous conversation turns ── */}
+        {conversationHistory.length > 1 && (
+          <div style={{ width: "100%", maxWidth: 760, marginBottom: 4 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "#9ca3af", letterSpacing: "0.06em", marginBottom: 8, textTransform: "uppercase" as const }}>
+              이전 대화 ({conversationHistory.length - 1}개)
+            </div>
+            {conversationHistory.slice(0, -1).map((turn, i) => (
+              <PreviousTurnCard key={i} turn={turn} index={i} agentType={agentType} />
+            ))}
+            <div style={{ borderTop: "2px solid #e5e7eb", marginBottom: 20, marginTop: 4 }} />
+          </div>
+        )}
+
         {/* ── Results ── */}
         {result && !isRunning && (
           <div style={{ width: "100%", maxWidth: 760 }}>
@@ -1457,25 +1578,7 @@ export default function AgentPage() {
             </div>
 
             {/* Result views */}
-            {agentType === "INSIGHT" ? (
-              <InsightResultView result={result as InsightResult} />
-            ) : agentType === "MULTI" ? (
-              <MultiResultView result={result as MultiResult} />
-            ) : agentType === "TAXLAW_PREC" ? (
-              <SimpleAnswerView result={result as TaxlawPrecResult} accentColor={color} label="법원 판례 에이전트 답변" />
-            ) : agentType === "TAXTR" ? (
-              <SimpleAnswerView result={result as TaxtrResult} accentColor={color} label="조세심판 재결례 에이전트 답변" />
-            ) : agentType === "STRATEGY" ? (
-              <StrategyResultView result={result as StrategyResult} />
-            ) : agentType === "REBUTTAL" ? (
-              <RebuttalResultView result={result as RebuttalResult} />
-            ) : agentType === "TREND" ? (
-              <TrendResultView result={result as TrendResult} />
-            ) : agentType === "ITCL" ? (
-              <ITCLResultView result={result as ITCLResult} />
-            ) : (
-              <RiskResultView result={result as RiskResult} />
-            )}
+            <ResultDispatch agentType={agentType} result={result} />
           </div>
         )}
       </div>
