@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, KeyboardEvent } from "react";
+import { useState, useRef, KeyboardEvent } from "react";
 import Link from "next/link";
 import {
   useAgentUI,
@@ -669,11 +669,14 @@ export default function AgentPage() {
     caseId, setCaseId,
     riskRevision, setRiskRevision,
     riskEffectiveDate, setRiskEffectiveDate,
+    uploadFile, setUploadFile,
     isRunning, result, steps, error,
     run, clear,
   } = useAgentUI();
 
   const [chipHover, setChipHover] = useState<AgentType | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const canUpload = agentType === "REBUTTAL" || agentType === "STRATEGY";
 
   const color = AGENT_LABELS[agentType].color;
   const isIdle = !isRunning && !result && !error;
@@ -943,6 +946,77 @@ export default function AgentPage() {
                   fontFamily: "var(--font-geist-sans), sans-serif",
                 }}
               />
+            </div>
+          )}
+
+          {/* File upload — REBUTTAL / STRATEGY */}
+          {canUpload && (
+            <div style={{ marginTop: 8 }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.txt"
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  setUploadFile(f);
+                }}
+              />
+              {uploadFile ? (
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "9px 14px",
+                  border: `1px solid ${color}40`,
+                  borderRadius: 10,
+                  background: `${color}08`,
+                  fontSize: 13,
+                  color: "#374151",
+                }}>
+                  <span style={{ fontSize: 16 }}>📄</span>
+                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {uploadFile.name}
+                  </span>
+                  <button
+                    onClick={() => { setUploadFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 16,
+                      color: "#9ca3af",
+                      padding: 0,
+                      lineHeight: 1,
+                    }}
+                    title="파일 제거"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isRunning}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    border: "1.5px dashed #d1d5db",
+                    borderRadius: 10,
+                    background: "none",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    color: "#6b7280",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                  }}
+                >
+                  <span>📎</span>
+                  <span>과세처분 이유서 PDF 또는 TXT 첨부 (선택)</span>
+                </button>
+              )}
             </div>
           )}
 

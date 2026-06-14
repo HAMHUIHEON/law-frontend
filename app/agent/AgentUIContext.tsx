@@ -59,6 +59,24 @@ export interface InsightResult {
   steps: string[];
 }
 
+export interface PdfCaseResult {
+  case_id: string;
+  court?: string;
+  case_no?: string;
+  tax_type?: string;
+  text_source?: string;
+  document?: string;
+  similarity?: number;
+}
+
+export interface IssueCacheResult {
+  case_id: string;
+  core_issue?: string;
+  mini_conclusion?: string;
+  statutes?: string[];
+  score?: number;
+}
+
 export interface MultiResult {
   query: string;
   final_report: string;
@@ -78,6 +96,8 @@ export interface MultiResult {
   taxlaw_prec_context?: CourtCase[];
   taxtr_context?: TaxtrCase[];
   law_articles_context?: LawArticle[];
+  pdf_cases_context?: PdfCaseResult[];
+  issue_cache_context?: IssueCacheResult[];
   tools_used: string[];
 }
 
@@ -153,6 +173,8 @@ interface AgentUIState {
   setRiskRevision: (v: string) => void;
   riskEffectiveDate: string;
   setRiskEffectiveDate: (v: string) => void;
+  uploadFile: File | null;
+  setUploadFile: (f: File | null) => void;
   isRunning: boolean;
   result: AnyResult | null;
   steps: string[];
@@ -173,6 +195,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
   const [caseId, setCaseId] = useState("");
   const [riskRevision, setRiskRevision] = useState("");
   const [riskEffectiveDate, setRiskEffectiveDate] = useState("");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<AnyResult | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
@@ -247,10 +270,23 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
         json = { query: query.trim(), ...raw } as StrategyResult;
 
       } else if (agentType === "REBUTTAL") {
-        const res = await fetch(`${API_BASE}/api/strategy/rebuttal`, {
-          method: "POST", headers,
-          body: JSON.stringify({ disposition_text: query.trim() }),
-        });
+        let res: Response;
+        if (uploadFile) {
+          const formData = new FormData();
+          formData.append("file", uploadFile);
+          const uploadHeaders: Record<string, string> = {};
+          if (token) uploadHeaders["Authorization"] = `Bearer ${token}`;
+          res = await fetch(`${API_BASE}/api/strategy/rebuttal/upload`, {
+            method: "POST",
+            headers: uploadHeaders,
+            body: formData,
+          });
+        } else {
+          res = await fetch(`${API_BASE}/api/strategy/rebuttal`, {
+            method: "POST", headers,
+            body: JSON.stringify({ disposition_text: query.trim() }),
+          });
+        }
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         const raw = await res.json();
         json = { query: query.trim(), ...raw } as RebuttalResult;
@@ -301,6 +337,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
     setResult(null);
     setSteps([]);
     setError(null);
+    setUploadFile(null);
   };
 
   return (
@@ -311,6 +348,7 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
         caseId, setCaseId,
         riskRevision, setRiskRevision,
         riskEffectiveDate, setRiskEffectiveDate,
+        uploadFile, setUploadFile,
         isRunning, result, steps, error,
         sidebarOpen, setSidebarOpen,
         run, clear,
