@@ -10,6 +10,19 @@ import {
   AgentType,
 } from "./AgentUIContext";
 
+const ITCL_TX_TYPES = [
+  "유형자산 매각", "무형자산 양도", "무형자산 라이선스",
+  "용역 제공", "금전 대여", "금전 차입", "원자재·완제품 매매", "기타",
+];
+
+const FILING_TYPES = ["이의신청", "심판청구", "행정소송"];
+
+const FILING_COLORS: Record<string, string> = {
+  "이의신청": "#0369a1",
+  "심판청구": "#c2410c",
+  "행정소송": "#7c3aed",
+};
+
 const AGENT_BLUE = "#1e40af";
 
 /* ─────────────────────────────────────────
@@ -590,9 +603,51 @@ function LawArticlesSection({ articles, title }: { articles: LawArticle[]; title
  * Agent-specific result views
  * ───────────────────────────────────────── */
 
+function DeadlinesCard({ deadlines }: { deadlines: Record<string, string> }) {
+  const entries = Object.entries(deadlines);
+  if (entries.length === 0) return null;
+  const hasWarning = "⚠️_경고" in deadlines;
+  return (
+    <div style={{ border: `1.5px solid ${hasWarning ? "#fca5a5" : "#d1fae5"}`, borderRadius: 10, overflow: "hidden", marginBottom: 12 }}>
+      <div style={{
+        padding: "10px 16px",
+        background: hasWarning ? "#fef2f2" : "#f0fdf4",
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+      }}>
+        <span style={{ fontSize: 16 }}>{hasWarning ? "⚠️" : "⏰"}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: hasWarning ? "#dc2626" : "#065f46" }}>
+          불복 기한 {hasWarning ? "— 기한 초과 주의" : ""}
+        </span>
+      </div>
+      <div style={{ padding: "12px 16px", background: "#fff" }}>
+        {entries.map(([k, v]) => {
+          if (k === "⚠️_경고") return (
+            <div key={k} style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 8, padding: "8px 12px", marginBottom: 8 }}>
+              <span style={{ fontSize: 13, color: "#dc2626", fontWeight: 600 }}>⚠️ {v}</span>
+            </div>
+          );
+          const label = k.replace(/_/g, " ").replace("마감", "마감일");
+          const isDeadline = k.includes("마감");
+          return (
+            <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f3f4f6" }}>
+              <span style={{ fontSize: 13, color: "#6b7280" }}>{label}</span>
+              <span style={{ fontSize: 13, fontWeight: isDeadline ? 700 : 400, color: isDeadline ? "#0f766e" : "#374151" }}>{v}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function StrategyResultView({ result }: { result: StrategyResult }) {
   return (
     <div>
+      {result.deadlines && Object.keys(result.deadlines).length > 0 && (
+        <DeadlinesCard deadlines={result.deadlines} />
+      )}
       <SectionCard title="불복전략 보고서" defaultOpen accent="#0f766e">
         <ReportText text={result.final_report} />
       </SectionCard>
@@ -604,8 +659,26 @@ function StrategyResultView({ result }: { result: StrategyResult }) {
 }
 
 function RebuttalResultView({ result }: { result: RebuttalResult }) {
+  const unverified = result.unverified_citations ?? [];
   return (
     <div>
+      {result.deadlines && Object.keys(result.deadlines).length > 0 && (
+        <DeadlinesCard deadlines={result.deadlines} />
+      )}
+      {unverified.length > 0 && (
+        <div style={{ background: "#fffbeb", border: "1px solid #fcd34d", borderRadius: 10, padding: "10px 14px", marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#92400e", marginBottom: 6 }}>
+            ⚠️ 검증 필요 판례 번호 ({unverified.length}건) — 인용 전 원문 확인 권고
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {unverified.map((c, i) => (
+              <span key={i} style={{ fontSize: 12, background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: 6, padding: "2px 8px", color: "#92400e" }}>
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
       <SectionCard title="반론 초안" defaultOpen accent="#c2410c">
         <ReportText text={result.final_report} />
       </SectionCard>
@@ -673,9 +746,24 @@ function TrendResultView({ result }: { result: TrendResult }) {
 
 function ITCLResultView({ result }: { result: ITCLResult }) {
   const itclIssues = result.itcl_issues ?? [];
+  const preferred = result.preferred_methods ?? [];
 
   return (
     <div>
+      {preferred.length > 0 && (
+        <div style={{ background: "#faf5ff", border: "1px solid #e9d5ff", borderRadius: 10, padding: "10px 16px", marginBottom: 12 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#6d28d9", marginBottom: 8 }}>
+            ✅ {result.transaction_type || "이 거래"} — 권장 정상가격 산출 방법
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {preferred.map((m, i) => (
+              <div key={i} style={{ background: "#7c3aed", color: "#fff", borderRadius: 8, padding: "6px 14px", fontSize: 13, fontWeight: 700 }}>
+                {m}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <SectionCard title="국제조세 분석 보고서" defaultOpen accent="#6d28d9">
         <ReportText text={result.final_report} />
       </SectionCard>
@@ -726,6 +814,18 @@ export default function AgentPage() {
     riskRevision, setRiskRevision,
     riskEffectiveDate, setRiskEffectiveDate,
     uploadFile, setUploadFile,
+    dispositionDate, setDispositionDate,
+    taxAmount, setTaxAmount,
+    alreadyFiled, setAlreadyFiled,
+    filingType, setFilingType,
+    taxpayerName, setTaxpayerName,
+    taxpayerIdNo, setTaxpayerIdNo,
+    taxOffice, setTaxOffice,
+    rebuttalTaxType, setRebuttalTaxType,
+    transactionType, setTransactionType,
+    relatedPartyCountry, setRelatedPartyCountry,
+    transactionAmountKrw, setTransactionAmountKrw,
+    transactionYear, setTransactionYear,
     isRunning, result, steps, error,
     run, clear,
   } = useAgentUI();
@@ -965,6 +1065,174 @@ export default function AgentPage() {
             </div>
           )}
 
+          {/* STRATEGY extra: disposition date, tax amount, already filed */}
+          {agentType === "STRATEGY" && (
+            <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 8, alignItems: "center" }}>
+              <input
+                value={dispositionDate}
+                onChange={(e) => setDispositionDate(e.target.value)}
+                placeholder="처분일 (YYYY-MM-DD) — 불복 기한 자동 계산"
+                disabled={isRunning}
+                style={{ padding: "10px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+              />
+              <input
+                value={taxAmount}
+                onChange={(e) => setTaxAmount(e.target.value)}
+                placeholder="처분 세액 (예: 500,000,000원)"
+                disabled={isRunning}
+                style={{ padding: "10px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+              />
+              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#374151", cursor: "pointer", whiteSpace: "nowrap" as const }}>
+                <input
+                  type="checkbox"
+                  checked={alreadyFiled}
+                  onChange={(e) => setAlreadyFiled(e.target.checked)}
+                  disabled={isRunning}
+                  style={{ width: 15, height: 15, cursor: "pointer" }}
+                />
+                이미 불복 진행 중
+              </label>
+            </div>
+          )}
+
+          {/* REBUTTAL extra: filing type chips + taxpayer info */}
+          {agentType === "REBUTTAL" && !uploadFile && (
+            <div style={{ marginTop: 8 }}>
+              {/* Filing type chips */}
+              <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                <span style={{ fontSize: 12, color: "#6b7280", alignSelf: "center", flexShrink: 0 }}>문서 종류:</span>
+                {FILING_TYPES.map((ft) => {
+                  const active = filingType === ft;
+                  const fc = FILING_COLORS[ft] ?? color;
+                  return (
+                    <button
+                      key={ft}
+                      onClick={() => setFilingType(ft)}
+                      disabled={isRunning}
+                      style={{
+                        padding: "5px 12px",
+                        borderRadius: 999,
+                        border: `1.5px solid ${active ? fc : "#e5e7eb"}`,
+                        background: active ? fc : "#fff",
+                        color: active ? "#fff" : "#374151",
+                        fontSize: 12,
+                        fontWeight: active ? 700 : 500,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {ft}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Date + amount */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
+                <input
+                  value={dispositionDate}
+                  onChange={(e) => setDispositionDate(e.target.value)}
+                  placeholder="처분일 (YYYY-MM-DD)"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+                <input
+                  value={taxAmount}
+                  onChange={(e) => setTaxAmount(e.target.value)}
+                  placeholder="처분 세액 (예: 500,000,000원)"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+              </div>
+              {/* Taxpayer info */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
+                <input
+                  value={taxpayerName}
+                  onChange={(e) => setTaxpayerName(e.target.value)}
+                  placeholder="청구인 성명"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+                <input
+                  value={taxpayerIdNo}
+                  onChange={(e) => setTaxpayerIdNo(e.target.value)}
+                  placeholder="사업자등록번호"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+                <input
+                  value={taxOffice}
+                  onChange={(e) => setTaxOffice(e.target.value)}
+                  placeholder="처분청"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+                <input
+                  value={rebuttalTaxType}
+                  onChange={(e) => setRebuttalTaxType(e.target.value)}
+                  placeholder="세목 (예: 법인세)"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ITCL extra: transaction type chips + detail fields */}
+          {agentType === "ITCL" && (
+            <div style={{ marginTop: 8 }}>
+              {/* Transaction type chips */}
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                <span style={{ fontSize: 12, color: "#6b7280", alignSelf: "center", flexShrink: 0 }}>거래 유형:</span>
+                {ITCL_TX_TYPES.map((tt) => {
+                  const active = transactionType === tt;
+                  return (
+                    <button
+                      key={tt}
+                      onClick={() => setTransactionType(tt)}
+                      disabled={isRunning}
+                      style={{
+                        padding: "5px 12px",
+                        borderRadius: 999,
+                        border: `1.5px solid ${active ? "#6d28d9" : "#e5e7eb"}`,
+                        background: active ? "#6d28d9" : "#fff",
+                        color: active ? "#fff" : "#374151",
+                        fontSize: 12,
+                        fontWeight: active ? 700 : 500,
+                        cursor: "pointer",
+                        whiteSpace: "nowrap" as const,
+                      }}
+                    >
+                      {tt}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Country, amount, year */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                <input
+                  value={relatedPartyCountry}
+                  onChange={(e) => setRelatedPartyCountry(e.target.value)}
+                  placeholder="상대방 국가 (예: 싱가포르)"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+                <input
+                  value={transactionAmountKrw}
+                  onChange={(e) => setTransactionAmountKrw(e.target.value)}
+                  placeholder="거래 금액 (원, 예: 8000000000)"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+                <input
+                  value={transactionYear}
+                  onChange={(e) => setTransactionYear(e.target.value)}
+                  placeholder="거래 연도 (예: 2023)"
+                  disabled={isRunning}
+                  style={{ padding: "9px 14px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, color: "#374151", background: "#fff", outline: "none", fontFamily: "var(--font-geist-sans), sans-serif" }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* RISK extra: revision summary + effective date */}
           {agentType === "RISK" && (
             <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "2fr 1fr", gap: 8 }}>
@@ -1163,6 +1431,27 @@ export default function AgentPage() {
                 <span style={{ display: "block", marginTop: 4, fontSize: 12, color: "#6b7280" }}>
                   개정 내용: {riskRevision}
                   {riskEffectiveDate && ` / 시행일: ${riskEffectiveDate}`}
+                </span>
+              )}
+              {agentType === "STRATEGY" && dispositionDate && (
+                <span style={{ display: "block", marginTop: 4, fontSize: 12, color: "#6b7280" }}>
+                  처분일: {dispositionDate}
+                  {taxAmount && ` / 처분 세액: ${taxAmount}`}
+                  {alreadyFiled && " / 불복 진행 중"}
+                </span>
+              )}
+              {agentType === "REBUTTAL" && (
+                <span style={{ display: "block", marginTop: 4, fontSize: 12, color: "#6b7280" }}>
+                  문서 종류: {filingType}
+                  {dispositionDate && ` / 처분일: ${dispositionDate}`}
+                  {taxpayerName && ` / 청구인: ${taxpayerName}`}
+                </span>
+              )}
+              {agentType === "ITCL" && transactionType && transactionType !== "기타" && (
+                <span style={{ display: "block", marginTop: 4, fontSize: 12, color: "#6b7280" }}>
+                  거래 유형: {transactionType}
+                  {relatedPartyCountry && ` / 상대방 국가: ${relatedPartyCountry}`}
+                  {transactionYear && ` / 거래 연도: ${transactionYear}`}
                 </span>
               )}
             </div>

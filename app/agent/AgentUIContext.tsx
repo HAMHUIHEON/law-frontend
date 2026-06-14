@@ -119,6 +119,7 @@ export interface StrategyResult {
   court_cases?: CourtCase[];
   taxtr_cases?: TaxtrCase[];
   law_articles?: LawArticle[];
+  deadlines?: Record<string, string>;
 }
 
 export interface RebuttalResult {
@@ -127,6 +128,8 @@ export interface RebuttalResult {
   winning_court_cases?: CourtCase[];
   favorable_taxtr_cases?: TaxtrCase[];
   law_articles?: LawArticle[];
+  unverified_citations?: string[];
+  deadlines?: Record<string, string>;
 }
 
 export interface TrendResult {
@@ -146,6 +149,8 @@ export interface ITCLResult {
   court_cases?: CourtCase[];
   law_articles?: LawArticle[];
   itcl_issues?: any[];
+  preferred_methods?: string[];
+  transaction_type?: string;
 }
 
 export interface RiskResult {
@@ -175,6 +180,34 @@ interface AgentUIState {
   setRiskEffectiveDate: (v: string) => void;
   uploadFile: File | null;
   setUploadFile: (f: File | null) => void;
+  // STRATEGY + REBUTTAL 공통
+  dispositionDate: string;
+  setDispositionDate: (v: string) => void;
+  taxAmount: string;
+  setTaxAmount: (v: string) => void;
+  // STRATEGY
+  alreadyFiled: boolean;
+  setAlreadyFiled: (v: boolean) => void;
+  // REBUTTAL
+  filingType: string;
+  setFilingType: (v: string) => void;
+  taxpayerName: string;
+  setTaxpayerName: (v: string) => void;
+  taxpayerIdNo: string;
+  setTaxpayerIdNo: (v: string) => void;
+  taxOffice: string;
+  setTaxOffice: (v: string) => void;
+  rebuttalTaxType: string;
+  setRebuttalTaxType: (v: string) => void;
+  // ITCL
+  transactionType: string;
+  setTransactionType: (v: string) => void;
+  relatedPartyCountry: string;
+  setRelatedPartyCountry: (v: string) => void;
+  transactionAmountKrw: string;
+  setTransactionAmountKrw: (v: string) => void;
+  transactionYear: string;
+  setTransactionYear: (v: string) => void;
   isRunning: boolean;
   result: AnyResult | null;
   steps: string[];
@@ -196,6 +229,22 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
   const [riskRevision, setRiskRevision] = useState("");
   const [riskEffectiveDate, setRiskEffectiveDate] = useState("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  // STRATEGY + REBUTTAL 공통
+  const [dispositionDate, setDispositionDate] = useState("");
+  const [taxAmount, setTaxAmount] = useState("");
+  // STRATEGY
+  const [alreadyFiled, setAlreadyFiled] = useState(false);
+  // REBUTTAL
+  const [filingType, setFilingType] = useState("심판청구");
+  const [taxpayerName, setTaxpayerName] = useState("");
+  const [taxpayerIdNo, setTaxpayerIdNo] = useState("");
+  const [taxOffice, setTaxOffice] = useState("");
+  const [rebuttalTaxType, setRebuttalTaxType] = useState("");
+  // ITCL
+  const [transactionType, setTransactionType] = useState("기타");
+  const [relatedPartyCountry, setRelatedPartyCountry] = useState("");
+  const [transactionAmountKrw, setTransactionAmountKrw] = useState("");
+  const [transactionYear, setTransactionYear] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<AnyResult | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
@@ -263,7 +312,12 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
       } else if (agentType === "STRATEGY") {
         const res = await fetch(`${API_BASE}/api/strategy/strategy`, {
           method: "POST", headers,
-          body: JSON.stringify({ summary: query.trim() }),
+          body: JSON.stringify({
+            summary: query.trim(),
+            ...(dispositionDate.trim() ? { disposition_date: dispositionDate.trim() } : {}),
+            ...(taxAmount.trim() ? { tax_amount: taxAmount.trim() } : {}),
+            already_filed: alreadyFiled,
+          }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         const raw = await res.json();
@@ -284,7 +338,16 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
         } else {
           res = await fetch(`${API_BASE}/api/strategy/rebuttal`, {
             method: "POST", headers,
-            body: JSON.stringify({ disposition_text: query.trim() }),
+            body: JSON.stringify({
+              disposition_text: query.trim(),
+              filing_type: filingType || "심판청구",
+              ...(taxpayerName.trim() ? { taxpayer_name: taxpayerName.trim() } : {}),
+              ...(taxpayerIdNo.trim() ? { taxpayer_id: taxpayerIdNo.trim() } : {}),
+              ...(taxOffice.trim() ? { tax_office: taxOffice.trim() } : {}),
+              ...(dispositionDate.trim() ? { disposition_date: dispositionDate.trim() } : {}),
+              ...(taxAmount.trim() ? { tax_amount: taxAmount.trim() } : {}),
+              ...(rebuttalTaxType.trim() ? { tax_type: rebuttalTaxType.trim() } : {}),
+            }),
           });
         }
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
@@ -303,7 +366,13 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
       } else if (agentType === "ITCL") {
         const res = await fetch(`${API_BASE}/api/itcl/ask`, {
           method: "POST", headers,
-          body: JSON.stringify({ query: query.trim() }),
+          body: JSON.stringify({
+            query: query.trim(),
+            transaction_type: transactionType || "기타",
+            ...(relatedPartyCountry.trim() ? { related_party_country: relatedPartyCountry.trim() } : {}),
+            ...(transactionAmountKrw.trim() ? { transaction_amount_krw: parseInt(transactionAmountKrw.replace(/,/g, ""), 10) || 0 } : {}),
+            ...(transactionYear.trim() ? { transaction_year: transactionYear.trim() } : {}),
+          }),
         });
         if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
         const raw = await res.json();
@@ -338,6 +407,18 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
     setSteps([]);
     setError(null);
     setUploadFile(null);
+    setDispositionDate("");
+    setTaxAmount("");
+    setAlreadyFiled(false);
+    setFilingType("심판청구");
+    setTaxpayerName("");
+    setTaxpayerIdNo("");
+    setTaxOffice("");
+    setRebuttalTaxType("");
+    setTransactionType("기타");
+    setRelatedPartyCountry("");
+    setTransactionAmountKrw("");
+    setTransactionYear("");
   };
 
   return (
@@ -349,6 +430,18 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
         riskRevision, setRiskRevision,
         riskEffectiveDate, setRiskEffectiveDate,
         uploadFile, setUploadFile,
+        dispositionDate, setDispositionDate,
+        taxAmount, setTaxAmount,
+        alreadyFiled, setAlreadyFiled,
+        filingType, setFilingType,
+        taxpayerName, setTaxpayerName,
+        taxpayerIdNo, setTaxpayerIdNo,
+        taxOffice, setTaxOffice,
+        rebuttalTaxType, setRebuttalTaxType,
+        transactionType, setTransactionType,
+        relatedPartyCountry, setRelatedPartyCountry,
+        transactionAmountKrw, setTransactionAmountKrw,
+        transactionYear, setTransactionYear,
         isRunning, result, steps, error,
         sidebarOpen, setSidebarOpen,
         run, clear,
