@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { useAuth } from "@clerk/nextjs";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://law-backend-production-5249.up.railway.app";
 
 export type AgentType =
   | "INSIGHT" | "MULTI" | "TAXLAW_PREC" | "TAXTR"
