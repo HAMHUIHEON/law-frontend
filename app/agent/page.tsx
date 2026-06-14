@@ -341,6 +341,62 @@ function MultiResultView({ result }: { result: MultiResult }) {
         </SectionCard>
       )}
 
+      {(result.pdf_cases_context ?? []).length > 0 && (
+        <SectionCard title={`PDF 판례 원문 (${result.pdf_cases_context!.length}건)`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {result.pdf_cases_context!.map((p, i) => (
+              <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{p.case_id}</span>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {p.court && <Badge label={p.court} />}
+                    {p.tax_type && <Badge label={p.tax_type} color="#065f46" />}
+                    {p.similarity != null && (
+                      <span style={{ fontSize: 11, color: "#6b7280" }}>유사도 {Math.round(p.similarity * 100)}%</span>
+                    )}
+                  </div>
+                </div>
+                {p.document && (
+                  <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>{p.document.slice(0, 150)}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+      )}
+
+      {(result.issue_cache_context ?? []).length > 0 && (
+        <SectionCard title={`구조화 판결 쟁점 캐시 (${result.issue_cache_context!.length}건)`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {result.issue_cache_context!.map((ic, i) => (
+              <div key={i} style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{ic.case_id}</span>
+                  {ic.score != null && (
+                    <span style={{ fontSize: 11, color: "#6b7280" }}>유사도 {Math.round(ic.score * 100)}%</span>
+                  )}
+                </div>
+                {ic.core_issue && (
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 4 }}>
+                    쟁점: {ic.core_issue}
+                  </div>
+                )}
+                {ic.mini_conclusion && (
+                  <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6, marginBottom: 4 }}>
+                    소결론: {ic.mini_conclusion}
+                  </div>
+                )}
+                {(ic.statutes ?? []).length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
+                    {ic.statutes!.map((s, j) => <Badge key={j} label={s} color="#6d28d9" />)}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+      )}
+
       {patternResult && (
         <SectionCard title="판례 패턴 분석">
           {patternResult.related_cases?.length > 0 && (
