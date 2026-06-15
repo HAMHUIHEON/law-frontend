@@ -7,7 +7,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "https://law-backend-produc
 
 export type AgentType =
   | "INSIGHT" | "MULTI" | "TAXLAW_PREC" | "TAXTR"
-  | "STRATEGY" | "REBUTTAL" | "TREND" | "ITCL" | "RISK";
+  | "STRATEGY" | "REBUTTAL" | "TREND" | "ITCL" | "RISK" | "LAW_RISK";
 
 /* ── shared sub-types ── */
 export type CourtCase = {
@@ -172,9 +172,15 @@ export interface RiskResult {
   revised_articles?: LawArticle[];
 }
 
+export interface LawRiskResult {
+  query: string;
+  question: string;
+  answer: string;
+}
+
 export type AnyResult =
   | InsightResult | MultiResult | TaxlawPrecResult | TaxtrResult
-  | StrategyResult | RebuttalResult | TrendResult | ITCLResult | RiskResult;
+  | StrategyResult | RebuttalResult | TrendResult | ITCLResult | RiskResult | LawRiskResult;
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 export type ConversationTurn = { query: string; result: AnyResult };
@@ -404,8 +410,17 @@ export function AgentUIProvider({ children }: { children: ReactNode }) {
         const raw = await res.json();
         json = { query: query.trim(), ...raw } as ITCLResult;
 
+      } else if (agentType === "LAW_RISK") {
+        const res = await fetch(`${API_BASE}/api/risk/ask`, {
+          method: "POST", headers,
+          body: JSON.stringify({ question: query.trim() }),
+        });
+        if (!res.ok) throw new Error(await res.text().catch(() => `오류 ${res.status}`));
+        const raw = await res.json();
+        json = { query: query.trim(), ...raw } as LawRiskResult;
+
       } else {
-        // RISK
+        // RISK — litigation risk (Chroma 기반 소송 리스크)
         const res = await fetch(`${API_BASE}/api/strategy/risk`, {
           method: "POST", headers,
           body: JSON.stringify({

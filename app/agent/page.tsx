@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   useAgentUI,
   InsightResult, MultiResult, TaxlawPrecResult, TaxtrResult,
-  StrategyResult, RebuttalResult, TrendResult, ITCLResult, RiskResult,
+  StrategyResult, RebuttalResult, TrendResult, ITCLResult, RiskResult, LawRiskResult,
   CourtCase, TaxtrCase, LawArticle, InquiryCase,
   AgentType, AnyResult, ConversationTurn,
 } from "./AgentUIContext";
@@ -39,11 +39,12 @@ const AGENT_LABELS: Record<AgentType, { name: string; color: string; placeholder
   TREND:       { name: "판례 트렌드",     color: "#0369a1", placeholder: "예) 최근 5년간 부가세 매입세액 공제 거부 판례 트렌드를 분석해줘" },
   ITCL:        { name: "국제조세 분석",   color: "#6d28d9", placeholder: "예) GLOBE 필라2 세액공제 관련 국제조세 판례와 법령을 분석해줘" },
   RISK:        { name: "개정법령 리스크",  color: "#b91c1c", placeholder: "법령명을 입력하세요 (예: 조세특례제한법)" },
+  LAW_RISK:    { name: "법령개정 분석",    color: "#7e22ce", placeholder: "예) 법인세법이 최근에 어떻게 바뀌었나요?" },
 };
 
 const AGENT_ORDER: AgentType[] = [
   "MULTI", "INSIGHT", "TAXLAW_PREC", "TAXTR",
-  "STRATEGY", "REBUTTAL", "TREND", "ITCL", "RISK",
+  "STRATEGY", "REBUTTAL", "TREND", "ITCL", "RISK", "LAW_RISK",
 ];
 
 const STEP_LABELS: Record<string, string> = {
@@ -497,7 +498,7 @@ function SimpleAnswerView({
   accentColor,
   label,
 }: {
-  result: TaxlawPrecResult | TaxtrResult;
+  result: TaxlawPrecResult | TaxtrResult | LawRiskResult;
   accentColor: string;
   label: string;
 }) {
@@ -844,6 +845,7 @@ function ResultDispatch({ agentType, result }: { agentType: AgentType; result: A
   if (agentType === "REBUTTAL") return <RebuttalResultView result={result as RebuttalResult} />;
   if (agentType === "TREND") return <TrendResultView result={result as TrendResult} />;
   if (agentType === "ITCL") return <ITCLResultView result={result as ITCLResult} />;
+  if (agentType === "LAW_RISK") return <SimpleAnswerView result={result as LawRiskResult} accentColor="#7e22ce" label="법령개정 분석 답변" />;
   return <RiskResultView result={result as RiskResult} />;
 }
 
