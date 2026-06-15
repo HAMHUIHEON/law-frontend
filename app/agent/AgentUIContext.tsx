@@ -77,6 +77,16 @@ export interface IssueCacheResult {
   score?: number;
 }
 
+export interface InquiryCase {
+  doc_id?: string;
+  doc_no?: string;
+  tax_type?: string;
+  reply_date?: string;
+  title?: string;
+  document?: string;
+  similarity?: number;
+}
+
 export interface MultiResult {
   query: string;
   final_report: string;
@@ -95,6 +105,7 @@ export interface MultiResult {
   };
   taxlaw_prec_context?: CourtCase[];
   taxtr_context?: TaxtrCase[];
+  inquiry_cases_context?: InquiryCase[];
   law_articles_context?: LawArticle[];
   pdf_cases_context?: PdfCaseResult[];
   issue_cache_context?: IssueCacheResult[];

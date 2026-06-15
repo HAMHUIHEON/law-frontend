@@ -6,7 +6,7 @@ import {
   useAgentUI,
   InsightResult, MultiResult, TaxlawPrecResult, TaxtrResult,
   StrategyResult, RebuttalResult, TrendResult, ITCLResult, RiskResult,
-  CourtCase, TaxtrCase, LawArticle,
+  CourtCase, TaxtrCase, LawArticle, InquiryCase,
   AgentType, AnyResult, ConversationTurn,
 } from "./AgentUIContext";
 
@@ -266,6 +266,7 @@ function MultiResultView({ result }: { result: MultiResult }) {
   const lawArticles = result.law_articles_context ?? [];
   const precResults = result.taxlaw_prec_context ?? [];
   const taxtrResults = result.taxtr_context ?? [];
+  const inquiryResults: InquiryCase[] = result.inquiry_cases_context ?? [];
 
   return (
     <div>
@@ -350,6 +351,33 @@ function MultiResultView({ result }: { result: MultiResult }) {
                 </div>
               );
             })}
+          </div>
+        </SectionCard>
+      )}
+
+      {(result.inquiry_cases_context ?? []).length > 0 && (
+        <SectionCard title={`국세청 질의회신 (${result.inquiry_cases_context!.length}건)`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {result.inquiry_cases_context!.map((q, i) => (
+              <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 8, padding: "10px 14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>{q.doc_no}</span>
+                  <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                    {q.tax_type && <Badge label={q.tax_type} color="#1e40af" />}
+                    {q.reply_date && <span style={{ fontSize: 11, color: "#9ca3af" }}>{q.reply_date}</span>}
+                    {q.similarity != null && (
+                      <span style={{ fontSize: 11, color: "#6b7280" }}>유사도 {Math.round(q.similarity * 100)}%</span>
+                    )}
+                  </div>
+                </div>
+                {q.title && (
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 4 }}>{q.title}</div>
+                )}
+                {q.document && (
+                  <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>{q.document.slice(0, 200)}</div>
+                )}
+              </div>
+            ))}
           </div>
         </SectionCard>
       )}
